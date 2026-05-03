@@ -9,7 +9,7 @@ version = '1.0.0'
 
 tasks.withType(JavaCompile) {
     options.fork = true
-    options.forkOptions.executable = '/Users/yangjongtae/workspace/happiness/openJdk-26.jdk/Contents/Home/bin/javac'
+    options.forkOptions.executable = '/Users/yangjongtae/workspace/happiness/openJdk-25.jdk/Contents/Home/bin/javac'
     options.release = 25
 }
 
@@ -32,5 +32,5 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
-    executable = '/Users/yangjongtae/workspace/happiness/openJdk-26.jdk/Contents/Home/bin/java'
+    executable = '/Users/yangjongtae/workspace/happiness/openJdk-25.jdk/Contents/Home/bin/java'
 }
