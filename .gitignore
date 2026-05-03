@@ -1,0 +1,30 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Java
+*.class
+*.jar
+*.war
+
+# Spring Boot
+application-prod.properties
+
+# Node
+node_modules/
+dist/
+.npm/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/

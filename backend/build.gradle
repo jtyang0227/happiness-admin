@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.0'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.happiness'
+version = '1.0.0'
+
+tasks.withType(JavaCompile) {
+    options.fork = true
+    options.forkOptions.executable = '/Users/yangjongtae/workspace/happiness/openJdk-26.jdk/Contents/Home/bin/javac'
+    options.release = 25
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'com.h2database:h2:2.2.220'
+    implementation 'org.projectlombok:lombok:1.18.46'
+
+    annotationProcessor 'org.projectlombok:lombok:1.18.46'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    executable = '/Users/yangjongtae/workspace/happiness/openJdk-26.jdk/Contents/Home/bin/java'
+}
