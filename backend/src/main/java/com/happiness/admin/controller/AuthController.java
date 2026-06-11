@@ -3,6 +3,7 @@ package com.happiness.admin.controller;
 import com.happiness.admin.dto.LoginRequest;
 import com.happiness.admin.dto.MemberResponse;
 import com.happiness.admin.dto.SignUpRequest;
+import com.happiness.admin.service.AuthService;
 import com.happiness.admin.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,8 +18,9 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class AuthController {
-    
+
     private final MemberService memberService;
+    private final AuthService authService;
     
     /**
      * 회원 가입
@@ -54,23 +56,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
-            MemberResponse response = memberService.login(request);
-            Map<String, Object> result = new HashMap<>();
-            result.put("status", "success");
-            result.put("message", "로그인에 성공했습니다.");
-            result.put("data", response);
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok(authService.adminLogin(request));
         } catch (IllegalArgumentException e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("status", "error");
-            error.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
-        } catch (Exception e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("status", "error");
-            error.put("message", "로그인 중 오류가 발생했습니다.");
-            error.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", e.getMessage()));
         }
     }
     

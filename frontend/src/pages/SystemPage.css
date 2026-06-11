@@ -1,0 +1,10 @@
+.system-page { max-width: 900px; }
+.system-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.system-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.system-card-title { font-size: 15px; font-weight: 600; color: #1e293b; margin: 0 0 16px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9; }
+.system-items { display: flex; flex-direction: column; gap: 12px; }
+.system-item { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+.system-label { color: #64748b; }
+.system-value { font-weight: 500; color: #1e293b; }
+.system-value.warn { color: #d97706; }
+.system-value.ok { color: #16a34a; }

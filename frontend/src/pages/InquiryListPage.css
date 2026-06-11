@@ -1,0 +1,11 @@
+.inquiry-row { cursor: pointer; }
+.inquiry-row:hover td { background: #f8fafc !important; }
+.sender-name { font-weight: 500; color: #1e293b; }
+.inquiry-detail td { background: #f8fafc !important; padding: 12px 20px !important; }
+.inquiry-message { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; font-size: 13px; color: #374151; line-height: 1.6; }
+.action-cell { display: flex; gap: 6px; align-items: center; }
+.btn-action {
+  padding: 5px 10px; background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;
+  border-radius: 6px; font-size: 12px; cursor: pointer; white-space: nowrap;
+}
+.btn-action:hover { background: #2563eb; color: white; }

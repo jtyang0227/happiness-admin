@@ -8,8 +8,6 @@ group = 'com.happiness'
 version = '1.0.0'
 
 tasks.withType(JavaCompile) {
-    options.fork = true
-    options.forkOptions.executable = '/Users/yangjongtae/workspace/happiness/openJdk-25.jdk/Contents/Home/bin/javac'
     options.release = 25
 }
 
@@ -24,6 +22,14 @@ dependencies {
     implementation 'com.h2database:h2:2.2.220'
     implementation 'org.projectlombok:lombok:1.18.46'
 
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    runtimeOnly    'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly    'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
+    // PostgreSQL (prod)
+    runtimeOnly 'org.postgresql:postgresql'
+
     annotationProcessor 'org.projectlombok:lombok:1.18.46'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -32,5 +38,4 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
-    executable = '/Users/yangjongtae/workspace/happiness/openJdk-25.jdk/Contents/Home/bin/java'
 }

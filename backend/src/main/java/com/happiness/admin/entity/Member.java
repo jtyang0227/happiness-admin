@@ -21,6 +21,9 @@ public class Member {
     
     @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = true, unique = true)
+    private String profileName;
     
     @Column(nullable = false)
     private String tel;
@@ -53,8 +56,8 @@ public class Member {
     
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        if (this.createdAt == null) this.createdAt = LocalDateTime.now();
+        if (this.updatedAt == null) this.updatedAt = LocalDateTime.now();
     }
     
     @PreUpdate

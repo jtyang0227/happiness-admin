@@ -1,0 +1,14 @@
+.stats-page { max-width: 1400px; }
+.stats-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 16px; }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.card-title { font-size: 15px; font-weight: 600; color: #1e293b; margin: 0; }
+.period-tabs { display: flex; gap: 4px; }
+.period-tab {
+  padding: 5px 14px; border: 1.5px solid #e2e8f0; border-radius: 6px; background: white;
+  font-size: 13px; cursor: pointer; color: #64748b; transition: all 0.15s;
+}
+.period-tab.active { background: #6366f1; color: white; border-color: #6366f1; font-weight: 600; }
+.stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.stats-card.half { margin-bottom: 0; }
+.rank-cell { font-weight: 700; color: #6366f1; }
+.top-thumb { width: 44px; height: 36px; object-fit: cover; border-radius: 6px; background: #f1f5f9; }
