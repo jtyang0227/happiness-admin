@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ConfirmProvider } from './context/ConfirmContext';
 import AdminLayout from './components/layout/AdminLayout';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
@@ -39,7 +41,28 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <ConfirmProvider>
+          <AppRoutes />
+          <Toaster
+            position="bottom-right"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#1e293b',
+                color: '#e2e8f0',
+                fontSize: '13px',
+                borderRadius: '10px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+              },
+              success: { iconTheme: { primary: '#22c55e', secondary: '#1e293b' } },
+              error: {
+                duration: 5000,
+                style: { background: '#1e293b', color: '#ef4444' },
+                iconTheme: { primary: '#ef4444', secondary: '#1e293b' },
+              },
+            }}
+          />
+        </ConfirmProvider>
       </AuthProvider>
     </BrowserRouter>
   );

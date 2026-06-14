@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { ArrowUpRight } from 'lucide-react';
 import { getApi } from '../utils/api';
+import ImgWithFallback from '../components/common/ImgWithFallback';
 import './DashboardPage.css';
 
-const StatCard = ({ icon, label, value, color }) => (
-  <div className="stat-card" style={{ borderTopColor: color }}>
-    <div className="stat-icon" style={{ background: color + '20', color }}>{icon}</div>
+const StatCard = ({ icon, label, value, color, to }) => (
+  <Link to={to} className="stat-card" style={{ borderLeft: `4px solid ${color}` }}>
+    <div className="stat-icon" style={{ background: color + '18', color }}>{icon}</div>
     <div className="stat-info">
       <div className="stat-value">{value?.toLocaleString() ?? '-'}</div>
       <div className="stat-label">{label}</div>
     </div>
-  </div>
+    <ArrowUpRight size={14} className="stat-card-arrow" />
+  </Link>
 );
 
 const DashboardPage = () => {
@@ -41,33 +45,42 @@ const DashboardPage = () => {
       <h1 className="page-title">대시보드</h1>
 
       <div className="stat-grid">
-        <StatCard icon="👥" label="전체 회원" value={summary?.totalMembers} color="#6366f1" />
-        <StatCard icon="📷" label="전체 사진" value={summary?.totalPhotos} color="#22c55e" />
-        <StatCard icon="📬" label="오늘 신규 문의" value={summary?.todayInquiries} color="#f59e0b" />
-        <StatCard icon="🔔" label="미읽음 문의" value={summary?.unreadInquiries} color="#ef4444" />
+        <StatCard icon="👥" label="전체 회원"     value={summary?.totalMembers}   color="#6366f1" to="/members" />
+        <StatCard icon="📷" label="전체 사진"     value={summary?.totalPhotos}    color="#22c55e" to="/photos" />
+        <StatCard icon="📬" label="오늘 신규 문의" value={summary?.todayInquiries} color="#f59e0b" to="/inquiries" />
+        <StatCard icon="🔔" label="미읽음 문의"   value={summary?.unreadInquiries} color="#ef4444" to="/inquiries" />
       </div>
 
       <div className="dashboard-grid">
         <div className="dashboard-card">
-          <h2 className="card-title">최근 7일 사진 업로드</h2>
+          <div className="card-header">
+            <h2 className="card-title">최근 7일 사진 업로드</h2>
+          </div>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={daily}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
               <XAxis dataKey="day" tick={{ fontSize: 11 }} tickFormatter={d => d.slice(5)} />
               <YAxis tick={{ fontSize: 11 }} />
               <Tooltip />
-              <Bar dataKey="photos" fill="#6366f1" radius={[4,4,0,0]} name="사진" />
+              <Bar dataKey="photos" fill="#6366f1" radius={[4, 4, 0, 0]} name="사진" />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
         <div className="dashboard-card">
-          <h2 className="card-title">인기 사진 TOP 5</h2>
+          <div className="card-header">
+            <h2 className="card-title">인기 사진 TOP 5</h2>
+            <Link to="/stats" className="card-link">전체 통계 <ArrowUpRight size={12} /></Link>
+          </div>
           <div className="top-photos-list">
             {topPhotos.map((p, i) => (
               <div key={p.id} className="top-photo-item">
                 <span className="rank">#{i + 1}</span>
-                <img src={p.thumbnailUrl} alt={p.title} className="photo-thumb" onError={e => e.target.style.display='none'} />
+                <ImgWithFallback
+                  src={p.thumbnailUrl}
+                  alt={p.title}
+                  className="photo-thumb"
+                />
                 <div className="photo-info">
                   <div className="photo-title">{p.title}</div>
                   <div className="photo-meta">❤️ {p.likesCount} · 🔖 {p.savesCount}</div>
@@ -79,7 +92,10 @@ const DashboardPage = () => {
       </div>
 
       <div className="dashboard-card full-width">
-        <h2 className="card-title">최근 문의 5건</h2>
+        <div className="card-header">
+          <h2 className="card-title">최근 문의 5건</h2>
+          <Link to="/inquiries" className="card-link">전체 문의 보기 <ArrowUpRight size={12} /></Link>
+        </div>
         <table className="data-table">
           <thead>
             <tr>
@@ -89,13 +105,15 @@ const DashboardPage = () => {
           <tbody>
             {recentInquiries.map(i => (
               <tr key={i.id}>
-                <td>{i.senderName}<br/><small>{i.senderEmail}</small></td>
+                <td>{i.senderName}<br /><small>{i.senderEmail}</small></td>
                 <td>{i.receiverProfileName || '-'}</td>
                 <td>{i.shootType || '-'}</td>
                 <td>{i.shootDate || '-'}</td>
-                <td><span className={`badge ${(i.read || i.isRead) ? 'badge-green' : 'badge-red'}`}>
-                  {(i.read || i.isRead) ? '읽음' : '미읽음'}
-                </span></td>
+                <td>
+                  <span className={`badge ${(i.read || i.isRead) ? 'badge-green' : 'badge-red'}`}>
+                    {(i.read || i.isRead) ? '읽음' : '미읽음'}
+                  </span>
+                </td>
               </tr>
             ))}
           </tbody>

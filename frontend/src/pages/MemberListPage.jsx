@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { getApi, patchApi, deleteApi } from '../utils/api';
+import { useConfirm } from '../context/ConfirmContext';
 import Pagination from '../components/common/Pagination';
 import './MemberListPage.css';
-
 
 const AUTHORITY_COLORS = { WM: 'badge-purple', SA: 'badge-blue', US: 'badge-green' };
 
 const MemberListPage = () => {
+  const { confirm } = useConfirm();
   const [data, setData] = useState({ content: [], totalPages: 0, totalElements: 0 });
   const [search, setSearch] = useState('');
   const [authority, setAuthority] = useState('');
@@ -25,15 +27,38 @@ const MemberListPage = () => {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const handleRoleChange = async (id, newAuthority) => {
-    await patchApi(`/admin/members/${id}/role`, { authority: newAuthority });
-    fetchData();
+  const handleRoleChange = async (id, name, newAuthority) => {
+    const LABELS = { WM: '웹관리자', SA: '운영자', US: '일반 회원' };
+    const ok = await confirm({
+      title: '역할 변경',
+      description: `"${name}"의 역할을 ${LABELS[newAuthority]}(${newAuthority})로 변경하시겠습니까?`,
+      variant: 'warning',
+    });
+    if (!ok) { fetchData(); return; }
+    try {
+      await patchApi(`/admin/members/${id}/role`, { authority: newAuthority });
+      toast.success('역할이 변경되었습니다.');
+      fetchData();
+    } catch {
+      toast.error('역할 변경에 실패했습니다.');
+      fetchData();
+    }
   };
 
   const handleDelete = async (id, name) => {
-    if (!window.confirm(`"${name}" 회원을 삭제하시겠습니까?\n사진, 시리즈, 문의가 함께 삭제됩니다.`)) return;
-    await deleteApi(`/admin/members/${id}`);
-    fetchData();
+    const ok = await confirm({
+      title: '회원 삭제',
+      description: `"${name}" 회원을 삭제합니다.\n사진, 시리즈, 문의가 함께 삭제됩니다.`,
+      variant: 'danger',
+    });
+    if (!ok) return;
+    try {
+      await deleteApi(`/admin/members/${id}`);
+      toast.success('회원이 삭제되었습니다.');
+      fetchData();
+    } catch {
+      toast.error('삭제에 실패했습니다.');
+    }
   };
 
   return (
@@ -44,8 +69,12 @@ const MemberListPage = () => {
       </div>
 
       <div className="filter-bar">
-        <input className="search-input" placeholder="이름 또는 이메일 검색" value={search}
-          onChange={e => { setSearch(e.target.value); setPage(0); }} />
+        <input
+          className="search-input"
+          placeholder="이름 또는 이메일 검색"
+          value={search}
+          onChange={e => { setSearch(e.target.value); setPage(0); }}
+        />
         <select className="filter-select" value={authority} onChange={e => { setAuthority(e.target.value); setPage(0); }}>
           <option value="">전체 역할</option>
           <option value="WM">웹관리자</option>
@@ -71,7 +100,7 @@ const MemberListPage = () => {
                   <select
                     className={`role-select badge ${AUTHORITY_COLORS[m.authority]}`}
                     value={m.authority}
-                    onChange={e => handleRoleChange(m.id, e.target.value)}
+                    onChange={e => handleRoleChange(m.id, m.name, e.target.value)}
                   >
                     <option value="WM">웹관리자</option>
                     <option value="SA">운영자</option>

@@ -1,11 +1,15 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { getApi, deleteApi } from '../utils/api';
+import { useConfirm } from '../context/ConfirmContext';
 import Pagination from '../components/common/Pagination';
+import ImgWithFallback from '../components/common/ImgWithFallback';
 import './PhotoListPage.css';
 
-const MOODS = ['WARM','COOL','NEUTRAL','VIVID','DARK','SOFT'];
+const MOODS = ['WARM', 'COOL', 'NEUTRAL', 'VIVID', 'DARK', 'SOFT'];
 
 const PhotoListPage = () => {
+  const { confirm } = useConfirm();
   const [data, setData] = useState({ content: [], totalPages: 0, totalElements: 0 });
   const [colorMood, setColorMood] = useState('');
   const [sortBy, setSortBy] = useState('latest');
@@ -24,9 +28,19 @@ const PhotoListPage = () => {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleDelete = async (id, title) => {
-    if (!window.confirm(`"${title}" 사진을 삭제하시겠습니까?`)) return;
-    await deleteApi(`/admin/photos/${id}`);
-    fetchData();
+    const ok = await confirm({
+      title: '사진 삭제',
+      description: `"${title}" 사진을 삭제하시겠습니까?`,
+      variant: 'danger',
+    });
+    if (!ok) return;
+    try {
+      await deleteApi(`/admin/photos/${id}`);
+      toast.success('사진이 삭제되었습니다.');
+      fetchData();
+    } catch {
+      toast.error('삭제에 실패했습니다.');
+    }
   };
 
   return (
@@ -55,15 +69,18 @@ const PhotoListPage = () => {
           {data.content.map(p => (
             <div key={p.id} className="photo-card">
               <div className="photo-img-wrap">
-                <img src={p.thumbnailUrl || p.imageUrl} alt={p.title}
-                  className="photo-img" onError={e => { e.target.src = ''; e.target.style.background='#f1f5f9'; }} />
+                <ImgWithFallback
+                  src={p.thumbnailUrl || p.imageUrl}
+                  alt={p.title}
+                  className="photo-img"
+                />
                 {p.colorMood && <span className="mood-badge">{p.colorMood}</span>}
               </div>
               <div className="photo-body">
                 <div className="photo-title">{p.title}</div>
                 <div className="photo-author">{p.authorName}</div>
                 <div className="photo-stats">❤️ {p.likesCount} · 🔖 {p.savesCount} · 🔄 {p.sharesCount}</div>
-                <div className="photo-date">{p.createdAt?.slice(0,10)}</div>
+                <div className="photo-date">{p.createdAt?.slice(0, 10)}</div>
                 <button className="btn-danger-sm" onClick={() => handleDelete(p.id, p.title)}>삭제</button>
               </div>
             </div>

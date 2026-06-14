@@ -1,9 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { getApi, deleteApi } from '../utils/api';
+import { useConfirm } from '../context/ConfirmContext';
 import Pagination from '../components/common/Pagination';
+import ImgWithFallback from '../components/common/ImgWithFallback';
 import './SeriesListPage.css';
 
 const SeriesListPage = () => {
+  const { confirm } = useConfirm();
   const [data, setData] = useState({ content: [], totalPages: 0, totalElements: 0 });
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -18,9 +22,19 @@ const SeriesListPage = () => {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleDelete = async (id, title) => {
-    if (!window.confirm(`"${title}" 시리즈를 삭제하시겠습니까?`)) return;
-    await deleteApi(`/admin/series/${id}`);
-    fetchData();
+    const ok = await confirm({
+      title: '시리즈 삭제',
+      description: `"${title}" 시리즈를 삭제하시겠습니까?`,
+      variant: 'danger',
+    });
+    if (!ok) return;
+    try {
+      await deleteApi(`/admin/series/${id}`);
+      toast.success('시리즈가 삭제되었습니다.');
+      fetchData();
+    } catch {
+      toast.error('삭제에 실패했습니다.');
+    }
   };
 
   return (
@@ -39,12 +53,16 @@ const SeriesListPage = () => {
               <tr><td colSpan="6" className="loading-cell">로딩 중...</td></tr>
             ) : data.content.map(s => (
               <tr key={s.id}>
-                <td><img src={s.coverImageUrl} alt={s.title} className="series-cover" onError={e => e.target.style.display='none'} /></td>
+                <td>
+                  <ImgWithFallback src={s.coverImageUrl} alt={s.title} className="series-cover" />
+                </td>
                 <td className="series-title">{s.title}</td>
                 <td>{s.authorName}</td>
                 <td>{s.photoCount}장</td>
-                <td>{s.createdAt?.slice(0,10)}</td>
-                <td><button className="btn-danger-sm" onClick={() => handleDelete(s.id, s.title)}>삭제</button></td>
+                <td>{s.createdAt?.slice(0, 10)}</td>
+                <td>
+                  <button className="btn-danger-sm" onClick={() => handleDelete(s.id, s.title)}>삭제</button>
+                </td>
               </tr>
             ))}
           </tbody>

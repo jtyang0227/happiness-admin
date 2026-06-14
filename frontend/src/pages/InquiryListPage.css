@@ -1,11 +1,56 @@
 .inquiry-row { cursor: pointer; }
-.inquiry-row:hover td { background: #f8fafc !important; }
-.sender-name { font-weight: 500; color: #1e293b; }
-.inquiry-detail td { background: #f8fafc !important; padding: 12px 20px !important; }
-.inquiry-message { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; font-size: 13px; color: #374151; line-height: 1.6; }
-.action-cell { display: flex; gap: 6px; align-items: center; }
-.btn-action {
-  padding: 5px 10px; background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;
-  border-radius: 6px; font-size: 12px; cursor: pointer; white-space: nowrap;
+.inquiry-row:hover td { background: var(--color-surface-2) !important; }
+
+.unread-row td { background: #fffdf5; }
+.unread-row .sender-name { font-weight: 700; color: var(--color-text-primary); }
+
+.chevron-cell { color: var(--color-text-tertiary); padding: 11px 8px 11px 14px !important; }
+
+.sender-name { font-weight: 500; color: var(--color-text-primary); }
+
+.inquiry-detail td {
+  background: var(--color-surface-2) !important;
+  padding: 12px 20px !important;
 }
-.btn-action:hover { background: #2563eb; color: white; }
+
+.inquiry-message {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+
+.action-cell { display: flex; gap: 6px; align-items: center; }
+
+.btn-action {
+  padding: 5px 10px;
+  background: var(--color-brand-50);
+  color: var(--color-brand-600);
+  border: 1px solid var(--color-brand-100);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.btn-action:hover { background: var(--color-brand-500); color: var(--color-text-inverse); border-color: var(--color-brand-500); }
+
+.btn-read-all {
+  margin-left: auto;
+  padding: 7px 14px;
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.btn-read-all:hover { background: var(--color-warning); color: var(--color-text-inverse); border-color: var(--color-warning); }
