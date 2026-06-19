@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git push*)",
+      "Bash(git pull*)",
+      "Bash(git branch*)",
+      "Bash(find frontend/src -type f*)",
+      "Bash(find backend/src -type f*)",
+      "Bash(grep -r * frontend/src)",
+      "Bash(grep -r * backend/src)",
+      "Bash(wc -l *)",
+      "Bash(cat frontend/package.json)",
+      "Bash(cat backend/build.gradle)",
+      "Bash(PATH=*/.nvm/versions/node/*/bin:$PATH npm run build)",
+      "Bash(PATH=*/.nvm/versions/node/*/bin:$PATH npm run test -- --watchAll=false*)",
+      "Bash(PATH=*/.nvm/versions/node/*/bin:$PATH npx eslint frontend/src*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=\"$CLAUDE_TOOL_RESULT_FILE_PATH\"; if echo \"$file\" | grep -q 'frontend/src'; then echo \"[hook] 프론트엔드 파일 변경 감지: $file\"; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
