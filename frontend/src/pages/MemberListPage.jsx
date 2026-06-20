@@ -189,7 +189,7 @@ const MemberListPage = () => {
             <div className="modal-actions">
               <button className="btn-secondary" onClick={() => setSuspendModal(null)} disabled={suspending}>취소</button>
               <button
-                className="btn-danger"
+                className="btn-danger-modal"
                 onClick={handleSuspendConfirm}
                 disabled={!suspendReason.trim() || suspending}
               >

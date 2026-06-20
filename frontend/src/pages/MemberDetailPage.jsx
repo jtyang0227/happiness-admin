@@ -320,7 +320,7 @@ const MemberDetailPage = () => {
             />
             <div className="modal-actions">
               <button className="btn-secondary" onClick={() => setSuspendModal(false)} disabled={suspending}>취소</button>
-              <button className="btn-danger" onClick={handleSuspendConfirm} disabled={!suspendReason.trim() || suspending}>
+              <button className="btn-danger-modal" onClick={handleSuspendConfirm} disabled={!suspendReason.trim() || suspending}>
                 {suspending ? '처리 중...' : '정지 처리'}
               </button>
             </div>

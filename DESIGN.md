@@ -349,7 +349,109 @@ const CHART_COLORS = {
 
 ---
 
-## 11. 작업 규칙 요약
+## 11. P0 신규 컴포넌트 패턴 (2026-06-20)
+
+### 회원 목록 — 상태 관리
+
+```
+테이블 행 "관리" 컬럼:
+  [상세]   → .btn-sm .btn-outline  → Link to="/members/:id"
+  [정지]   → .btn-sm .btn-danger-outline  → openSuspendModal()
+  [해제]   → .btn-sm .btn-warning         → handleActivate() via useConfirm
+  [삭제]   → .btn-danger-sm               → handleDelete() via useConfirm
+
+상태 배지 클래스 매핑:
+  ACTIVE   → badge-green  (활성)
+  SUSPENDED → badge-red   (정지)
+  INACTIVE  → badge-yellow (비활성)
+  DELETED   → badge-red   (삭제됨)
+```
+
+### SuspendModal (정지 사유 입력)
+
+`ConfirmContext`의 `useConfirm()`은 폼 입력을 지원하지 않으므로 인라인 state로 구현.
+
+```jsx
+// 상태
+const [suspendModal, setSuspendModal] = useState(null); // { id, name, email }
+const [suspendReason, setSuspendReason] = useState('');
+
+// JSX — global.css의 .modal-* 클래스 사용
+<div className="modal-overlay" onClick={() => setSuspendModal(null)}>
+  <div className="modal-dialog" onClick={e => e.stopPropagation()}>
+    <div className="modal-icon warning">⚠</div>
+    <h3 className="modal-title">회원 정지</h3>
+    <p className="modal-desc">...</p>
+    <label className="modal-label">정지 사유 (필수)</label>
+    <textarea className="modal-textarea" rows={3} />
+    <div className="modal-actions">
+      <button className="btn-secondary">취소</button>
+      <button className="btn-danger-modal">정지 처리</button>
+    </div>
+  </div>
+</div>
+```
+
+**API:** `PATCH /api/admin/members/{id}/status` → `{ status: 'SUSPENDED', reason: '...' }`  
+**해제:** `PATCH /api/admin/members/{id}/status` → `{ status: 'ACTIVE', reason: '' }` (useConfirm 사용)
+
+---
+
+### 회원 상세 페이지 (`/members/:id`)
+
+```
+[← 회원 목록]
+이름 (@handle)                       [활성 배지] [정지하기]
+─────────────────────────────────────────────────────────
+┌── 기본 정보 ────────┐  ┌── 활동 현황 ────────────────┐
+│ 이메일  user@…      │  │   12        3       5      │
+│ 역할    [US] [변경] │  │  사진      시리즈   문의    │
+│ 가입유형 local      │  └────────────────────────────┘
+│ 가입일  2026-01-01  │
+└────────────────────┘
+[사진(12)] [받은 문의] [보낸 문의] [시리즈]
+─────────────────────────────────────────
+탭 콘텐츠
+```
+
+**CSS 클래스 (MemberDetailPage.css):**
+- `.detail-info-grid` — 2컬럼 그리드, 모바일은 1컬럼
+- `.detail-card` — 카드 (`var(--shadow-md)`, `var(--radius-lg)`)
+- `.detail-stats-grid` — 3컬럼 통계 그리드
+- `.detail-tabs` + `.detail-tab.active` — 탭바 (border-bottom 방식)
+- `.photos-grid` — 사진 `auto-fill minmax(160px, 1fr)` 그리드
+- `.photo-thumb-card:hover .photo-delete-btn` — hover 시 삭제 버튼 노출
+
+**탭별 데이터 소스:**
+| 탭 | API |
+|---|---|
+| 사진 | `GET /api/admin/photos?memberId={id}&size=12` |
+| 받은 문의 | `GET /api/admin/inquiries?receiverId={id}&size=10` |
+| 보낸 문의 | `GET /api/admin/inquiries?senderId={id}&size=10` |
+| 시리즈 | `GET /api/admin/series?memberId={id}&size=10` |
+
+---
+
+### global.css에 추가된 공용 클래스
+
+| 클래스 | 설명 |
+|---|---|
+| `.action-cell` | 테이블 관리 컬럼 flex 컨테이너 |
+| `.btn-sm` | 소형 버튼 base (모든 variant 상위) |
+| `.btn-outline` | 기본 아웃라인 버튼 |
+| `.btn-warning` | 경고 색상 버튼 |
+| `.btn-danger-outline` | 위험 아웃라인 버튼 |
+| `.btn-secondary` | 모달 취소 버튼 |
+| `.btn-primary` | 주요 확인 버튼 |
+| `.btn-danger-modal` | 모달 삭제/정지 버튼 |
+| `.empty-state` | 탭/목록 빈 상태 |
+| `.modal-overlay` | 모달 배경 (fade-in 애니메이션) |
+| `.modal-dialog` | 모달 컨테이너 (slide-up 애니메이션) |
+| `.modal-icon.warning` / `.danger` | 모달 아이콘 원 |
+
+---
+
+## 12. 작업 규칙 요약
 
 ```
 ✅ DO
@@ -366,6 +468,8 @@ const CHART_COLORS = {
   - Sidebar.css 외 새 CSS 파일 생성 자제 — global.css 확장
   - 아이콘 이모지 사용 금지 — lucide-react 아이콘 사용
 ```
+
+---
 
 ---
 
