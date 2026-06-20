@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getApi, deleteApi } from '../utils/api';
 import { useConfirm } from '../context/ConfirmContext';
@@ -8,15 +9,40 @@ import './PhotoListPage.css';
 
 const MOODS = ['WARM', 'COOL', 'NEUTRAL', 'VIVID', 'DARK', 'SOFT'];
 
+const Highlight = ({ text, keyword }) => {
+  if (!keyword || !text) return text;
+  const parts = text.split(new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
+  return parts.map((part, i) =>
+    part.toLowerCase() === keyword.toLowerCase()
+      ? <mark key={i} className="search-highlight">{part}</mark>
+      : part
+  );
+};
+
 const PhotoListPage = () => {
   const { confirm } = useConfirm();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [data, setData] = useState({ content: [], totalPages: 0, totalElements: 0 });
-  const [colorMood, setColorMood] = useState('');
-  const [sortBy, setSortBy] = useState('latest');
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [inputValue, setInputValue] = useState(searchParams.get('search') || '');
   const searchTimerRef = useRef(null);
+
+  const search    = searchParams.get('search')    || '';
+  const colorMood = searchParams.get('colorMood') || '';
+  const sortBy    = searchParams.get('sortBy')    || 'latest';
+  const page      = parseInt(searchParams.get('page') || '0', 10);
+
+  const updateParams = (updates) => {
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      Object.entries(updates).forEach(([k, v]) => {
+        if (v === '' || v === null || v === undefined) next.delete(k);
+        else next.set(k, String(v));
+      });
+      return next;
+    });
+  };
 
   const fetchData = useCallback(() => {
     setLoading(true);
@@ -46,36 +72,59 @@ const PhotoListPage = () => {
     }
   };
 
+  const isFiltered = search || colorMood;
+
   return (
     <div className="list-page">
       <div className="page-header">
         <h1 className="page-title">사진 관리</h1>
-        <span className="total-count">총 {data.totalElements?.toLocaleString()}장</span>
+        <span className="total-count">
+          {isFiltered
+            ? `"${search || colorMood}" 검색 결과 — ${data.totalElements?.toLocaleString()}장`
+            : `총 ${data.totalElements?.toLocaleString()}장`}
+        </span>
       </div>
       <div className="filter-bar">
         <input
           className="search-input"
-          placeholder="제목 또는 작가 검색"
+          placeholder="제목·작가·설명·@아이디 검색"
+          value={inputValue}
           onChange={e => {
             const val = e.target.value;
+            setInputValue(val);
             clearTimeout(searchTimerRef.current);
-            searchTimerRef.current = setTimeout(() => { setSearch(val); setPage(0); }, 300);
+            searchTimerRef.current = setTimeout(() => {
+              updateParams({ search: val, page: '' });
+            }, 300);
           }}
         />
-        <select className="filter-select" value={colorMood} onChange={e => { setColorMood(e.target.value); setPage(0); }}>
+        <select className="filter-select" value={colorMood} onChange={e => updateParams({ colorMood: e.target.value, page: '' })}>
           <option value="">전체 무드</option>
           {MOODS.map(m => <option key={m} value={m}>{m}</option>)}
         </select>
-        <select className="filter-select" value={sortBy} onChange={e => { setSortBy(e.target.value); setPage(0); }}>
+        <select className="filter-select" value={sortBy} onChange={e => updateParams({ sortBy: e.target.value, page: '' })}>
           <option value="latest">최신순</option>
           <option value="likes">좋아요순</option>
           <option value="saves">저장순</option>
           <option value="shares">공유순</option>
         </select>
+        {isFiltered && (
+          <button className="btn-reset" onClick={() => { setInputValue(''); setSearchParams({}); }}>
+            초기화
+          </button>
+        )}
       </div>
 
       {loading ? (
         <div className="loading-msg">로딩 중...</div>
+      ) : data.content.length === 0 ? (
+        <div className="empty-state">
+          <div className="empty-icon">검색</div>
+          <div className="empty-title">
+            {search ? `"${search}"에 대한 결과가 없습니다` : '사진이 없습니다'}
+          </div>
+          <div className="empty-desc">검색어를 다시 확인하거나 필터를 변경해 보세요.</div>
+        </div>
       ) : (
         <div className="photo-grid">
           {data.content.map(p => (
@@ -89,8 +138,12 @@ const PhotoListPage = () => {
                 {p.colorMood && <span className="mood-badge">{p.colorMood}</span>}
               </div>
               <div className="photo-body">
-                <div className="photo-title">{p.title}</div>
-                <div className="photo-author">{p.authorName}</div>
+                <div className="photo-title">
+                  <Highlight text={p.title} keyword={search} />
+                </div>
+                <div className="photo-author">
+                  <Highlight text={p.authorName} keyword={search} />
+                </div>
                 <div className="photo-stats">❤️ {p.likesCount} · 🔖 {p.savesCount} · 🔄 {p.sharesCount}</div>
                 <div className="photo-date">{p.createdAt?.slice(0, 10)}</div>
                 <button className="btn-danger-sm" onClick={() => handleDelete(p.id, p.title)}>삭제</button>
@@ -99,7 +152,7 @@ const PhotoListPage = () => {
           ))}
         </div>
       )}
-      <Pagination page={page} totalPages={data.totalPages} onPageChange={setPage} />
+      <Pagination page={page} totalPages={data.totalPages} onPageChange={p => updateParams({ page: p === 0 ? '' : p })} />
     </div>
   );
 };

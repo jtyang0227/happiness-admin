@@ -18,7 +18,11 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
     @Query("SELECT p FROM Photo p WHERE " +
            "(:memberId IS NULL OR p.member.id = :memberId) AND " +
            "(:colorMood IS NULL OR p.colorMood = :colorMood) AND " +
-           "(:search IS NULL OR LOWER(p.title) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(p.member.name) LIKE LOWER(CONCAT('%', :search, '%')))")
+           "(:search IS NULL OR " +
+           "  LOWER(p.title) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "  LOWER(p.member.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "  LOWER(p.description) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "  LOWER(p.member.profileName) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<Photo> searchPhotos(@Param("memberId") Long memberId,
                              @Param("colorMood") String colorMood,
                              @Param("search") String search,
