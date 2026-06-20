@@ -11,6 +11,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -19,7 +21,26 @@ public class AdminPhotoService {
     private final PhotoRepository photoRepository;
     private final SeriesPhotoRepository seriesPhotoRepository;
 
-    public PageResponse<AdminPhotoDto> getPhotos(Long memberId, String colorMood, String sortBy, int page, int size) {
+    private static final Map<String, String> MOOD_ALIASES = Map.ofEntries(
+        Map.entry("따뜻", "WARM"),   Map.entry("웜", "WARM"),
+        Map.entry("차가운", "COOL"), Map.entry("쿨", "COOL"),
+        Map.entry("중성", "NEUTRAL"), Map.entry("뉴트럴", "NEUTRAL"),
+        Map.entry("선명", "VIVID"),  Map.entry("비비드", "VIVID"),
+        Map.entry("어두운", "DARK"), Map.entry("다크", "DARK"),
+        Map.entry("부드러운", "SOFT"), Map.entry("소프트", "SOFT")
+    );
+
+    private String resolveColorMood(String colorMood) {
+        if (colorMood == null || colorMood.isBlank()) return null;
+        String upper = colorMood.trim().toUpperCase();
+        if (upper.matches("WARM|COOL|NEUTRAL|VIVID|DARK|SOFT")) return upper;
+        for (Map.Entry<String, String> e : MOOD_ALIASES.entrySet()) {
+            if (colorMood.trim().contains(e.getKey())) return e.getValue();
+        }
+        return colorMood.trim().toUpperCase();
+    }
+
+    public PageResponse<AdminPhotoDto> getPhotos(Long memberId, String colorMood, String search, String sortBy, int page, int size) {
         Sort sort = switch (sortBy != null ? sortBy : "latest") {
             case "likes"  -> Sort.by("likesCount").descending();
             case "saves"  -> Sort.by("savesCount").descending();
@@ -27,8 +48,10 @@ public class AdminPhotoService {
             default       -> Sort.by("createdAt").descending();
         };
         var pageable = PageRequest.of(page, size, sort);
+        String searchTerm = (search != null && !search.isBlank()) ? search.trim() : null;
+        String resolvedMood = resolveColorMood(colorMood);
         return PageResponse.of(
-                photoRepository.searchPhotos(memberId, colorMood, pageable).map(AdminPhotoDto::from));
+                photoRepository.searchPhotos(memberId, resolvedMood, searchTerm, pageable).map(AdminPhotoDto::from));
     }
 
     @Transactional

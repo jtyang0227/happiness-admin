@@ -11,8 +11,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SeriesRepository extends JpaRepository<Series, Long> {
 
-    @Query("SELECT s FROM Series s WHERE (:memberId IS NULL OR s.member.id = :memberId)")
-    Page<Series> searchSeries(@Param("memberId") Long memberId, Pageable pageable);
+    @Query("SELECT s FROM Series s WHERE " +
+           "(:memberId IS NULL OR s.member.id = :memberId) AND " +
+           "(:search IS NULL OR LOWER(s.title) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(s.member.name) LIKE LOWER(CONCAT('%', :search, '%')))")
+    Page<Series> searchSeries(@Param("memberId") Long memberId,
+                              @Param("search") String search,
+                              Pageable pageable);
 
     long countByMemberId(Long memberId);
 }

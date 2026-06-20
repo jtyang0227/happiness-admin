@@ -30,6 +30,12 @@ public class AdminInquiryController {
         return ResponseEntity.ok(Map.of("message", "읽음 처리되었습니다."));
     }
 
+    @PatchMapping("/read-all")
+    public ResponseEntity<?> markAllRead() {
+        int count = inquiryService.markAllRead();
+        return ResponseEntity.ok(Map.of("message", "모든 미읽음 문의를 읽음 처리했습니다.", "count", count));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         inquiryService.deleteInquiry(id);

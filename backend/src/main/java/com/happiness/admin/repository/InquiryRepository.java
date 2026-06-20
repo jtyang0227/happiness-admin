@@ -24,6 +24,7 @@ public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
                                   Pageable pageable);
 
     long countByIsReadFalse();
+    List<Inquiry> findAllByIsReadFalse();
 
     @Query("SELECT COUNT(i) FROM Inquiry i WHERE i.createdAt >= :today AND i.createdAt < :tomorrow")
     long countToday(@Param("today") LocalDateTime today,

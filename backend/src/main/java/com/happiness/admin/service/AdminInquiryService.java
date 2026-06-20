@@ -10,6 +10,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -30,6 +32,14 @@ public class AdminInquiryService {
                 .orElseThrow(() -> new IllegalArgumentException("문의를 찾을 수 없습니다."));
         inquiry.setRead(true);
         inquiryRepository.save(inquiry);
+    }
+
+    @Transactional
+    public int markAllRead() {
+        List<Inquiry> unread = inquiryRepository.findAllByIsReadFalse();
+        unread.forEach(i -> i.setRead(true));
+        inquiryRepository.saveAll(unread);
+        return unread.size();
     }
 
     @Transactional

@@ -17,9 +17,10 @@ public class AdminSeriesController {
     @GetMapping
     public ResponseEntity<?> list(
             @RequestParam(required = false) Long memberId,
+            @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(seriesService.getSeries(memberId, page, size));
+        return ResponseEntity.ok(seriesService.getSeries(memberId, search, page, size));
     }
 
     @DeleteMapping("/{id}")

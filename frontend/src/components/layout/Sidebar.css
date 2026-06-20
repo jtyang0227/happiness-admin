@@ -127,3 +127,31 @@
   background: var(--color-danger);
   color: var(--color-text-inverse);
 }
+
+.sidebar-close {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  padding: 4px;
+  color: var(--color-sidebar-text);
+  border-radius: var(--radius-sm);
+  transition: background 0.15s, color 0.15s;
+}
+
+.sidebar-close:hover {
+  background: var(--color-sidebar-hover);
+  color: #e2e8f0;
+}
+
+@media (max-width: 767px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 100;
+  }
+
+  .sidebar.sidebar-open { transform: translateX(0); }
+
+  .sidebar-close { display: flex; }
+}

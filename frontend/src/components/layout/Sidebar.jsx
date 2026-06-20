@@ -1,9 +1,9 @@
-import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Image, MessageSquare,
   BookOpen, BarChart2, Settings, LogOut,
-  Sparkles,
+  Sparkles, X,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './Sidebar.css';
@@ -18,9 +18,14 @@ const NAV_ITEMS = [
   { path: '/system',    label: '시스템 설정', Icon: Settings },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen = true, onClose }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    onClose?.();
+  }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleLogout = () => {
     logout();
@@ -30,10 +35,13 @@ const Sidebar = () => {
   const initials = user?.name ? user.name.slice(0, 2) : 'AD';
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isOpen ? 'sidebar-open' : ''}`}>
       <div className="sidebar-header">
         <span className="sidebar-logo"><Sparkles size={20} /></span>
         <span className="sidebar-title">Happiness Admin</span>
+        <button className="sidebar-close" onClick={onClose} aria-label="사이드바 닫기">
+          <X size={18} />
+        </button>
       </div>
 
       <nav className="sidebar-nav">
