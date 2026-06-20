@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { getApi, deleteApi } from '../utils/api';
 import { useConfirm } from '../context/ConfirmContext';
@@ -9,15 +9,19 @@ import './SeriesListPage.css';
 const SeriesListPage = () => {
   const { confirm } = useConfirm();
   const [data, setData] = useState({ content: [], totalPages: 0, totalElements: 0 });
+  const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
+  const searchTimerRef = useRef(null);
 
   const fetchData = useCallback(() => {
     setLoading(true);
-    getApi(`/admin/series?page=${page}&size=20`)
+    const params = new URLSearchParams({ page, size: 20 });
+    if (search) params.set('search', search);
+    getApi(`/admin/series?${params}`)
       .then(setData)
       .finally(() => setLoading(false));
-  }, [page]);
+  }, [page, search]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -42,6 +46,17 @@ const SeriesListPage = () => {
       <div className="page-header">
         <h1 className="page-title">시리즈 관리</h1>
         <span className="total-count">총 {data.totalElements?.toLocaleString()}개</span>
+      </div>
+      <div className="filter-bar">
+        <input
+          className="search-input"
+          placeholder="시리즈 제목 또는 작가 검색"
+          onChange={e => {
+            const val = e.target.value;
+            clearTimeout(searchTimerRef.current);
+            searchTimerRef.current = setTimeout(() => { setSearch(val); setPage(0); }, 300);
+          }}
+        />
       </div>
       <div className="table-card">
         <table className="data-table">

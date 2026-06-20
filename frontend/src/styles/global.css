@@ -55,6 +55,17 @@ body {
 }
 .btn-danger-sm:hover { background: var(--color-danger); color: var(--color-text-inverse); border-color: var(--color-danger); }
 
+@media (max-width: 767px) {
+  .table-card { overflow-x: auto; }
+  .data-table { min-width: 600px; }
+}
+
+@media (max-width: 640px) {
+  .filter-bar { flex-direction: column; }
+  .search-input { width: 100%; }
+  .filter-select { width: 100%; }
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

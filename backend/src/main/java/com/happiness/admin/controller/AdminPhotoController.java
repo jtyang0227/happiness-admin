@@ -18,10 +18,11 @@ public class AdminPhotoController {
     public ResponseEntity<?> list(
             @RequestParam(required = false) Long memberId,
             @RequestParam(required = false) String colorMood,
+            @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "latest") String sortBy,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "24") int size) {
-        return ResponseEntity.ok(photoService.getPhotos(memberId, colorMood, sortBy, page, size));
+        return ResponseEntity.ok(photoService.getPhotos(memberId, colorMood, search, sortBy, page, size));
     }
 
     @DeleteMapping("/{id}")
