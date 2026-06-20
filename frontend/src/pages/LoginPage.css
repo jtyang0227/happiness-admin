@@ -6,7 +6,15 @@
   background: white; border-radius: 16px; padding: 40px; width: 100%; max-width: 400px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;
 }
-.login-logo { font-size: 40px; margin-bottom: 12px; }
+.login-logo { font-size: 40px; margin-bottom: 12px; color: var(--color-brand-500); display: flex; justify-content: center; }
+.password-wrap { position: relative; }
+.password-wrap input { padding-right: 40px; }
+.password-toggle {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  color: var(--color-text-tertiary); padding: 4px; border-radius: var(--radius-sm);
+  transition: color 0.15s;
+}
+.password-toggle:hover { color: var(--color-text-secondary); }
 .login-title { font-size: 22px; font-weight: 700; color: #1e293b; margin: 0 0 6px; }
 .login-subtitle { color: #64748b; font-size: 14px; margin: 0 0 28px; }
 .login-form { text-align: left; }

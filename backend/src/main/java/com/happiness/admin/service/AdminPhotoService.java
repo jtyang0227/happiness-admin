@@ -19,7 +19,7 @@ public class AdminPhotoService {
     private final PhotoRepository photoRepository;
     private final SeriesPhotoRepository seriesPhotoRepository;
 
-    public PageResponse<AdminPhotoDto> getPhotos(Long memberId, String colorMood, String sortBy, int page, int size) {
+    public PageResponse<AdminPhotoDto> getPhotos(Long memberId, String colorMood, String search, String sortBy, int page, int size) {
         Sort sort = switch (sortBy != null ? sortBy : "latest") {
             case "likes"  -> Sort.by("likesCount").descending();
             case "saves"  -> Sort.by("savesCount").descending();
@@ -27,8 +27,9 @@ public class AdminPhotoService {
             default       -> Sort.by("createdAt").descending();
         };
         var pageable = PageRequest.of(page, size, sort);
+        String searchTerm = (search != null && !search.isBlank()) ? search.trim() : null;
         return PageResponse.of(
-                photoRepository.searchPhotos(memberId, colorMood, pageable).map(AdminPhotoDto::from));
+                photoRepository.searchPhotos(memberId, colorMood, searchTerm, pageable).map(AdminPhotoDto::from));
     }
 
     @Transactional

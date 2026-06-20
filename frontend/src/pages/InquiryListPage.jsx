@@ -61,13 +61,12 @@ const InquiryListPage = () => {
     if (unreadCount === 0) return;
     const ok = await confirm({
       title: '모두 읽음 처리',
-      description: `현재 페이지의 미읽음 문의 ${unreadCount}건을 모두 읽음으로 처리합니다.`,
+      description: '전체 미읽음 문의를 일괄 읽음으로 처리합니다.',
       variant: 'warning',
     });
     if (!ok) return;
     try {
-      const unread = data.content.filter(i => !(i.read || i.isRead));
-      await Promise.all(unread.map(i => patchApi(`/admin/inquiries/${i.id}/read`, {})));
+      await patchApi('/admin/inquiries/read-all', {});
       toast.success('모든 문의를 읽음 처리했습니다.');
       fetchData();
     } catch {

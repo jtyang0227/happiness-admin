@@ -1,2 +1,31 @@
-.admin-layout { display: flex; min-height: 100vh; background: #f1f5f9; }
-.admin-main { margin-left: 240px; flex: 1; padding: 28px; min-height: 100vh; overflow: auto; }
+.admin-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.admin-main {
+  margin-left: 240px;
+  flex: 1;
+  padding: 28px;
+  min-height: 100vh;
+  overflow: auto;
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+}
+
+.sidebar-overlay.visible { display: block; }
+
+@media (max-width: 767px) {
+  .admin-main {
+    margin-left: 0;
+    padding: 16px;
+  }
+}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { getApi, deleteApi } from '../utils/api';
 import { useConfirm } from '../context/ConfirmContext';
@@ -13,17 +13,20 @@ const PhotoListPage = () => {
   const [data, setData] = useState({ content: [], totalPages: 0, totalElements: 0 });
   const [colorMood, setColorMood] = useState('');
   const [sortBy, setSortBy] = useState('latest');
+  const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
+  const searchTimerRef = useRef(null);
 
   const fetchData = useCallback(() => {
     setLoading(true);
     const params = new URLSearchParams({ page, size: 24, sortBy });
     if (colorMood) params.set('colorMood', colorMood);
+    if (search) params.set('search', search);
     getApi(`/admin/photos?${params}`)
       .then(setData)
       .finally(() => setLoading(false));
-  }, [page, colorMood, sortBy]);
+  }, [page, colorMood, sortBy, search]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -50,6 +53,15 @@ const PhotoListPage = () => {
         <span className="total-count">총 {data.totalElements?.toLocaleString()}장</span>
       </div>
       <div className="filter-bar">
+        <input
+          className="search-input"
+          placeholder="제목 또는 작가 검색"
+          onChange={e => {
+            const val = e.target.value;
+            clearTimeout(searchTimerRef.current);
+            searchTimerRef.current = setTimeout(() => { setSearch(val); setPage(0); }, 300);
+          }}
+        />
         <select className="filter-select" value={colorMood} onChange={e => { setColorMood(e.target.value); setPage(0); }}>
           <option value="">전체 무드</option>
           {MOODS.map(m => <option key={m} value={m}>{m}</option>)}
