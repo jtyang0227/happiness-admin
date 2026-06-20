@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getApi, patchApi, deleteApi } from '../utils/api';
 import { useConfirm } from '../context/ConfirmContext';
@@ -6,6 +7,8 @@ import Pagination from '../components/common/Pagination';
 import './MemberListPage.css';
 
 const AUTHORITY_COLORS = { WM: 'badge-purple', SA: 'badge-blue', US: 'badge-green' };
+const STATUS_LABELS = { ACTIVE: '활성', SUSPENDED: '정지', INACTIVE: '비활성', DELETED: '삭제됨' };
+const STATUS_CLASSES = { ACTIVE: 'badge-green', SUSPENDED: 'badge-red', INACTIVE: 'badge-yellow', DELETED: 'badge-red' };
 
 const MemberListPage = () => {
   const { confirm } = useConfirm();
@@ -14,6 +17,9 @@ const MemberListPage = () => {
   const [authority, setAuthority] = useState('');
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [suspendModal, setSuspendModal] = useState(null);
+  const [suspendReason, setSuspendReason] = useState('');
+  const [suspending, setSuspending] = useState(false);
 
   const fetchData = useCallback(() => {
     setLoading(true);
@@ -42,6 +48,38 @@ const MemberListPage = () => {
     } catch {
       toast.error('역할 변경에 실패했습니다.');
       fetchData();
+    }
+  };
+
+  const handleSuspendConfirm = async () => {
+    if (!suspendReason.trim()) return;
+    setSuspending(true);
+    try {
+      await patchApi(`/admin/members/${suspendModal.id}/status`, { status: 'SUSPENDED', reason: suspendReason });
+      toast.success(`${suspendModal.name} 회원이 정지되었습니다.`);
+      setSuspendModal(null);
+      setSuspendReason('');
+      fetchData();
+    } catch {
+      toast.error('정지 처리에 실패했습니다.');
+    } finally {
+      setSuspending(false);
+    }
+  };
+
+  const handleActivate = async (member) => {
+    const ok = await confirm({
+      title: '정지 해제',
+      description: `"${member.name}" 회원의 정지를 해제하시겠습니까?`,
+      variant: 'warning',
+    });
+    if (!ok) return;
+    try {
+      await patchApi(`/admin/members/${member.id}/status`, { status: 'ACTIVE', reason: '' });
+      toast.success(`${member.name} 회원의 정지가 해제되었습니다.`);
+      fetchData();
+    } catch {
+      toast.error('상태 변경에 실패했습니다.');
     }
   };
 
@@ -86,11 +124,14 @@ const MemberListPage = () => {
       <div className="table-card">
         <table className="data-table">
           <thead>
-            <tr><th>이름</th><th>이메일</th><th>프로필</th><th>역할</th><th>사진 수</th><th>가입일</th><th>관리</th></tr>
+            <tr>
+              <th>이름</th><th>이메일</th><th>프로필</th><th>역할</th>
+              <th>상태</th><th>사진</th><th>가입일</th><th>관리</th>
+            </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan="7" className="loading-cell">로딩 중...</td></tr>
+              <tr><td colSpan="8" className="loading-cell">로딩 중...</td></tr>
             ) : data.content.map(m => (
               <tr key={m.id}>
                 <td className="name-cell">{m.name}</td>
@@ -107,10 +148,22 @@ const MemberListPage = () => {
                     <option value="US">일반</option>
                   </select>
                 </td>
+                <td>
+                  <span className={`badge ${STATUS_CLASSES[m.status] || 'badge-green'}`}>
+                    {STATUS_LABELS[m.status] || m.status}
+                  </span>
+                </td>
                 <td>{m.photoCount}</td>
                 <td>{m.createdAt?.slice(0, 10)}</td>
                 <td>
-                  <button className="btn-danger-sm" onClick={() => handleDelete(m.id, m.name)}>삭제</button>
+                  <div className="action-cell">
+                    <Link to={`/members/${m.id}`} className="btn-sm btn-outline">상세</Link>
+                    {m.status === 'SUSPENDED'
+                      ? <button className="btn-sm btn-warning" onClick={() => handleActivate(m)}>해제</button>
+                      : <button className="btn-sm btn-danger-outline" onClick={() => { setSuspendModal({ id: m.id, name: m.name, email: m.email }); setSuspendReason(''); }}>정지</button>
+                    }
+                    <button className="btn-danger-sm" onClick={() => handleDelete(m.id, m.name)}>삭제</button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -118,6 +171,34 @@ const MemberListPage = () => {
         </table>
       </div>
       <Pagination page={page} totalPages={data.totalPages} onPageChange={setPage} />
+
+      {suspendModal && (
+        <div className="modal-overlay" onClick={() => !suspending && setSuspendModal(null)}>
+          <div className="modal-dialog" onClick={e => e.stopPropagation()}>
+            <div className="modal-icon warning">⚠</div>
+            <h3 className="modal-title">회원 정지</h3>
+            <p className="modal-desc">{suspendModal.name}({suspendModal.email})을 정지합니다.</p>
+            <label className="modal-label">정지 사유 (필수)</label>
+            <textarea
+              className="modal-textarea"
+              value={suspendReason}
+              onChange={e => setSuspendReason(e.target.value)}
+              placeholder="정지 사유를 입력하세요"
+              rows={3}
+            />
+            <div className="modal-actions">
+              <button className="btn-secondary" onClick={() => setSuspendModal(null)} disabled={suspending}>취소</button>
+              <button
+                className="btn-danger"
+                onClick={handleSuspendConfirm}
+                disabled={!suspendReason.trim() || suspending}
+              >
+                {suspending ? '처리 중...' : '정지 처리'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

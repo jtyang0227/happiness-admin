@@ -16,12 +16,13 @@ public class AdminInquiryController {
 
     @GetMapping
     public ResponseEntity<?> list(
+            @RequestParam(required = false) Long senderId,
             @RequestParam(required = false) Long receiverId,
             @RequestParam(required = false) Boolean isRead,
             @RequestParam(required = false) String shootType,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(inquiryService.getInquiries(receiverId, isRead, shootType, page, size));
+        return ResponseEntity.ok(inquiryService.getInquiries(senderId, receiverId, isRead, shootType, page, size));
     }
 
     @PatchMapping("/{id}/read")

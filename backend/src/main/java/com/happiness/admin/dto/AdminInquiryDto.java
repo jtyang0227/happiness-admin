@@ -12,8 +12,11 @@ import java.time.LocalDateTime;
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class AdminInquiryDto {
     private Long id;
+    private Long senderId;
+    private Long receiverId;
     private String senderName;
     private String senderEmail;
+    private String receiverName;
     private String receiverProfileName;
     private String shootType;
     private LocalDate shootDate;
@@ -25,8 +28,11 @@ public class AdminInquiryDto {
     public static AdminInquiryDto from(Inquiry i) {
         return AdminInquiryDto.builder()
                 .id(i.getId())
+                .senderId(i.getSender() != null ? i.getSender().getId() : null)
+                .receiverId(i.getReceiver() != null ? i.getReceiver().getId() : null)
                 .senderName(i.getSenderName())
                 .senderEmail(i.getSenderEmail())
+                .receiverName(i.getReceiver() != null ? i.getReceiver().getName() : null)
                 .receiverProfileName(i.getReceiver() != null ? i.getReceiver().getProfileName() : null)
                 .shootType(i.getShootType())
                 .shootDate(i.getShootDate())

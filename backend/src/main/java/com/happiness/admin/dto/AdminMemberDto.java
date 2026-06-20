@@ -20,6 +20,7 @@ public class AdminMemberDto {
     private long photoCount;
     private long seriesCount;
     private long inquiryCount;
+    private String provider;
 
     public static AdminMemberDto from(Member m, long photoCount, long seriesCount, long inquiryCount) {
         return AdminMemberDto.builder()
@@ -33,6 +34,7 @@ public class AdminMemberDto {
                 .photoCount(photoCount)
                 .seriesCount(seriesCount)
                 .inquiryCount(inquiryCount)
+                .provider(m.getProvider())
                 .build();
     }
 }

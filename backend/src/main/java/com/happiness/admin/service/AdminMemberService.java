@@ -4,6 +4,7 @@ import com.happiness.admin.dto.AdminMemberDto;
 import com.happiness.admin.dto.PageResponse;
 import com.happiness.admin.entity.Authority;
 import com.happiness.admin.entity.Member;
+import com.happiness.admin.entity.MemberStatus;
 import com.happiness.admin.repository.InquiryRepository;
 import com.happiness.admin.repository.MemberRepository;
 import com.happiness.admin.repository.PhotoRepository;
@@ -53,6 +54,14 @@ public class AdminMemberService {
         Member m = memberRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
         m.setAuthority(Authority.valueOf(authorityStr));
+        memberRepository.save(m);
+    }
+
+    @Transactional
+    public void updateStatus(Long id, String statusStr, String reason) {
+        Member m = memberRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
+        m.setStatus(MemberStatus.valueOf(statusStr));
         memberRepository.save(m);
     }
 

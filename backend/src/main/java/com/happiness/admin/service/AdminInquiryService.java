@@ -19,10 +19,10 @@ public class AdminInquiryService {
 
     private final InquiryRepository inquiryRepository;
 
-    public PageResponse<AdminInquiryDto> getInquiries(Long receiverId, Boolean isRead, String shootType, int page, int size) {
+    public PageResponse<AdminInquiryDto> getInquiries(Long senderId, Long receiverId, Boolean isRead, String shootType, int page, int size) {
         var pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         return PageResponse.of(
-                inquiryRepository.searchInquiries(receiverId, isRead, shootType, pageable)
+                inquiryRepository.searchInquiries(senderId, receiverId, isRead, shootType, pageable)
                         .map(AdminInquiryDto::from));
     }
 

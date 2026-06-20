@@ -7,6 +7,7 @@ import AdminLayout from './components/layout/AdminLayout';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import MemberListPage from './pages/MemberListPage';
+import MemberDetailPage from './pages/MemberDetailPage';
 import PhotoListPage from './pages/PhotoListPage';
 import InquiryListPage from './pages/InquiryListPage';
 import SeriesListPage from './pages/SeriesListPage';
@@ -27,6 +28,7 @@ const AppRoutes = () => {
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
       <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
       <Route path="/members" element={<ProtectedRoute><MemberListPage /></ProtectedRoute>} />
+      <Route path="/members/:id" element={<ProtectedRoute><MemberDetailPage /></ProtectedRoute>} />
       <Route path="/photos" element={<ProtectedRoute><PhotoListPage /></ProtectedRoute>} />
       <Route path="/inquiries" element={<ProtectedRoute><InquiryListPage /></ProtectedRoute>} />
       <Route path="/series" element={<ProtectedRoute><SeriesListPage /></ProtectedRoute>} />

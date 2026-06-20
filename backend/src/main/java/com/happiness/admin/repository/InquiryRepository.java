@@ -15,10 +15,12 @@ import java.util.List;
 public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
 
     @Query("SELECT i FROM Inquiry i WHERE " +
+           "(:senderId IS NULL OR i.sender.id = :senderId) AND " +
            "(:receiverId IS NULL OR i.receiver.id = :receiverId) AND " +
            "(:isRead IS NULL OR i.isRead = :isRead) AND " +
            "(:shootType IS NULL OR i.shootType = :shootType)")
-    Page<Inquiry> searchInquiries(@Param("receiverId") Long receiverId,
+    Page<Inquiry> searchInquiries(@Param("senderId") Long senderId,
+                                  @Param("receiverId") Long receiverId,
                                   @Param("isRead") Boolean isRead,
                                   @Param("shootType") String shootType,
                                   Pageable pageable);
