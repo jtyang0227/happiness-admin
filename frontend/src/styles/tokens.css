@@ -62,6 +62,7 @@
 
   /* Font */
   --font-sans: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
   --text-xs:   11px;
   --text-sm:   13px;
   --text-base: 14px;
@@ -69,4 +70,91 @@
   --text-lg:   18px;
   --text-xl:   22px;
   --text-2xl:  28px;
+  --text-3xl:  36px;
+
+  /* Line height */
+  --line-tight:  1.25;
+  --line-normal: 1.5;
+  --line-loose:  1.75;
+
+  /* Font weight */
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+
+  /* Z-index layers */
+  --z-base:     0;
+  --z-raised:   10;
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-overlay:  300;
+  --z-modal:    400;
+  --z-toast:    500;
+  --z-tooltip:  600;
+
+  /* Animation */
+  --dur-fast:   100ms;
+  --dur-normal: 200ms;
+  --dur-slow:   350ms;
+  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out:     cubic-bezier(0, 0, 0.2, 1);
+
+  /* Shadow additions */
+  --shadow-focus: 0 0 0 3px rgba(99,102,241,0.25);
+  --shadow-modal: 0 20px 60px rgba(0,0,0,0.3);
+
+  /* Category colors (1차 촬영종류) */
+  --color-cat-wedding:  #f9a8d4;
+  --color-cat-snap:     #86efac;
+  --color-cat-family:   #fbbf24;
+  --color-cat-graduate: #60a5fa;
+  --color-cat-body:     #f97316;
+  --color-cat-product:  #a78bfa;
+  --color-cat-nature:   #34d399;
+  --color-cat-arch:     #94a3b8;
+
+  /* Mood colors */
+  --color-mood-warm:    #fcd34d;
+  --color-mood-cool:    #7dd3fc;
+  --color-mood-neutral: #d1d5db;
+  --color-mood-vivid:   #f472b6;
+  --color-mood-dark:    #6b7280;
+  --color-mood-soft:    #c4b5fd;
+  --color-mood-mono:    #374151;
+  --color-mood-film:    #d97706;
+
+  /* Portfolio / Review status colors */
+  --color-status-draft:    #94a3b8;
+  --color-status-pending:  #f59e0b;
+  --color-status-approved: #22c55e;
+  --color-status-rejected: #ef4444;
+
+  /* Dark mode surface tokens (applied via data-theme or media query) */
+  --color-bg-dark:           #0b1120;
+  --color-surface-dark:      #131f35;
+  --color-surface-2-dark:    #1a2845;
+  --color-border-dark:       #1e3a5f;
+  --color-text-primary-dark: #e2e8f0;
+}
+
+/* Dark mode — system preference */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg:           var(--color-bg-dark);
+    --color-surface:      var(--color-surface-dark);
+    --color-surface-2:    var(--color-surface-2-dark);
+    --color-border:       var(--color-border-dark);
+    --color-text-primary: var(--color-text-primary-dark);
+  }
+}
+
+/* Dark mode — manual override */
+[data-theme="dark"] {
+  --color-bg:           var(--color-bg-dark);
+  --color-surface:      var(--color-surface-dark);
+  --color-surface-2:    var(--color-surface-2-dark);
+  --color-border:       var(--color-border-dark);
+  --color-text-primary: var(--color-text-primary-dark);
 }

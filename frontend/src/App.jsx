@@ -10,6 +10,7 @@ import MemberListPage from './pages/MemberListPage';
 import PhotoListPage from './pages/PhotoListPage';
 import InquiryListPage from './pages/InquiryListPage';
 import SeriesListPage from './pages/SeriesListPage';
+import PortfolioListPage from './pages/PortfolioListPage';
 import StatsPage from './pages/StatsPage';
 import SystemPage from './pages/SystemPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -29,6 +30,7 @@ const AppRoutes = () => {
       <Route path="/members" element={<ProtectedRoute><MemberListPage /></ProtectedRoute>} />
       <Route path="/photos" element={<ProtectedRoute><PhotoListPage /></ProtectedRoute>} />
       <Route path="/inquiries" element={<ProtectedRoute><InquiryListPage /></ProtectedRoute>} />
+      <Route path="/portfolios" element={<ProtectedRoute><PortfolioListPage /></ProtectedRoute>} />
       <Route path="/series" element={<ProtectedRoute><SeriesListPage /></ProtectedRoute>} />
       <Route path="/stats" element={<ProtectedRoute><StatsPage /></ProtectedRoute>} />
       <Route path="/system" element={<ProtectedRoute><SystemPage /></ProtectedRoute>} />

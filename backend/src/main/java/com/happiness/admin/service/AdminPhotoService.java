@@ -40,7 +40,9 @@ public class AdminPhotoService {
         return colorMood.trim().toUpperCase();
     }
 
-    public PageResponse<AdminPhotoDto> getPhotos(Long memberId, String colorMood, String search, String sortBy, int page, int size) {
+    public PageResponse<AdminPhotoDto> getPhotos(Long memberId, String colorMood,
+            String l1, String l2, String l3, String l4, String l5,
+            String search, String sortBy, int page, int size) {
         Sort sort = switch (sortBy != null ? sortBy : "latest") {
             case "likes"  -> Sort.by("likesCount").descending();
             case "saves"  -> Sort.by("savesCount").descending();
@@ -50,8 +52,11 @@ public class AdminPhotoService {
         var pageable = PageRequest.of(page, size, sort);
         String searchTerm = (search != null && !search.isBlank()) ? search.trim() : null;
         String resolvedMood = resolveColorMood(colorMood);
+        String rl1 = blank(l1); String rl2 = blank(l2); String rl3 = blank(l3);
+        String rl4 = blank(l4); String rl5 = blank(l5);
         return PageResponse.of(
-                photoRepository.searchPhotos(memberId, resolvedMood, searchTerm, pageable).map(AdminPhotoDto::from));
+                photoRepository.searchPhotos(memberId, resolvedMood, rl1, rl2, rl3, rl4, rl5, searchTerm, pageable)
+                        .map(AdminPhotoDto::from));
     }
 
     @Transactional
@@ -61,4 +66,14 @@ public class AdminPhotoService {
         seriesPhotoRepository.deleteByPhotoId(id);
         photoRepository.delete(photo);
     }
+
+    @Transactional
+    public AdminPhotoDto updateCategoryCode(Long id, String categoryCode) {
+        Photo photo = photoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("사진을 찾을 수 없습니다."));
+        photo.setCategoryCode(categoryCode);
+        return AdminPhotoDto.from(photoRepository.save(photo));
+    }
+
+    private String blank(String s) { return (s != null && !s.isBlank()) ? s.trim() : null; }
 }
