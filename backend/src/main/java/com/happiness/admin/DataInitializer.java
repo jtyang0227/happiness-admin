@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @Profile("!prod")
@@ -24,6 +25,10 @@ public class DataInitializer implements ApplicationRunner {
     private final PhotoRepository photoRepository;
     private final InquiryRepository inquiryRepository;
     private final SeriesRepository seriesRepository;
+    private final NoticeRepository noticeRepository;
+    private final BannerRepository bannerRepository;
+    private final ReportRepository reportRepository;
+    private final VerificationRequestRepository verificationRepository;
     private final PasswordEncoder passwordEncoder;
 
     private static final String[] MOODS = {"WARM", "COOL", "NEUTRAL", "VIVID", "DARK", "SOFT"};
@@ -101,6 +106,75 @@ public class DataInitializer implements ApplicationRunner {
             series.getSeriesPhotos().add(SeriesPhoto.builder()
                     .series(series).photo(photos.get((i * 3 + 1) % photos.size())).displayOrder(1).build());
             seriesRepository.save(series);
+        }
+
+        // ── 공지사항 ──────────────────────────────────────────
+        String[][] noticeData = {
+            {"점검", "2026년 6월 서버 점검 안내", "6월 20일 새벽 2시~4시 서버 점검을 진행합니다. 이용에 불편을 드려 죄송합니다.", "PUBLISHED"},
+            {"일반", "신규 작가 모집 공고", "Happiness 플랫폼의 새로운 작가를 모집합니다. 지금 신청하세요!", "PUBLISHED"},
+            {"이벤트", "여름 사진전 이벤트", "7월 한 달간 여름을 주제로 한 사진을 올려주세요. 최우수작에게 상금을 드립니다.", "PUBLISHED"},
+            {"정책", "이용약관 변경 안내", "개인정보 처리방침이 일부 변경됩니다. 2026년 7월 1일부터 적용됩니다.", "PUBLISHED"},
+            {"일반", "작가 인증 시스템 도입", "이제 전문 작가 인증 뱃지를 신청하실 수 있습니다.", "DRAFT"},
+        };
+        for (int i = 0; i < noticeData.length; i++) {
+            noticeRepository.save(Notice.builder()
+                    .type(noticeData[i][0]).title(noticeData[i][1]).content(noticeData[i][2])
+                    .status(noticeData[i][3]).isPinned(i == 0)
+                    .publishedAt("PUBLISHED".equals(noticeData[i][3]) ? LocalDateTime.now().minusDays(i + 1) : null)
+                    .expiresAt(i == 0 ? LocalDateTime.now().plusDays(7) : null)
+                    .authorId(wm.getId()).build());
+        }
+
+        // ── 배너 ──────────────────────────────────────────────
+        String[][] bannerData = {
+            {"여름 이벤트 배너", "https://picsum.photos/seed/banner1/1200/400", "/events/summer"},
+            {"작가 모집 배너", "https://picsum.photos/seed/banner2/1200/400", "/recruit"},
+            {"신규 기능 안내", "https://picsum.photos/seed/banner3/1200/400", "/notices"},
+        };
+        for (int i = 0; i < bannerData.length; i++) {
+            bannerRepository.save(Banner.builder()
+                    .title(bannerData[i][0]).imageUrl(bannerData[i][1]).linkUrl(bannerData[i][2])
+                    .isActive(i < 2).displayOrder(i + 1)
+                    .startsAt(LocalDateTime.now().minusDays(3))
+                    .endsAt(i == 0 ? LocalDateTime.now().plusDays(30) : null)
+                    .build());
+        }
+
+        // ── 신고 ──────────────────────────────────────────────
+        String[] reasons = {"부적절 콘텐츠", "스팸", "저작권 침해", "허위 정보", "혐오 발언"};
+        String[] statuses = {"PENDING", "PENDING", "IN_REVIEW", "ACTION_TAKEN", "DISMISSED",
+                             "PENDING", "PENDING", "IN_REVIEW"};
+        for (int i = 0; i < 8; i++) {
+            reportRepository.save(Report.builder()
+                    .reporter(users.get(i % users.size()))
+                    .targetType(i % 3 == 0 ? "PHOTO" : (i % 3 == 1 ? "MEMBER" : "SERIES"))
+                    .targetId(photos.get(i % photos.size()).getId())
+                    .reason(reasons[i % reasons.length])
+                    .details("해당 콘텐츠가 플랫폼 규정에 위반된다고 생각합니다.")
+                    .status(statuses[i])
+                    .build());
+        }
+
+        // ── 작가 인증 신청 ────────────────────────────────────
+        String[] verStatuses = {"PENDING", "PENDING", "PENDING", "APPROVED", "REJECTED"};
+        for (int i = 0; i < 5; i++) {
+            Member applicant = users.get(i);
+            VerificationRequest vr = VerificationRequest.builder()
+                    .member(applicant)
+                    .portfolioUrl("https://portfolio.example.com/" + applicant.getProfileName())
+                    .bio(applicant.getName() + "입니다. 3년간 사진 작가로 활동했습니다.")
+                    .status(verStatuses[i])
+                    .build();
+            if ("APPROVED".equals(verStatuses[i])) {
+                vr.setReviewedAt(LocalDateTime.now().minusDays(2));
+                applicant.setVerified(true);
+                applicant.setVerifiedAt(LocalDateTime.now().minusDays(2));
+                memberRepository.save(applicant);
+            } else if ("REJECTED".equals(verStatuses[i])) {
+                vr.setRejectReason("포트폴리오 작품 수가 부족합니다. 최소 10장 이상의 작품이 필요합니다.");
+                vr.setReviewedAt(LocalDateTime.now().minusDays(1));
+            }
+            verificationRepository.save(vr);
         }
     }
 

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getApi, patchApi, deleteApi } from '../utils/api';
 import { useConfirm } from '../context/ConfirmContext';
+import { useAuth } from '../context/AuthContext';
 import Pagination from '../components/common/Pagination';
 import './MemberListPage.css';
 
@@ -12,6 +13,8 @@ const STATUS_CLASSES = { ACTIVE: 'badge-green', SUSPENDED: 'badge-red', INACTIVE
 
 const MemberListPage = () => {
   const { confirm } = useConfirm();
+  const { user } = useAuth();
+  const isWM = user?.authority === 'WM';
   const [data, setData] = useState({ content: [], totalPages: 0, totalElements: 0 });
   const [search, setSearch] = useState('');
   const [authority, setAuthority] = useState('');
@@ -138,15 +141,21 @@ const MemberListPage = () => {
                 <td>{m.email}</td>
                 <td>{m.profileName || '-'}</td>
                 <td>
-                  <select
-                    className={`role-select badge ${AUTHORITY_COLORS[m.authority]}`}
-                    value={m.authority}
-                    onChange={e => handleRoleChange(m.id, m.name, e.target.value)}
-                  >
-                    <option value="WM">웹관리자</option>
-                    <option value="SA">운영자</option>
-                    <option value="US">일반</option>
-                  </select>
+                  {isWM ? (
+                    <select
+                      className={`role-select badge ${AUTHORITY_COLORS[m.authority]}`}
+                      value={m.authority}
+                      onChange={e => handleRoleChange(m.id, m.name, e.target.value)}
+                    >
+                      <option value="WM">웹관리자</option>
+                      <option value="SA">운영자</option>
+                      <option value="US">일반</option>
+                    </select>
+                  ) : (
+                    <span className={`badge ${AUTHORITY_COLORS[m.authority]}`}>
+                      {m.authority}
+                    </span>
+                  )}
                 </td>
                 <td>
                   <span className={`badge ${STATUS_CLASSES[m.status] || 'badge-green'}`}>
@@ -162,7 +171,7 @@ const MemberListPage = () => {
                       ? <button className="btn-sm btn-warning" onClick={() => handleActivate(m)}>해제</button>
                       : <button className="btn-sm btn-danger-outline" onClick={() => { setSuspendModal({ id: m.id, name: m.name, email: m.email }); setSuspendReason(''); }}>정지</button>
                     }
-                    <button className="btn-danger-sm" onClick={() => handleDelete(m.id, m.name)}>삭제</button>
+                    {isWM && <button className="btn-danger-sm" onClick={() => handleDelete(m.id, m.name)}>삭제</button>}
                   </div>
                 </td>
               </tr>

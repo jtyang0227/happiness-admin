@@ -34,6 +34,8 @@ const apiCall = async (endpoint, options = {}) => {
 export const getApi = (endpoint) => apiCall(endpoint, { method: 'GET' });
 export const postApi = (endpoint, data) =>
   apiCall(endpoint, { method: 'POST', body: JSON.stringify(data) });
+export const putApi = (endpoint, data) =>
+  apiCall(endpoint, { method: 'PUT', body: JSON.stringify(data) });
 export const patchApi = (endpoint, data) =>
   apiCall(endpoint, { method: 'PATCH', body: JSON.stringify(data) });
 export const deleteApi = (endpoint) => apiCall(endpoint, { method: 'DELETE' });

@@ -16,6 +16,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -59,9 +61,22 @@ public class AdminMemberService {
 
     @Transactional
     public void updateStatus(Long id, String statusStr, String reason) {
+        MemberStatus newStatus;
+        try {
+            newStatus = MemberStatus.valueOf(statusStr);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("잘못된 상태 값입니다: " + statusStr);
+        }
         Member m = memberRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
-        m.setStatus(MemberStatus.valueOf(statusStr));
+        m.setStatus(newStatus);
+        if (newStatus == MemberStatus.SUSPENDED) {
+            m.setSuspendReason(reason);
+            m.setSuspendedAt(LocalDateTime.now());
+        } else {
+            m.setSuspendReason(null);
+            m.setSuspendedAt(null);
+        }
         memberRepository.save(m);
     }
 
@@ -71,15 +86,11 @@ public class AdminMemberService {
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
         inquiryRepository.deleteBySenderId(id);
         inquiryRepository.deleteByReceiverId(id);
-        photoRepository.findAll().stream()
-                .filter(p -> p.getMember().getId().equals(id))
-                .forEach(p -> {
-                    seriesPhotoRepository.deleteByPhotoId(p.getId());
-                    photoRepository.delete(p);
-                });
-        seriesRepository.findAll().stream()
-                .filter(s -> s.getMember().getId().equals(id))
-                .forEach(seriesRepository::delete);
+        photoRepository.findByMemberId(id).forEach(p -> {
+            seriesPhotoRepository.deleteByPhotoId(p.getId());
+            photoRepository.delete(p);
+        });
+        seriesRepository.findByMemberId(id).forEach(seriesRepository::delete);
         memberRepository.delete(m);
     }
 }

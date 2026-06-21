@@ -1,0 +1,58 @@
+/* NoticePage */
+
+.row-pinned { background: #fdfce4; }
+
+.notice-type-badge {
+  display: inline-block; padding: 2px 8px;
+  border-radius: var(--radius-sm); font-size: var(--text-xs); font-weight: 600;
+  background: var(--color-surface-2); color: var(--color-text-secondary);
+}
+
+.btn-primary-sm {
+  padding: 7px 14px; border-radius: var(--radius-md); font-size: var(--text-sm); font-weight: 600;
+  border: none; background: var(--color-brand-500); color: white; cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-primary-sm:hover { opacity: 0.88; }
+
+.notice-form-dialog {
+  background: var(--color-surface); border-radius: var(--radius-lg);
+  padding: 28px 32px; width: 640px; max-width: 95vw; max-height: 90vh;
+  overflow-y: auto; box-shadow: var(--shadow-lg);
+  animation: modal-slide-up 0.2s ease;
+}
+
+.notice-form-row {
+  display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4);
+}
+
+.notice-form-group { margin-bottom: var(--space-4); }
+
+.notice-pin-label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: var(--text-sm); color: var(--color-text-secondary); cursor: pointer;
+}
+
+.notice-title-input {
+  width: 100%; padding: 9px 12px; border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md); font-size: var(--text-sm);
+  background: var(--color-surface); color: var(--color-text-primary); outline: none;
+  box-sizing: border-box;
+}
+.notice-title-input:focus { border-color: var(--color-brand-500); }
+
+.notice-content-textarea {
+  width: 100%; padding: 10px 12px; border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md); font-size: var(--text-sm);
+  background: var(--color-surface); color: var(--color-text-primary); outline: none;
+  resize: vertical; min-height: 160px; box-sizing: border-box; font-family: inherit;
+}
+.notice-content-textarea:focus { border-color: var(--color-brand-500); }
+
+.btn-primary-modal {
+  padding: 9px 20px; border-radius: var(--radius-md); font-size: var(--text-sm); font-weight: 600;
+  border: none; background: var(--color-brand-500); color: white; cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-primary-modal:hover:not(:disabled) { opacity: 0.88; }
+.btn-primary-modal:disabled { opacity: 0.5; cursor: not-allowed; }

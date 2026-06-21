@@ -14,6 +14,10 @@ import SeriesListPage from './pages/SeriesListPage';
 import StatsPage from './pages/StatsPage';
 import SystemPage from './pages/SystemPage';
 import NotFoundPage from './pages/NotFoundPage';
+import NoticePage from './pages/NoticePage';
+import BannerPage from './pages/BannerPage';
+import ReportListPage from './pages/ReportListPage';
+import VerificationListPage from './pages/VerificationListPage';
 import './styles/global.css';
 
 const ProtectedRoute = ({ children }) => {
@@ -34,6 +38,10 @@ const AppRoutes = () => {
       <Route path="/series" element={<ProtectedRoute><SeriesListPage /></ProtectedRoute>} />
       <Route path="/stats" element={<ProtectedRoute><StatsPage /></ProtectedRoute>} />
       <Route path="/system" element={<ProtectedRoute><SystemPage /></ProtectedRoute>} />
+      <Route path="/notices" element={<ProtectedRoute><NoticePage /></ProtectedRoute>} />
+      <Route path="/banners" element={<ProtectedRoute><BannerPage /></ProtectedRoute>} />
+      <Route path="/reports" element={<ProtectedRoute><ReportListPage /></ProtectedRoute>} />
+      <Route path="/verifications" element={<ProtectedRoute><VerificationListPage /></ProtectedRoute>} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

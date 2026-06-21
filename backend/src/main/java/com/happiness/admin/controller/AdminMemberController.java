@@ -5,6 +5,7 @@ import com.happiness.admin.dto.StatusUpdateRequest;
 import com.happiness.admin.service.AdminMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -30,6 +31,7 @@ public class AdminMemberController {
         return ResponseEntity.ok(memberService.getMember(id));
     }
 
+    @PreAuthorize("hasRole('WM')")
     @PatchMapping("/{id}/role")
     public ResponseEntity<?> updateRole(@PathVariable Long id, @RequestBody RoleUpdateRequest req) {
         memberService.updateRole(id, req.getAuthority());
@@ -42,6 +44,7 @@ public class AdminMemberController {
         return ResponseEntity.ok(Map.of("message", "회원 상태가 변경되었습니다."));
     }
 
+    @PreAuthorize("hasRole('WM')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         memberService.deleteMember(id);

@@ -54,4 +54,6 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
     void deleteSeriesPhotosByPhotoId(@Param("photoId") Long photoId);
 
     long countByMemberId(Long memberId);
+
+    List<Photo> findByMemberId(Long memberId);
 }

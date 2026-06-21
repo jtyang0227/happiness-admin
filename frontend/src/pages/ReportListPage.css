@@ -1,0 +1,57 @@
+/* ReportListPage */
+
+.report-counts {
+  display: flex; gap: var(--space-3); margin-bottom: var(--space-4);
+}
+
+.count-card {
+  flex: 1; padding: var(--space-4); border-radius: var(--radius-lg);
+  text-align: center; cursor: pointer; border: 2px solid transparent;
+  box-shadow: var(--shadow-sm); transition: border-color 0.15s, box-shadow 0.15s;
+  background: var(--color-surface);
+}
+.count-card.active { box-shadow: var(--shadow-md); }
+.count-num { font-size: 28px; font-weight: 800; }
+.count-label { font-size: var(--text-xs); color: var(--color-text-tertiary); margin-top: 4px; font-weight: 600; }
+
+.count-red .count-num { color: var(--color-danger); }
+.count-red.active { border-color: var(--color-danger); }
+.count-yellow .count-num { color: #d97706; }
+.count-yellow.active { border-color: #d97706; }
+.count-green .count-num { color: var(--color-success); }
+.count-green.active { border-color: var(--color-success); }
+.count-gray .count-num { color: var(--color-text-tertiary); }
+.count-gray.active { border-color: var(--color-text-tertiary); }
+
+.row-pending { background: #fff8f8; }
+
+.report-review-dialog {
+  background: var(--color-surface); border-radius: var(--radius-lg);
+  padding: 28px 32px; width: 560px; max-width: 95vw; max-height: 90vh;
+  overflow-y: auto; box-shadow: var(--shadow-lg);
+  animation: modal-slide-up 0.2s ease;
+}
+
+.review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-5); }
+.review-close {
+  background: none; border: none; font-size: 18px; cursor: pointer;
+  color: var(--color-text-tertiary); line-height: 1;
+}
+
+.review-info-grid { display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-5); }
+.review-label { font-size: var(--text-xs); color: var(--color-text-tertiary); font-weight: 700; text-transform: uppercase; margin-right: var(--space-2); }
+.review-val { font-size: var(--text-sm); color: var(--color-text-primary); }
+.review-details p { margin: 4px 0 0; }
+
+.review-section { margin-bottom: var(--space-4); }
+.review-radio {
+  display: flex; align-items: center; gap: 8px;
+  font-size: var(--text-sm); color: var(--color-text-primary);
+  cursor: pointer; padding: 6px 0;
+}
+
+.notice-type-badge {
+  display: inline-block; padding: 2px 8px;
+  border-radius: var(--radius-sm); font-size: var(--text-xs); font-weight: 600;
+  background: var(--color-surface-2); color: var(--color-text-secondary);
+}

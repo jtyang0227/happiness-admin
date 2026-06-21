@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getApi, patchApi, deleteApi } from '../utils/api';
 import { useConfirm } from '../context/ConfirmContext';
+import { useAuth } from '../context/AuthContext';
 import ImgWithFallback from '../components/common/ImgWithFallback';
 import './MemberDetailPage.css';
 
@@ -22,6 +23,8 @@ const MemberDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { confirm } = useConfirm();
+  const { user } = useAuth();
+  const isWM = user?.authority === 'WM';
 
   const [member, setMember] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -176,15 +179,17 @@ const MemberDetailPage = () => {
                 <span className={`badge ${AUTH_CLASSES[member.authority] || 'badge-green'}`}>
                   {AUTH_LABELS[member.authority] || member.authority}
                 </span>
-                <select
-                  className="role-select-sm"
-                  value={member.authority}
-                  onChange={e => handleRoleChange(e.target.value)}
-                >
-                  <option value="WM">웹관리자</option>
-                  <option value="SA">운영자</option>
-                  <option value="US">일반</option>
-                </select>
+                {isWM && (
+                  <select
+                    className="role-select-sm"
+                    value={member.authority}
+                    onChange={e => handleRoleChange(e.target.value)}
+                  >
+                    <option value="WM">웹관리자</option>
+                    <option value="SA">운영자</option>
+                    <option value="US">일반</option>
+                  </select>
+                )}
               </span>
             </div>
             <div className="info-row">

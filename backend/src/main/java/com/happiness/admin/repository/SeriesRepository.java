@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface SeriesRepository extends JpaRepository<Series, Long> {
 
@@ -19,4 +21,6 @@ public interface SeriesRepository extends JpaRepository<Series, Long> {
                               Pageable pageable);
 
     long countByMemberId(Long memberId);
+
+    List<Series> findByMemberId(Long memberId);
 }
