@@ -40,6 +40,10 @@ public class Photo {
     @Builder.Default
     private int sharesCount = 0;
 
+    @Column(name = "category_code", length = 10)
+    @Builder.Default
+    private String categoryCode = "0000000000";
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;

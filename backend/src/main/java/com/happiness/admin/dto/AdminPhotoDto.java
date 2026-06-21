@@ -20,6 +20,9 @@ public class AdminPhotoDto {
     private int sharesCount;
     private Long memberId;
     private String authorName;
+    private String categoryCode;
+    private String l1Name;
+    private String l2Name;
     private LocalDateTime createdAt;
 
     public static AdminPhotoDto from(Photo p) {
@@ -34,6 +37,9 @@ public class AdminPhotoDto {
                 .sharesCount(p.getSharesCount())
                 .memberId(p.getMember().getId())
                 .authorName(p.getMember().getName())
+                .categoryCode(p.getCategoryCode())
+                .l1Name(p.getCategoryCode() != null ? com.happiness.admin.util.CategoryCode.getLevel(p.getCategoryCode(), 1) : "00")
+                .l2Name(p.getCategoryCode() != null ? com.happiness.admin.util.CategoryCode.getLevel(p.getCategoryCode(), 2) : "00")
                 .createdAt(p.getCreatedAt())
                 .build();
     }

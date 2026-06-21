@@ -30,6 +30,8 @@ public class DataInitializer implements ApplicationRunner {
     private final ReportRepository reportRepository;
     private final VerificationRequestRepository verificationRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PhotoCategoryRepository categoryRepository;
+    private final PortfolioRepository portfolioRepository;
 
     private static final String[] MOODS = {"WARM", "COOL", "NEUTRAL", "VIVID", "DARK", "SOFT"};
     private static final String[] SHOOT_TYPES = {"웨딩", "가족", "프로필", "스냅", "바디프로필", "커플"};
@@ -108,6 +110,27 @@ public class DataInitializer implements ApplicationRunner {
             seriesRepository.save(series);
         }
 
+        // Seed category master (5 levels)
+        seedCategories();
+
+        // Assign category codes to photos
+        String[] catCodes = {
+            "0101010101","0101020201","0201010301","0201030102","0301020401",
+            "0301010501","0102010101","0401020201","0501010301","0201020401",
+            "0701010201","0601030101","0101020302","0301010402","0201010501",
+            "0801020101","0901010201","1001020301","0101010402","0201030103",
+            "0301020204","0101010305","0501020101","0601010202","0701030301",
+            "0201010404","0801020202","0301010103","0401020303","0501010101"
+        };
+        for (int i = 0; i < Math.min(photos.size(), catCodes.length); i++) {
+            Photo ph = photos.get(i);
+            ph.setCategoryCode(catCodes[i]);
+            photoRepository.save(ph);
+        }
+
+        // Seed portfolios
+        seedPortfolios(photos, users, wm, sa);
+
         // ── 공지사항 ──────────────────────────────────────────
         String[][] noticeData = {
             {"점검", "2026년 6월 서버 점검 안내", "6월 20일 새벽 2시~4시 서버 점검을 진행합니다. 이용에 불편을 드려 죄송합니다.", "PUBLISHED"},
@@ -182,5 +205,126 @@ public class DataInitializer implements ApplicationRunner {
         m.setCreatedAt(LocalDateTime.now().minusDays((long)(Math.random() * 90)));
         m.setUpdatedAt(LocalDateTime.now());
         return memberRepository.save(m);
+    }
+
+    private void seedCategories() {
+        // Level 1: 촬영 종류
+        Object[][] l1 = {{"00","미분류","UNCLASSIFIED"},{"01","웨딩","WEDDING"},{"02","스냅","SNAP"},
+            {"03","가족","FAMILY"},{"04","졸업","GRADUATION"},{"05","바디프로필","BODY"},
+            {"06","제품","PRODUCT"},{"07","자연·풍경","NATURE"},{"08","건축·공간","ARCH"},
+            {"09","반려동물","PET"},{"10","만삭·신생아","MATERNITY"},{"99","기타","ETC"}};
+        for (int i = 0; i < l1.length; i++) {
+            categoryRepository.save(PhotoCategory.builder().level(1).code((String)l1[i][0])
+                .nameKo((String)l1[i][1]).nameEn((String)l1[i][2]).sortOrder(i).build());
+        }
+        // Level 2: 촬영 환경
+        Object[][] l2 = {{"00","미분류","UNCLASSIFIED"},{"01","야외","OUTDOOR"},{"02","스튜디오","STUDIO"},
+            {"03","실내 장소","INDOOR"},{"04","해외","OVERSEAS"},{"05","혼합","MIXED"}};
+        for (int i = 0; i < l2.length; i++) {
+            categoryRepository.save(PhotoCategory.builder().level(2).code((String)l2[i][0])
+                .nameKo((String)l2[i][1]).nameEn((String)l2[i][2]).sortOrder(i).build());
+        }
+        // Level 3: 색채 무드
+        Object[][] l3 = {{"00","미분류","UNCLASSIFIED"},{"01","웜","WARM"},{"02","쿨","COOL"},
+            {"03","뉴트럴","NEUTRAL"},{"04","비비드","VIVID"},{"05","다크","DARK"},
+            {"06","소프트","SOFT"},{"07","흑백","MONO"},{"08","필름","FILM"}};
+        for (int i = 0; i < l3.length; i++) {
+            categoryRepository.save(PhotoCategory.builder().level(3).code((String)l3[i][0])
+                .nameKo((String)l3[i][1]).nameEn((String)l3[i][2]).sortOrder(i).build());
+        }
+        // Level 4: 스타일/분위기
+        Object[][] l4 = {{"00","미분류","UNCLASSIFIED"},{"01","자연스러운","NATURAL"},{"02","로맨틱","ROMANTIC"},
+            {"03","빈티지","VINTAGE"},{"04","모던","MODERN"},{"05","무드/다크","MOODY"},
+            {"06","밝고화사","BRIGHT"},{"07","감성/아트","ARTISTIC"},{"08","유머/위트","HUMOR"}};
+        for (int i = 0; i < l4.length; i++) {
+            categoryRepository.save(PhotoCategory.builder().level(4).code((String)l4[i][0])
+                .nameKo((String)l4[i][1]).nameEn((String)l4[i][2]).sortOrder(i).build());
+        }
+        // Level 5: 세부 속성
+        Object[][] l5 = {{"00","미분류","UNCLASSIFIED"},{"01","인물 중심","PORTRAIT"},{"02","배경 중심","BACKGROUND"},
+            {"03","오브제 포함","OBJECT"},{"04","커플/2인","COUPLE"},{"05","그룹/단체","GROUP"},
+            {"06","흑백 후처리","BW_POST"},{"07","드론/항공","DRONE"},{"08","접사/디테일","CLOSEUP"},
+            {"09","야간/인공조명","NIGHT"},{"10","움직임 포착","MOTION"}};
+        for (int i = 0; i < l5.length; i++) {
+            categoryRepository.save(PhotoCategory.builder().level(5).code((String)l5[i][0])
+                .nameKo((String)l5[i][1]).nameEn((String)l5[i][2]).sortOrder(i).build());
+        }
+    }
+
+    private void seedPortfolios(List<Photo> photos, List<Member> users, Member wm, Member sa) {
+        // Portfolio 1: APPROVED + PUBLIC
+        Portfolio p1 = Portfolio.builder()
+            .member(wm).title("웨딩 스타일 모음").subtitle("2026년 봄/여름 웨딩 작품집")
+            .coverImageUrl("https://picsum.photos/seed/pf1/600/400")
+            .categoryCode("0101010101").tags("#웨딩 #야외 #봄 #내추럴")
+            .status(PortfolioStatus.APPROVED).visibility(PortfolioVisibility.PUBLIC)
+            .viewCount(1240).likesCount(234).pinned(true)
+            .build();
+        p1.getItems().add(PortfolioItem.builder().portfolio(p1).itemType("PHOTO")
+            .photo(photos.get(0)).displayOrder(0).featured(true).build());
+        p1.getItems().add(PortfolioItem.builder().portfolio(p1).itemType("PHOTO")
+            .photo(photos.get(2)).displayOrder(1).build());
+        p1.getItems().add(PortfolioItem.builder().portfolio(p1).itemType("PHOTO")
+            .photo(photos.get(4)).displayOrder(2).build());
+        portfolioRepository.save(p1);
+
+        // Portfolio 2: PENDING (검수 대기)
+        Portfolio p2 = Portfolio.builder()
+            .member(users.get(0)).title("2026 스프링 컬렉션").subtitle("봄날의 스냅 포트폴리오")
+            .coverImageUrl("https://picsum.photos/seed/pf2/600/400")
+            .categoryCode("0201010302").tags("#스냅 #야외 #뉴트럴")
+            .status(PortfolioStatus.PENDING).visibility(PortfolioVisibility.PRIVATE)
+            .viewCount(0).likesCount(0).build();
+        p2.getItems().add(PortfolioItem.builder().portfolio(p2).itemType("PHOTO")
+            .photo(photos.get(1)).displayOrder(0).featured(true).build());
+        p2.getItems().add(PortfolioItem.builder().portfolio(p2).itemType("PHOTO")
+            .photo(photos.get(3)).displayOrder(1).build());
+        portfolioRepository.save(p2);
+
+        // Portfolio 3: PENDING (검수 대기 2)
+        Portfolio p3 = Portfolio.builder()
+            .member(users.get(1)).title("가을 감성 모음").subtitle("깊어가는 계절의 기록")
+            .coverImageUrl("https://picsum.photos/seed/pf3/600/400")
+            .categoryCode("0201030501").tags("#스냅 #뉴트럴 #다크")
+            .status(PortfolioStatus.PENDING).visibility(PortfolioVisibility.PRIVATE)
+            .viewCount(0).likesCount(0).build();
+        p3.getItems().add(PortfolioItem.builder().portfolio(p3).itemType("PHOTO")
+            .photo(photos.get(5)).displayOrder(0).featured(true).build());
+        portfolioRepository.save(p3);
+
+        // Portfolio 4: APPROVED + PUBLIC
+        Portfolio p4 = Portfolio.builder()
+            .member(sa).title("도시 스케치").subtitle("도시 일상의 순간들")
+            .coverImageUrl("https://picsum.photos/seed/pf4/600/400")
+            .categoryCode("0201030401").tags("#스냅 #야외 #뉴트럴 #모던")
+            .status(PortfolioStatus.APPROVED).visibility(PortfolioVisibility.PUBLIC)
+            .viewCount(890).likesCount(156).build();
+        p4.getItems().add(PortfolioItem.builder().portfolio(p4).itemType("PHOTO")
+            .photo(photos.get(6)).displayOrder(0).featured(true).build());
+        p4.getItems().add(PortfolioItem.builder().portfolio(p4).itemType("PHOTO")
+            .photo(photos.get(8)).displayOrder(1).build());
+        portfolioRepository.save(p4);
+
+        // Portfolio 5: REJECTED
+        Portfolio p5 = Portfolio.builder()
+            .member(users.get(2)).title("빛의 탐구").subtitle("빛과 그림자의 실험")
+            .coverImageUrl("https://picsum.photos/seed/pf5/600/400")
+            .categoryCode("0701050501").tags("#자연풍경 #다크 #무드")
+            .status(PortfolioStatus.REJECTED)
+            .adminNote("사진 해상도가 기준에 미달합니다. 재업로드 후 재신청해 주세요.")
+            .visibility(PortfolioVisibility.PRIVATE)
+            .viewCount(0).likesCount(0).build();
+        p5.getItems().add(PortfolioItem.builder().portfolio(p5).itemType("PHOTO")
+            .photo(photos.get(9)).displayOrder(0).featured(true).build());
+        portfolioRepository.save(p5);
+
+        // Portfolio 6: DRAFT
+        Portfolio p6 = Portfolio.builder()
+            .member(users.get(3)).title("인물 연작 (초안)").subtitle("사람의 표정을 담다")
+            .coverImageUrl("https://picsum.photos/seed/pf6/600/400")
+            .categoryCode("0201010101").tags("#스냅 #인물")
+            .status(PortfolioStatus.DRAFT).visibility(PortfolioVisibility.PRIVATE)
+            .viewCount(0).likesCount(0).build();
+        portfolioRepository.save(p6);
     }
 }
