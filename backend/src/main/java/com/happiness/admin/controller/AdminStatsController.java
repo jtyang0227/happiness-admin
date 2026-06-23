@@ -36,4 +36,9 @@ public class AdminStatsController {
     public ResponseEntity<?> shootTypeDist() {
         return ResponseEntity.ok(statsService.getShootTypeDistribution());
     }
+
+    @GetMapping("/photographers")
+    public ResponseEntity<?> photographers(@RequestParam(defaultValue = "10") int limit) {
+        return ResponseEntity.ok(statsService.getPhotographerStats(limit));
+    }
 }

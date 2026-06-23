@@ -44,6 +44,10 @@ public class Photo {
     @Builder.Default
     private String categoryCode = "0000000000";
 
+    @Column(name = "display_order")
+    @Builder.Default
+    private int displayOrder = 0;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;

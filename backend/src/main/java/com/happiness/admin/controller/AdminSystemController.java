@@ -1,9 +1,14 @@
 package com.happiness.admin.controller;
 
+import com.happiness.admin.dto.AdminActivityLogDto;
+import com.happiness.admin.dto.PageResponse;
 import com.happiness.admin.dto.SystemStatusDto;
+import com.happiness.admin.entity.AdminActivityLog;
+import com.happiness.admin.repository.AdminActivityLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +20,7 @@ import java.util.Arrays;
 public class AdminSystemController {
 
     private final Environment env;
+    private final AdminActivityLogRepository activityLogRepository;
 
     @Value("${spring.mail.host:}")
     private String mailHost;
@@ -38,5 +44,22 @@ public class AdminSystemController {
                 .dbType(dbType)
                 .activeProfile(activeProfile)
                 .build());
+    }
+
+    @GetMapping("/activity-logs")
+    public ResponseEntity<?> activityLogs(
+            @RequestParam(required = false) Long adminId,
+            @RequestParam(required = false) String action,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        var pageable = PageRequest.of(page, size);
+        var logs = activityLogRepository.searchLogs(adminId, action, pageable)
+                .map(AdminActivityLogDto::from);
+        return ResponseEntity.ok(PageResponse.of(logs));
+    }
+
+    @PostMapping("/activity-logs")
+    public ResponseEntity<?> logActivity(@RequestBody AdminActivityLog log) {
+        return ResponseEntity.ok(activityLogRepository.save(log));
     }
 }

@@ -2,6 +2,7 @@ package com.happiness.admin.service;
 
 import com.happiness.admin.dto.DailyStatDto;
 import com.happiness.admin.dto.DistItemDto;
+import com.happiness.admin.dto.PhotographerStatDto;
 import com.happiness.admin.dto.StatsSummaryDto;
 import com.happiness.admin.dto.TopPhotoDto;
 import com.happiness.admin.repository.InquiryRepository;
@@ -76,6 +77,19 @@ public class AdminStatsService {
     public List<DistItemDto> getShootTypeDistribution() {
         return inquiryRepository.shootTypeDistribution().stream()
                 .map(r -> new DistItemDto((String) r[0], (Long) r[1]))
+                .collect(Collectors.toList());
+    }
+
+    public List<PhotographerStatDto> getPhotographerStats(int limit) {
+        return memberRepository.photographerStats(PageRequest.of(0, limit)).stream()
+                .map(r -> PhotographerStatDto.builder()
+                        .memberId((Long) r[0])
+                        .name((String) r[1])
+                        .profileName((String) r[2])
+                        .photoCount((Long) r[3])
+                        .totalLikes((Long) r[4])
+                        .totalSaves((Long) r[5])
+                        .build())
                 .collect(Collectors.toList());
     }
 
