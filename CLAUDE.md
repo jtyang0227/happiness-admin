@@ -77,6 +77,84 @@ React SPA using React Router v6 + Recharts:
 - **`utils/api.js`** — `getApi`, `postApi`, `patchApi`, `deleteApi` (localStorage JWT 자동 첨부, 401 시 `/login` 리다이렉트)
 - **`App.jsx`** — `ProtectedRoute` 래퍼: 미인증 시 `/login`으로 리다이렉트
 
+## Design System
+
+### Design References
+
+이 프로젝트의 UI는 두 앱에서 영감을 받은 **Cosmos × Pinterest 퓨전 디자인**을 사용한다.
+
+| Reference | DNA | Key Elements |
+|---|---|---|
+| **Pinterest** | Light mode base, warm neutrals, masonry layout | Pin Red (#E60023), cream bg (#FAFAF8), column-count masonry, card hover overlay |
+| **Cosmos** | Dark mode DNA, minimal black, collage hero | Pure black (#000000), tracked title, italic pill search, 2px-gap collage, underline tabs |
+
+### CSS Variable System
+
+모든 색상은 CSS 변수 단일 인터페이스를 통해 light/dark 자동 전환된다.
+
+```css
+/* Light mode (Pinterest base) */
+:root {
+  --color-bg:       #FAFAF8;
+  --color-surface:  #FFFFFF;
+  --color-surface-2: #F5F5F3;
+  --color-text:     #1A1A1A;
+  --color-text-2:   #767676;
+  --color-border:   #E5E5E5;
+  --color-brand:    #E60023;   /* Pin Red */
+  --color-brand-2:  #AD081B;
+}
+
+/* Dark mode (Cosmos DNA) */
+[data-theme="dark"], @media (prefers-color-scheme: dark) {
+  --color-bg:       #000000;
+  --color-surface:  #111111;
+  --color-surface-2: #1A1A1A;
+  --color-text:     #F5F5F5;
+  --color-text-2:   #A0A0A0;
+  --color-border:   #2A2A2A;
+  --color-brand:    #FF4455;
+  --color-brand-2:  #E60023;
+}
+```
+
+### Key Component Patterns
+
+| Component | Pattern | Notes |
+|---|---|---|
+| **Masonry grid** | `column-count` CSS (no JS) | `break-inside: avoid` on cards |
+| **SlideOver** | Right panel, ESC to close, body scroll lock | Spring animation: `transform: translateX` |
+| **Category tabs** | Sliding underline indicator | JS measures `offsetLeft + offsetWidth` of active tab |
+| **Collage hero** | 3–5 images, 2px gap CSS grid | Named areas: `"a b" "a c"` |
+| **Image blur reveal** | `filter: blur(4px) → blur(0)` on `onLoad` | `transition: filter 0.4s ease` |
+| **Scroll entrance** | `IntersectionObserver` + `.visible` class | `opacity 0→1, translateY 16px→0` |
+| **Pin card** | `position: relative`, hover shows overlay | `border-radius: 16px`, `overflow: hidden` |
+| **Board card** | 3-split cover (CSS grid named areas) | Portfolio 대표 이미지 3장 |
+
+### Font
+
+```css
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css');
+font-family: 'Pretendard Variable', -apple-system, sans-serif;
+```
+
+### Design Files
+
+- `PINTEREST_DESIGN_SPEC.md` — Pinterest 컨셉 전체 디자인 명세 (색상, 컴포넌트, 레이아웃)
+- `COSMOS_DESIGN_SPEC.md` — Cosmos × Pinterest 퓨전 명세 (다크모드, 고급 컴포넌트)
+- `CLAUDE_DESIGN_PROMPTS.md` — Claude에게 UI 구현 요청 시 사용할 재사용 가능한 프롬프트 라이브러리 (13개 컴포넌트)
+- `APP_TO_ADMIN_SPEC.md` — happiness-app에서 admin으로 이식할 기능 명세
+
+### Design Rules
+
+1. **CSS 변수만 사용**: 하드코딩된 색상값 금지. 반드시 `var(--color-*)` 사용.
+2. **다크모드 기본 지원**: 새 컴포넌트는 CSS 변수 시스템에 따라 자동으로 양쪽 테마를 지원해야 한다.
+3. **이미지 blur reveal**: 모든 이미지는 `onLoad`에서 blur → clear 전환 적용.
+4. **column-count 마소니**: JS 기반 마소니 라이브러리(Masonry.js, react-masonry-css) 사용 금지. 순수 CSS `column-count` 방식 사용.
+5. **IntersectionObserver 입장 애니메이션**: 카드 리스트 페이지에서 스크롤 진입 시 fade+slide up 적용.
+6. **Pretendard Variable 폰트**: 모든 페이지에 CDN 로드 필수.
+7. **새 UI 구현 시**: `CLAUDE_DESIGN_PROMPTS.md`의 해당 프롬프트 섹션을 참조하여 일관성 유지.
+
 ## Working Rules
 
 1. **항상 기능 검증**: 코드 작성 후 반드시 백엔드는 `./gradlew build` + 서버 기동 후 API curl 테스트, 프론트엔드는 `npm run build` 로 빌드 성공을 확인한다.
