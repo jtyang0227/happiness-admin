@@ -837,36 +837,45 @@ POST /api/admin/members/bulk-action             → 벌크 제재
                          구현 난이도
 ```
 
-### Phase 로드맵 (현재 디자인 리팩토링과 병행)
+### Phase 로드맵 (디자인 리팩토링 현황 반영, 2026-06-23 기준)
 
-| Phase | 기간 | 내용 |
-|-------|------|------|
-| **디자인 Phase 0~4** | 1주 | 데드코드 정리, CSS 토큰, 아이콘, Toast |
-| **기능 P0** | 2주 | 회원 상태 관리 UI, 회원 상세 페이지 |
-| **디자인 Phase 5~7** | 2주 | 대시보드 UX, 반응형 레이아웃 |
-| **기능 P1** | 4주 | 신고, 공지, 배너, 작가 인증 |
-| **디자인 Phase 8~10** | 3주 | 통계 강화, 다크모드, 고급 UX |
-| **기능 P2** | 6주 | 피처드, 문의 분석, 태그 DB화, CSV 내보내기 |
-| **기능 P3** | 8주+ | 정렬 정책, 점검 모드, 감사 로그 |
+| Phase | 기간 | 내용 | 상태 |
+|-------|------|------|------|
+| **디자인 Phase 0~4** | 1주 | 데드코드 정리, CSS 토큰, 아이콘, Toast | ✅ 완료 |
+| **디자인 Phase 5~7** | 2주 | 대시보드 UX, 반응형 레이아웃 | ✅ 완료 |
+| **디자인 Phase 8~9** | 3주 | 통계 강화, 다크모드 | ✅ 완료 |
+| **디자인 Phase 10** | 1주 | SlideOver, 사이드바 접기, 미읽음 뱃지 | 🚧 진행 중 |
+| **기능 P0** | 2주 | 회원 상태 관리 UI, 회원 상세 페이지 | ❌ 미착수 |
+| **기능 P1** | 4주 | 신고, 공지, 배너, 작가 인증 | ❌ 미착수 |
+| **기능 P2** | 6주 | 피처드, 문의 분석, 태그 DB화, CSV 내보내기 | ❌ 미착수 |
+| **기능 P3** | 8주+ | 정렬 정책, 점검 모드, 감사 로그 | ❌ 미착수 |
 
-### 즉시 착수 체크리스트 (P0)
+### 완료된 P0 항목 (2026-06-23 기준)
+
+```
+백엔드 (완료):
+[x] GET   /api/admin/photos?search= — 검색 파라미터 추가 ✅
+[x] GET   /api/admin/series?search= — 검색 파라미터 추가 ✅
+[x] PATCH /api/admin/inquiries/read-all — 전체 읽음 처리 ✅
+
+프론트엔드 (완료):
+[x] PhotoListPage: 검색 인풋 추가 ✅
+[x] SeriesListPage: 검색 인풋 추가 ✅
+[x] InquiryListPage: [모두 읽음 처리] 버튼 추가 ✅
+```
+
+### 착수 대기 체크리스트 (기능 P0)
 
 ```
 백엔드:
 [ ] PATCH /api/admin/members/{id}/status — MemberStatus 변경 API
 [ ] GET   /api/admin/members/{id}/details — 탭별 통합 조회
-[ ] GET   /api/admin/photos?search= — 검색 파라미터 추가
-[ ] GET   /api/admin/series?search= — 검색 파라미터 추가
-[ ] PATCH /api/admin/inquiries/read-all — 전체 읽음 처리
 
 프론트엔드:
 [ ] MemberListPage: 상태 Badge + [정지/해제] 버튼
 [ ] MemberListPage: 정지 ConfirmDialog (사유 + 기간 입력)
 [ ] /members/:id 라우트 + MemberDetailPage 신규 생성
 [ ] MemberDetailPage: 탭 컴포넌트 (사진/문의/시리즈/제재이력)
-[ ] PhotoListPage: 검색 인풋 추가
-[ ] SeriesListPage: 검색 인풋 추가
-[ ] InquiryListPage: [모두 읽음 처리] 버튼 추가
 ```
 
 ---

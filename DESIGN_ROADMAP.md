@@ -998,7 +998,7 @@ const CHART_COLORS = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#06b6d4', '#a
    (utils/api.js 인터페이스 유지)
 
 2. 라우팅 구조 변경 금지:
-   /login, /, /members, /photos, /inquiries, /series, /stats, /system
+   /login, /, /members, /photos, /portfolios, /inquiries, /series, /stats, /system
 
 3. AuthContext의 login/logout/user 인터페이스 변경 금지
 
@@ -1031,33 +1031,64 @@ const CHART_COLORS = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#06b6d4', '#a
 
 ---
 
-## 백엔드 API 현황 요약 (검증 완료)
+## 백엔드 API 현황 요약 (2026-06-23 기준)
 
-| 엔드포인트 | 현재 상태 | Phase 6 작업 |
-|---|---|---|
-| `GET /api/admin/members` | search 파라미터 지원 ✅ | 없음 |
-| `GET /api/admin/photos` | search 파라미터 **없음** ❌ | 백엔드 추가 필요 |
-| `GET /api/admin/series` | search 파라미터 **없음** ❌ | 백엔드 추가 필요 |
-| `GET /api/admin/inquiries` | isRead, shootType, receiverId 지원 ✅ | 없음 |
-| `PATCH /api/admin/inquiries/{id}/read` | 지원 ✅ | 없음 |
-| `PATCH /api/admin/inquiries/read-all` | **없음** ❌ | 백엔드 추가 필요 |
-| `GET /api/admin/stats/summary` | 지원 ✅ | 없음 |
-| `GET /api/admin/stats/daily` | 지원 ✅ | 없음 |
+| 엔드포인트 | 상태 |
+|---|---|
+| `POST /api/auth/login` | ✅ 구현 완료 |
+| `GET /api/admin/members` | ✅ search·page·size 파라미터 지원 |
+| `PATCH /api/admin/members/{id}/role` | ✅ 구현 완료 |
+| `DELETE /api/admin/members/{id}` | ✅ 구현 완료 |
+| `GET /api/admin/photos` | ✅ search·l1~l5·colorMood·sortBy·page·size 지원 |
+| `PATCH /api/admin/photos/{id}/category-code` | ✅ 구현 완료 |
+| `DELETE /api/admin/photos/{id}` | ✅ 구현 완료 |
+| `GET /api/admin/portfolios` | ✅ 구현 완료 |
+| `PATCH /api/admin/portfolios/{id}/approve` | ✅ 구현 완료 |
+| `PATCH /api/admin/portfolios/{id}/reject` | ✅ 구현 완료 |
+| `PATCH /api/admin/portfolios/{id}/hide` | ✅ 구현 완료 |
+| `DELETE /api/admin/portfolios/{id}` | ✅ 구현 완료 |
+| `GET /api/admin/inquiries` | ✅ isRead·shootType·receiverId·page·size 지원 |
+| `PATCH /api/admin/inquiries/{id}/read` | ✅ 구현 완료 |
+| `PATCH /api/admin/inquiries/read-all` | ✅ 구현 완료 (Phase 6에서 추가) |
+| `GET /api/admin/series` | ✅ search·memberId·page·size 지원 |
+| `DELETE /api/admin/series/{id}` | ✅ 구현 완료 |
+| `GET /api/admin/stats/summary` | ✅ 구현 완료 |
+| `GET /api/admin/stats/daily` | ✅ days 파라미터 지원 |
+| `GET /api/admin/stats/top-photos` | ✅ sortBy 파라미터 지원 |
+| `GET /api/admin/stats/mood-dist` | ✅ 구현 완료 |
+| `GET /api/admin/stats/shoot-type-dist` | ✅ 구현 완료 |
+| `GET /api/admin/system/status` | ✅ 구현 완료 |
+| `GET /api/admin/categories` | ✅ 카테고리 트리 조회 |
 
 ---
 
 ## 진행 상태 체크리스트
 
 ```
-[ ] Phase 0  — 데드 코드 정리 & CSS 중복 제거
-[ ] Phase 1  — ConfirmDialog & 역할 변경 확인
-[ ] Phase 2  — CSS Design Token 도입
-[ ] Phase 3  — Lucide 아이콘 + Pretendard 폰트
-[ ] Phase 4  — Toast 알림 시스템
-[ ] Phase 5  — 대시보드 & 로그인 UX 개선
-[ ] Phase 6  — 목록 페이지 기능 보강 (백엔드 포함)
-[ ] Phase 7  — 반응형 레이아웃 & AdminHeader 통합
-[ ] Phase 8  — 통계 페이지 강화
-[ ] Phase 9  — 다크모드
+[x] Phase 0  — 데드 코드 정리 & CSS 중복 제거
+              (Header.jsx, HomePage.jsx, useFetchAPI.js 삭제 완료)
+[x] Phase 1  — ConfirmDialog & 역할 변경 확인
+              (ConfirmDialog.jsx + ConfirmContext.jsx 구현 완료)
+[x] Phase 2  — CSS Design Token 도입
+              (src/styles/tokens.css 구현 완료)
+[x] Phase 3  — Lucide 아이콘 + Pretendard 폰트
+              (lucide-react 설치, Sidebar 아이콘 교체 완료)
+[x] Phase 4  — Toast 알림 시스템
+              (react-hot-toast + Toaster App.jsx 통합 완료)
+[x] Phase 5  — 대시보드 & 로그인 UX 개선
+              (ImgWithFallback, StatCard 링크화, 비밀번호 토글 완료)
+[x] Phase 6  — 목록 페이지 기능 보강 (백엔드 포함)
+              (photos/series 검색 파라미터, inquiries read-all 추가 완료)
+[x] Phase 7  — 반응형 레이아웃 & AdminHeader 통합
+              (AdminHeader.jsx, 햄버거 메뉴, 모바일 반응형 완료)
+[x] Phase 8  — 통계 페이지 강화
+              (KPI 카드, 기간별 부분 로딩, CSV 내보내기 완료)
+[x] Phase 9  — 다크모드
+              (tokens.css dark mode 오버라이드, prefers-color-scheme 지원 완료)
 [ ] Phase 10 — 고급 기능 확장
+              SlideOver.jsx 구현 완료 / 사이드바 접기·미읽음 뱃지 미구현
+              [10-A] 사이드바 접기/펼치기 — 미구현
+              [10-B] 미읽음 문의 뱃지 — 미구현
+              [10-C] 문의 SlideOver — SlideOver 컴포넌트 구현, 연동 미구현
+              [10-D] 회원 상세 SlideOver — 미구현
 ```

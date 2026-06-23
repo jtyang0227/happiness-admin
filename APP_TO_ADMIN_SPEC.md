@@ -2,7 +2,24 @@
 
 > **목적**: `happiness-app` 에 구현된 기능 중 어드민이 관리·감독해야 할 기능을 `happiness-admin` 으로 이관
 > **기준 분기**: App 브랜치 분석일 2026-06-23 기준
-> **디자인 컨셉**: Pinterest (PINTEREST_DESIGN_SPEC.md 기준)
+> **디자인 컨셉**: Cosmos × Pinterest 퓨전 (COSMOS_DESIGN_SPEC.md + PINTEREST_DESIGN_SPEC.md 기준)
+
+---
+
+## 현재 구현 현황 (2026-06-23 기준)
+
+| # | 기능 | 백엔드 엔드포인트 | 프론트엔드 페이지 | 구현 상태 |
+|---|------|----------------|----------------|---------|
+| 1 | 갤러리 순서 관리 | `PUT /api/admin/photos/reorder` ❌ | `/gallery-order` ❌ | **미구현 (P0)** |
+| 2 | 방문자 분석 | `GET /api/admin/analytics/**` ❌ | `/analytics` ❌ | **미구현 (P0)** |
+| 3 | 납품 포털 | `GET /api/admin/deliveries/**` ❌ | `/deliveries` ❌ | **미구현 (P1)** |
+| 4 | 촬영 예약 | `GET /api/admin/bookings/**` ❌ | `/bookings` ❌ | **미구현 (P1)** |
+| 5 | 장르 분류 | `GET /api/admin/genres/**` ❌ | `/genres` ❌ | **미구현 (P1)** |
+| 6 | 보안 감사 로그 | `GET /api/admin/audit-logs/**` ❌ | `/audit-logs` ❌ | **미구현 (P2)** |
+| 7 | 태그 관리 | `GET /api/admin/tags/**` ❌ | `/tags` ❌ | **미구현 (P2)** |
+| 8 | 신고/제재 | `GET /api/admin/reports/**` ❌ | `/reports` ❌ | **미구현 (P2)** |
+
+> **다음 구현 우선순위**: P0 (갤러리 순서 → 방문자 분석) → P1 (납품/예약/장르) → P2 (보안/태그/신고)
 
 ---
 
