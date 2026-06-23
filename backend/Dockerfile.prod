@@ -1,0 +1,23 @@
+# CI/CD 전용 — GitHub Actions에서 미리 빌드된 JAR을 그대로 이미지화
+# (Gradle 빌드를 Docker 내부에서 다시 실행하지 않음 → 빌드 캐시 재사용)
+FROM eclipse-temurin:21-jre-alpine
+
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+
+WORKDIR /app
+
+# backend-ci 잡이 build/libs/app.jar 을 이미 만들어 전달함
+COPY build/libs/app.jar app.jar
+
+ENV JAVA_OPTS="-Xms128m -Xmx400m \
+  -XX:+UseContainerSupport \
+  -XX:MaxRAMPercentage=75.0 \
+  -Djava.security.egd=file:/dev/./urandom"
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD wget -qO- http://localhost:8080/actuator/health || exit 1
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
