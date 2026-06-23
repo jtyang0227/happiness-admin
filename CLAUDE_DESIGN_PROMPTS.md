@@ -6,6 +6,28 @@
 
 ---
 
+## 프롬프트 구현 현황 (2026-06-23 기준)
+
+| # | 컴포넌트 | 파일 경로 | 상태 |
+|---|---------|----------|------|
+| 1 | CosmosSearchBar | 미생성 (PhotoListPage 내부 인라인 구현) | 🚧 통합 검토 필요 |
+| 2 | CosmosTabs | 미생성 | ❌ 미구현 |
+| 3 | CosmosCollage | 미생성 | ❌ 미구현 |
+| 4 | BoardCard | 미생성 (PortfolioListPage 내부 카드 사용 중) | 🚧 리팩토링 필요 |
+| 5 | PinCard | 미생성 (PhotoListPage 내부 카드 사용 중) | 🚧 리팩토링 필요 |
+| 6 | MasonryGrid | 미생성 (PhotoListPage CSS column-count 적용 중) | 🚧 리팩토링 필요 |
+| 7 | GalleryOrderPage | `frontend/src/pages/GalleryOrderPage.jsx` | ❌ 미구현 |
+| 8 | AnalyticsPage | `frontend/src/pages/AnalyticsPage.jsx` | ❌ 미구현 |
+| 9 | DeliveryListPage | `frontend/src/pages/DeliveryListPage.jsx` | ❌ 미구현 |
+| 10 | BookingListPage | `frontend/src/pages/BookingListPage.jsx` | ❌ 미구현 |
+| 11 | GenreListPage | `frontend/src/pages/GenreListPage.jsx` | ❌ 미구현 |
+| 12 | Sidebar | `frontend/src/components/layout/Sidebar.jsx` | ✅ 구현됨 (lucide-react, 8개 메뉴) |
+| 13 | DashboardPage | `frontend/src/pages/DashboardPage.jsx` | ✅ 기본 구현 (Cosmos 스타일 리팩토링 대상) |
+
+> **다음 구현 우선순위**: P7 GalleryOrderPage → P8 AnalyticsPage → P9-P11 납품/예약/장르
+
+---
+
 ## 시스템 컨텍스트 블록 (모든 프롬프트에 붙이는 공통 헤더)
 
 ```
