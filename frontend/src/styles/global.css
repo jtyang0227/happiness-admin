@@ -83,6 +83,15 @@ body {
 .btn-warning:hover { background: var(--color-warning); color: #fff; border-color: var(--color-warning); }
 .btn-icon { padding: 7px; border-radius: var(--radius-md); background: transparent; color: var(--color-text-secondary); border: 1.5px solid var(--color-border); }
 .btn-icon:hover { background: var(--color-surface-2); }
+.btn-outline { background: transparent; color: var(--color-text-secondary); border: 1.5px solid var(--color-border); }
+.btn-outline:hover { border-color: var(--color-brand); color: var(--color-brand); background: var(--color-brand-light, #fff0f1); }
+.btn-danger-outline { background: transparent; color: var(--color-danger); border: 1.5px solid #fecaca; }
+.btn-danger-outline:hover { background: var(--color-danger); color: #fff; border-color: var(--color-danger); }
+.btn-brand { background: var(--color-brand); color: #fff; border: none; }
+.btn-brand:hover { background: var(--color-brand-hover, #AD081B); }
+
+/* ── Action cell ── */
+.action-cell { display: flex; align-items: center; gap: 6px; }
 
 /* ── Badge system ── */
 .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: var(--text-xs); font-weight: var(--fw-semibold); }
