@@ -47,7 +47,23 @@ public class Member {
     
     @Column(nullable = true)
     private String providerId;
-    
+
+    @Column(nullable = true)
+    private String suspendReason;
+
+    @Column(nullable = true)
+    private LocalDateTime suspendUntil;
+
+    @Column(nullable = true)
+    private LocalDateTime suspendedAt;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean isVerified = false;
+
+    @Column(nullable = true)
+    private LocalDateTime verifiedAt;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
     

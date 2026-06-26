@@ -35,3 +35,20 @@
   border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.15s;
 }
 .btn-danger-sm:hover { background: #ef4444; color: white; border-color: #ef4444; }
+.badge-gray { background: #f1f5f9; color: #64748b; }
+.member-name-link {
+  background: none; border: none; cursor: pointer; font-size: 13px; font-weight: 500;
+  color: var(--color-text, #1e293b); display: inline-flex; align-items: center; gap: 4px;
+  padding: 0; text-decoration: none;
+}
+.member-name-link:hover { color: var(--color-brand, #E60023); text-decoration: underline; }
+.verified-icon { color: #2563eb; flex-shrink: 0; }
+.suspend-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.period-chip {
+  padding: 6px 14px; border-radius: 20px; border: 1.5px solid #e2e8f0;
+  background: white; font-size: 13px; cursor: pointer; transition: all 0.15s;
+}
+.period-chip.selected {
+  border-color: #dc2626; background: #fef2f2; color: #dc2626; font-weight: 600;
+}
+.period-chip:hover:not(.selected) { border-color: #94a3b8; }

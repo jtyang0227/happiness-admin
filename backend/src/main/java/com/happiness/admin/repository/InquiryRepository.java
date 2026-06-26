@@ -40,6 +40,8 @@ public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
     @Query("SELECT i.shootType, COUNT(i) FROM Inquiry i WHERE i.shootType IS NOT NULL GROUP BY i.shootType ORDER BY COUNT(i) DESC")
     List<Object[]> shootTypeDistribution();
 
+    long countBySenderId(Long senderId);
+
     void deleteBySenderId(Long senderId);
     void deleteByReceiverId(Long receiverId);
 }
