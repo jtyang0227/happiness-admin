@@ -155,10 +155,29 @@ font-family: 'Pretendard Variable', -apple-system, sans-serif;
 6. **Pretendard Variable 폰트**: 모든 페이지에 CDN 로드 필수.
 7. **새 UI 구현 시**: `CLAUDE_DESIGN_PROMPTS.md`의 해당 프롬프트 섹션을 참조하여 일관성 유지.
 
+## AI Roles
+
+이 프로젝트는 아래 AI가 역할을 분담하여 협업한다.
+
+| AI | 역할 | 주요 책임 |
+|---|---|---|
+| **Pomelli** | 기획 (Planning) | 요구사항 분석, 기능 정의, 화면 및 사용자 플로우 설계, 작업 우선순위 결정 |
+| **Stitch** | 디자인 (Design) | UI/UX 디자인, 컴포넌트 구조 제안, 스타일 및 디자인 시스템 관리, 반응형 레이아웃 설계 |
+| **AI Studio** | 자동화 (Automation) | 반복 작업 자동화, 스크립트 생성, 배포 및 워크플로우 자동화, 생산성 향상 도구 연동 |
+| **Claude Code** | 구현 (Implementation) | 백엔드·프론트엔드 코드 작성, 빌드 검증, 커밋·푸시 |
+
+### 협업 원칙
+
+- 기획 변경 사항은 **Pomelli** 기준으로 작성한다.
+- UI/UX 관련 사항은 **Stitch**의 결과를 우선 반영한다.
+- 반복 작업 및 자동화는 **AI Studio**를 적극 활용한다.
+- 코드 구현 시 위 역할을 참고하여 일관된 개발 프로세스를 유지한다.
+
 ## Working Rules
 
 1. **항상 기능 검증**: 코드 작성 후 반드시 백엔드는 `./gradlew build` + 서버 기동 후 API curl 테스트, 프론트엔드는 `npm run build` 로 빌드 성공을 확인한다.
 2. **검증 완료 후 커밋·푸시**: 기능 검증이 통과된 경우에만 `git add → git commit → git push` 를 수행한다. 검증 실패 시 먼저 수정 후 재검증한다.
+3. **기획 요청 시 전체 구현**: 기획(스펙 문서 작성)을 요청받으면 문서 작성에서 그치지 않고 백엔드·프론트엔드 개발과 디자인까지 end-to-end로 구현한다.
 
 ## Tech Stack
 
