@@ -1,0 +1,134 @@
+.gallery-order-page { padding: 24px; }
+
+.go-header { margin-bottom: 20px; }
+.go-subtitle { color: var(--color-text-2); font-size: 13px; margin-top: 4px; }
+
+.go-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.go-count { color: var(--color-text-2); font-size: 13px; }
+.go-sort-btns { display: flex; gap: 6px; }
+
+.btn-sm-outline {
+  padding: 5px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.btn-sm-outline:hover { border-color: var(--color-brand); color: var(--color-brand); }
+
+.go-dirty-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  color: #92400e;
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+.go-dirty-actions { display: flex; gap: 8px; align-items: center; }
+.go-save-btn {
+  padding: 6px 16px;
+  background: var(--color-brand);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.go-save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.go-saved-banner {
+  background: #d1fae5;
+  border: 1px solid #34d399;
+  color: #065f46;
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.go-empty {
+  text-align: center;
+  color: var(--color-text-2);
+  padding: 60px 0;
+  font-size: 14px;
+}
+
+.go-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.go-card {
+  position: relative;
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  overflow: hidden;
+  cursor: grab;
+  transition: box-shadow 0.15s, transform 0.15s;
+  user-select: none;
+}
+.go-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+.go-card.dragging { opacity: 0.4; transform: scale(1.03); cursor: grabbing; }
+.go-card.drag-over { outline: 2px dashed var(--color-brand); background: color-mix(in srgb, var(--color-brand) 8%, var(--color-surface)); }
+
+.go-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 22px;
+  height: 22px;
+  background: var(--color-brand);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.go-thumb {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+  display: block;
+}
+
+.go-title {
+  padding: 6px 8px 2px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.go-meta {
+  padding: 0 8px 6px;
+  font-size: 11px;
+  color: var(--color-text-2);
+}
+.go-drag-handle {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.8);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}

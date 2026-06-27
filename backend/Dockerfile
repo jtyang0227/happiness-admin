@@ -1,32 +1,38 @@
-# ===============================================
-# Dockerfile - 어드민 백엔드
-# ===============================================
-# 빌드 이미지
-FROM eclipse-temurin:22-jdk-alpine AS builder
+# ── Stage 1: Build ────────────────────────────────────────────────────
+# compile target = 21 이므로 JDK 21로 충분히 빌드 가능
+FROM eclipse-temurin:21-jdk-alpine AS builder
 
-WORKDIR /build
+WORKDIR /workspace
 
-# 소스 코드 복사
-COPY . .
+COPY gradlew .
+COPY gradle gradle
+RUN chmod +x gradlew
 
-# 빌드
-RUN chmod +x gradlew && \
-    ./gradlew clean build -x test --no-daemon
+# 의존성 레이어 캐시 (소스 변경 시에도 재다운로드 방지)
+COPY build.gradle settings.gradle gradle.properties ./
+RUN ./gradlew dependencies --no-daemon -q 2>/dev/null || true
 
-# 실행 이미지
-FROM eclipse-temurin:22-jre-alpine
+COPY src src
+RUN ./gradlew bootJar -x test --no-daemon -q
+
+# ── Stage 2: Runtime ───────────────────────────────────────────────────
+FROM eclipse-temurin:21-jre-alpine AS runtime
+
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
 
 WORKDIR /app
 
-# 빌드 이미지에서 JAR 파일 복사
-COPY --from=builder /build/build/libs/*.jar app.jar
+COPY --from=builder /workspace/build/libs/app.jar app.jar
 
-# 헬스 체크
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD wget --quiet --tries=1 --spider http://localhost:8081/actuator/health || exit 1
+ENV JAVA_OPTS="-Xms128m -Xmx400m \
+  -XX:+UseContainerSupport \
+  -XX:MaxRAMPercentage=75.0 \
+  -Djava.security.egd=file:/dev/./urandom"
 
-# 포트 노출
-EXPOSE 8081
+EXPOSE 8080
 
-# 앱 실행
-ENTRYPOINT ["sh", "-c", "java $JAVA_TOOL_OPTIONS -jar app.jar"]
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD wget -qO- http://localhost:8080/actuator/health || exit 1
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

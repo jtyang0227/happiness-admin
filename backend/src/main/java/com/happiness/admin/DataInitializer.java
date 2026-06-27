@@ -32,6 +32,9 @@ public class DataInitializer implements ApplicationRunner {
     private final PasswordEncoder passwordEncoder;
     private final PhotoCategoryRepository categoryRepository;
     private final PortfolioRepository portfolioRepository;
+    private final FeaturedItemRepository featuredItemRepository;
+    private final SystemConfigRepository systemConfigRepository;
+    private final AdminActivityLogRepository activityLogRepository;
 
     private static final String[] MOODS = {"WARM", "COOL", "NEUTRAL", "VIVID", "DARK", "SOFT"};
     private static final String[] SHOOT_TYPES = {"웨딩", "가족", "프로필", "스냅", "바디프로필", "커플"};
@@ -198,6 +201,51 @@ public class DataInitializer implements ApplicationRunner {
                 vr.setReviewedAt(LocalDateTime.now().minusDays(1));
             }
             verificationRepository.save(vr);
+        }
+
+        // ── 피처드 콘텐츠 ─────────────────────────────────────
+        for (int i = 0; i < 5; i++) {
+            featuredItemRepository.save(FeaturedItem.builder()
+                    .photo(photos.get(i * 2))
+                    .displayOrder(i)
+                    .startsAt(LocalDate.now().minusDays(7))
+                    .endsAt(LocalDate.now().plusDays(30))
+                    .addedById(wm.getId())
+                    .build());
+        }
+
+        // ── 시스템 설정 ────────────────────────────────────────
+        Map<String, String> configs = Map.of(
+            "sort.default", "composite",
+            "sort.new_author_boost_days", "30",
+            "sort.composite_likes_weight", "0.5",
+            "sort.composite_inquiries_weight", "0.3",
+            "sort.composite_views_weight", "0.2",
+            "maintenance.enabled", "false",
+            "maintenance.message", "시스템 점검 중입니다. 잠시 후 다시 이용해 주세요."
+        );
+        for (Map.Entry<String, String> e : configs.entrySet()) {
+            systemConfigRepository.save(SystemConfig.builder()
+                    .key(e.getKey()).value(e.getValue()).build());
+        }
+
+        // ── 관리자 활동 로그 ───────────────────────────────────
+        String[][] logData = {
+            {"MEMBER_SUSPEND", "MEMBER", "회원 정지 처리"},
+            {"PHOTO_DELETE", "PHOTO", "부적절 사진 삭제"},
+            {"VERIFICATION_APPROVE", "VERIFICATION", "작가 인증 승인"},
+            {"REPORT_PROCESS", "REPORT", "신고 처리 완료"},
+            {"NOTICE_PUBLISH", "NOTICE", "공지사항 발행"},
+        };
+        for (int i = 0; i < logData.length; i++) {
+            activityLogRepository.save(AdminActivityLog.builder()
+                    .adminId(i % 2 == 0 ? wm.getId() : sa.getId())
+                    .adminName(i % 2 == 0 ? wm.getName() : sa.getName())
+                    .action(logData[i][0])
+                    .targetType(logData[i][1])
+                    .targetId((long) (i + 1))
+                    .details(logData[i][2])
+                    .build());
         }
     }
 

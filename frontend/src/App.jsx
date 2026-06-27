@@ -19,6 +19,9 @@ import NoticePage from './pages/NoticePage';
 import BannerPage from './pages/BannerPage';
 import ReportListPage from './pages/ReportListPage';
 import VerificationListPage from './pages/VerificationListPage';
+import GalleryOrderPage from './pages/GalleryOrderPage';
+import FeaturedPage from './pages/FeaturedPage';
+import ContentPolicyPage from './pages/ContentPolicyPage';
 import './styles/global.css';
 
 const ProtectedRoute = ({ children }) => {
@@ -44,6 +47,9 @@ const AppRoutes = () => {
       <Route path="/banners" element={<ProtectedRoute><BannerPage /></ProtectedRoute>} />
       <Route path="/reports" element={<ProtectedRoute><ReportListPage /></ProtectedRoute>} />
       <Route path="/verifications" element={<ProtectedRoute><VerificationListPage /></ProtectedRoute>} />
+      <Route path="/gallery-order" element={<ProtectedRoute><GalleryOrderPage /></ProtectedRoute>} />
+      <Route path="/featured" element={<ProtectedRoute><FeaturedPage /></ProtectedRoute>} />
+      <Route path="/content-policy" element={<ProtectedRoute><ContentPolicyPage /></ProtectedRoute>} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -30,5 +31,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("SELECT cast(m.createdAt as LocalDate) as day, COUNT(m) as cnt FROM Member m " +
            "WHERE m.createdAt >= :since GROUP BY cast(m.createdAt as LocalDate) ORDER BY day")
-    java.util.List<Object[]> dailySignups(@Param("since") LocalDateTime since);
+    List<Object[]> dailySignups(@Param("since") LocalDateTime since);
+
+    @Query("SELECT m.id, m.name, m.profileName, COUNT(p), COALESCE(SUM(p.likesCount), 0), COALESCE(SUM(p.savesCount), 0) " +
+           "FROM Member m JOIN Photo p ON p.member = m " +
+           "GROUP BY m.id, m.name, m.profileName " +
+           "ORDER BY COUNT(p) DESC")
+    List<Object[]> photographerStats(Pageable pageable);
 }

@@ -15,7 +15,8 @@ build/
 *.war
 
 # Spring Boot
-application-prod.properties
+# application-prod.properties 는 env var 참조만 포함하므로 커밋 허용
+# 실제 시크릿은 Railway/GitHub Secrets 에서 주입
 
 # Node
 node_modules/

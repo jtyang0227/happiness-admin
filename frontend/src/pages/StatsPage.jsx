@@ -17,14 +17,17 @@ const StatsPage = () => {
   const [topPhotos, setTopPhotos] = useState([]);
   const [moodDist, setMoodDist] = useState([]);
   const [shootDist, setShootDist] = useState([]);
+  const [photographers, setPhotographers] = useState([]);
 
   useEffect(() => {
     Promise.all([
       getApi('/admin/stats/mood-dist'),
       getApi('/admin/stats/shoot-type-dist'),
-    ]).then(([md, sd]) => {
+      getApi('/admin/stats/photographers?limit=10'),
+    ]).then(([md, sd, pg]) => {
       setMoodDist(md);
       setShootDist(sd);
+      setPhotographers(pg);
     });
   }, []);
 
@@ -147,6 +150,29 @@ const StatsPage = () => {
                 <td>❤️ {p.likesCount}</td>
                 <td>🔖 {p.savesCount}</td>
                 <td>🔄 {p.sharesCount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="stats-card">
+        <h2 className="card-title">작가 성과 TOP 10</h2>
+        <table className="data-table">
+          <thead>
+            <tr><th>#</th><th>작가</th><th>프로필</th><th>사진 수</th><th>총 좋아요</th><th>총 저장</th></tr>
+          </thead>
+          <tbody>
+            {photographers.length === 0 ? (
+              <tr><td colSpan="6" className="loading-cell">데이터가 없습니다.</td></tr>
+            ) : photographers.map((pg, i) => (
+              <tr key={pg.memberId}>
+                <td className="rank-cell">{i + 1}</td>
+                <td className="name-cell">{pg.name}</td>
+                <td style={{ color: 'var(--color-text-2)', fontSize: 12 }}>{pg.profileName}</td>
+                <td>{pg.photoCount.toLocaleString()}</td>
+                <td>❤️ {pg.totalLikes.toLocaleString()}</td>
+                <td>🔖 {pg.totalSaves.toLocaleString()}</td>
               </tr>
             ))}
           </tbody>

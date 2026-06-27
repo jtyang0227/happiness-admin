@@ -23,6 +23,7 @@ public class AdminPhotoDto {
     private String categoryCode;
     private String l1Name;
     private String l2Name;
+    private int displayOrder;
     private LocalDateTime createdAt;
 
     public static AdminPhotoDto from(Photo p) {
@@ -40,6 +41,7 @@ public class AdminPhotoDto {
                 .categoryCode(p.getCategoryCode())
                 .l1Name(p.getCategoryCode() != null ? com.happiness.admin.util.CategoryCode.getLevel(p.getCategoryCode(), 1) : "00")
                 .l2Name(p.getCategoryCode() != null ? com.happiness.admin.util.CategoryCode.getLevel(p.getCategoryCode(), 2) : "00")
+                .displayOrder(p.getDisplayOrder())
                 .createdAt(p.getCreatedAt())
                 .build();
     }
