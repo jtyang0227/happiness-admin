@@ -51,30 +51,54 @@ npx eslint src/ --fix  # Auto-fix lint
 
 Standard layered Spring Boot architecture:
 
-- **`controller/`** — REST endpoints. Auth: `AuthController` (`/api/auth/login` → JWT 발급). Admin: `AdminStatsController`, `AdminMemberController`, `AdminPhotoController`, `AdminInquiryController`, `AdminSeriesController`, `AdminSystemController` (모두 `/api/admin/**`).
-- **`service/`** — `AuthService` (JWT 로그인), `MemberService`, `AdminStatsService`, `AdminMemberService`, `AdminPhotoService`, `AdminInquiryService`, `AdminSeriesService`.
-- **`repository/`** — Spring Data JPA: `MemberRepository`, `PhotoRepository`, `InquiryRepository`, `SeriesRepository`, `SeriesPhotoRepository`.
-- **`entity/`** — `Member`, `Photo`, `Inquiry`, `Series`, `SeriesPhoto`, `Authority` (WM/SA/US), `MemberStatus`.
-- **`security/`** — `JwtTokenProvider`, `JwtAuthenticationFilter` (Bearer 토큰 검증).
-- **`dto/`** — `LoginResponse`, `PageResponse<T>`, `AdminMemberDto`, `AdminPhotoDto`, `AdminInquiryDto`, `AdminSeriesDto`, `StatsSummaryDto`, `DailyStatDto`, `TopPhotoDto`, `DistItemDto`, `SystemStatusDto`, `RoleUpdateRequest`.
-- **`DataInitializer`** — `@Profile("!prod")`: 서버 기동 시 H2에 테스트 데이터 자동 삽입 (관리자 2명, 회원 10명, 사진 30장, 문의 15건, 시리즈 8개). **개발 계정: `admin@happiness.dev` / `Admin123!`**
+- **`controller/`** — REST endpoints. Auth: `AuthController` (`/api/auth/login` → JWT 발급). Admin (모두 `/api/admin/**`):
+  - `AdminStatsController` — 대시보드 통계
+  - `AdminMemberController` — 회원 목록/상세/역할 변경/상태 변경(정지·해제)/삭제
+  - `AdminPhotoController` — 사진 목록/삭제/카테고리코드 수정
+  - `AdminInquiryController` — 문의 목록(receiverId·senderId 필터)/읽음 처리/삭제
+  - `AdminSeriesController` — 시리즈 목록/삭제
+  - `AdminPortfolioController` — 포트폴리오 목록/승인/반려/비공개/삭제
+  - `AdminCategoryController` — 사진 카테고리 트리 조회
+  - `AdminSortController` — 정렬 관리 (`GET/PUT /sort/photos`, `/sort/series`, `/sort/series/:id/photos`, `/sort/portfolios/:id/items`)
+  - `AdminSystemController` — 시스템 상태
+- **`service/`** — `AuthService`, `MemberService`, `AdminStatsService`, `AdminMemberService`, `AdminPhotoService`, `AdminInquiryService`, `AdminSeriesService`, `AdminPortfolioService`, `AdminCategoryService`, `AdminSortService`.
+- **`repository/`** — Spring Data JPA: `MemberRepository`, `PhotoRepository`, `InquiryRepository`, `SeriesRepository`, `SeriesPhotoRepository`, `PortfolioRepository`, `PortfolioItemRepository`, `PhotoCategoryRepository`, `BoardRepository`, `ContentRepository`.
+- **`entity/`** — `Member` (suspendReason·suspendUntil·isVerified 포함), `Photo` (displayOrder), `Inquiry`, `Series` (displayOrder), `SeriesPhoto` (displayOrder), `Portfolio`, `PortfolioItem` (displayOrder), `PhotoCategory`, `Authority` (WM/SA/US), `MemberStatus`, `PortfolioStatus`, `PortfolioVisibility`.
+- **`security/`** — `JwtTokenProvider`, `JwtAuthenticationFilter` (Bearer 토큰 검증). 모든 `/api/admin/**`는 `ROLE_WM` 또는 `ROLE_SA` 필요.
+- **`dto/`** — `LoginResponse`, `PageResponse<T>`, `AdminMemberDto` (portfolioCount 포함), `AdminPhotoDto`, `AdminInquiryDto`, `AdminSeriesDto`, `AdminPortfolioDto`, `StatsSummaryDto`, `DailyStatDto`, `TopPhotoDto`, `DistItemDto`, `SystemStatusDto`, `RoleUpdateRequest`, `StatusUpdateRequest`, `CategoryDto`, `ReorderItem`, `SortPhotoDto`, `SortSeriesDto`, `SortSeriesPhotoDto`, `SortPortfolioItemDto`.
+- **`DataInitializer`** — `@Profile("!prod")`: 서버 기동 시 H2에 테스트 데이터 자동 삽입 (관리자 2명, 회원 10명, 사진 30장·displayOrder 1–30, 문의 15건, 시리즈 8개·displayOrder 1–8, 포트폴리오 6개). **개발 계정: `admin@happiness.dev` / `Admin123!`**
 
 Key settings (`application.properties`):
 - Server: `localhost:8081`
 - H2 console: `localhost:8081/h2-console` (JDBC URL: `jdbc:h2:mem:happinessadmindb`)
 - DDL: `create-drop` (schema recreated on every restart)
 - JWT: `jwt.secret`, `jwt.expiration` (env 또는 dev 기본값 사용)
-- 모든 `/api/admin/**` 엔드포인트는 `ROLE_WM` 또는 `ROLE_SA` JWT 필요
 
 ### Frontend (`frontend/src/`)
 
 React SPA using React Router v6 + Recharts:
 
 - **`context/AuthContext.jsx`** — JWT 저장/조회/삭제, `useAuth()` 훅 제공
-- **`pages/`** — `LoginPage`, `DashboardPage` (요약카드+바차트), `MemberListPage`, `PhotoListPage`, `InquiryListPage`, `SeriesListPage`, `StatsPage` (꺾은선/파이/바 차트), `SystemPage`
-- **`components/layout/`** — `Sidebar` (네비게이션), `AdminLayout` (사이드바+콘텐츠 래퍼)
-- **`components/common/`** — `Pagination`
-- **`utils/api.js`** — `getApi`, `postApi`, `patchApi`, `deleteApi` (localStorage JWT 자동 첨부, 401 시 `/login` 리다이렉트)
+- **`context/ConfirmContext.jsx`** — 전역 확인 다이얼로그, `useConfirm()` 훅 제공
+- **`pages/`** —
+  - `LoginPage` — JWT 로그인
+  - `DashboardPage` — 요약 카드 + 바 차트
+  - `MemberListPage` — 회원 목록/검색/상태 필터/역할 변경/정지/삭제
+  - `MemberDetailPage` — 회원 상세·KPI·탭(사진·시리즈·문의)·정지 모달
+  - `PhotoListPage` — 사진 목록/필터/삭제
+  - `InquiryListPage` — 문의 목록/읽음 처리
+  - `SeriesListPage` — 시리즈 목록/삭제/사진 정렬 링크
+  - `PortfolioListPage` — 포트폴리오 목록/슬라이드오버 심사·승인·반려/아이템 정렬 링크
+  - `SortPhotosPage` (`/sort/photos`) — 전체 사진 드래그 정렬
+  - `SortSeriesPage` (`/sort/series`) — 전체 시리즈 드래그 정렬
+  - `SortSeriesDetailPage` (`/sort/series/:id`) — 시리즈별 사진 순서 정렬
+  - `SortPortfolioPage` (`/sort/portfolios/:id`) — 포트폴리오별 아이템 순서 정렬
+  - `StatsPage` — 꺾은선/파이/바 차트
+  - `SystemPage` — 시스템 상태
+- **`components/layout/`** — `Sidebar` (정렬 관리 아코디언 포함), `AdminLayout`, `AdminHeader`
+- **`components/common/`** — `Pagination`, `ConfirmDialog`, `SlideOver`, `ImgWithFallback`
+- **`hooks/useDragSort.js`** — HTML5 DnD 기반 정렬 훅. `toReorderPayload()` 로 `[{id, displayOrder}]` 생성
+- **`utils/api.js`** — `getApi`, `postApi`, `patchApi`, `putApi`, `deleteApi` (localStorage JWT 자동 첨부, 401 시 `/login` 리다이렉트)
 - **`App.jsx`** — `ProtectedRoute` 래퍼: 미인증 시 `/login`으로 리다이렉트
 
 ## Design System

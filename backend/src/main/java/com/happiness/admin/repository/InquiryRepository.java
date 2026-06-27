@@ -16,9 +16,11 @@ public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
 
     @Query("SELECT i FROM Inquiry i WHERE " +
            "(:receiverId IS NULL OR i.receiver.id = :receiverId) AND " +
+           "(:senderId IS NULL OR i.sender.id = :senderId) AND " +
            "(:isRead IS NULL OR i.isRead = :isRead) AND " +
            "(:shootType IS NULL OR i.shootType = :shootType)")
     Page<Inquiry> searchInquiries(@Param("receiverId") Long receiverId,
+                                  @Param("senderId") Long senderId,
                                   @Param("isRead") Boolean isRead,
                                   @Param("shootType") String shootType,
                                   Pageable pageable);

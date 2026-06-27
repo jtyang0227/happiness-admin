@@ -96,6 +96,27 @@ const KpiCard = ({ icon: Icon, label, value, color, delay = 0 }) => {
   );
 };
 
+/* ── 사진 썸네일 (blur reveal) ── */
+const PhotoThumb = ({ photo }) => {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div className="mdp-photo-card">
+      <div className="mdp-photo-img-wrap">
+        {photo.thumbnailUrl
+          ? <img
+              src={photo.thumbnailUrl}
+              alt={photo.title}
+              className={`mdp-photo-img${loaded ? ' loaded' : ''}`}
+              onLoad={() => setLoaded(true)}
+            />
+          : <div className="mdp-photo-placeholder"><Camera size={24} /></div>
+        }
+      </div>
+      <div className="mdp-photo-title">{photo.title || '제목 없음'}</div>
+    </div>
+  );
+};
+
 /* ── 메인 컴포넌트 ── */
 const MemberDetailPage = () => {
   const { id } = useParams();
@@ -123,11 +144,11 @@ const MemberDetailPage = () => {
   useEffect(() => {
     if (!member) return;
     if (activeTab === 'photos') {
-      getApi(`/admin/photos?size=6`).then(r => setTabPhotos(r.content || [])).catch(() => {});
+      getApi(`/admin/photos?memberId=${id}&size=6`).then(r => setTabPhotos(r.content || [])).catch(() => {});
     } else if (activeTab === 'series') {
-      getApi(`/admin/series?size=6`).then(r => setTabSeries(r.content || [])).catch(() => {});
+      getApi(`/admin/series?memberId=${id}&size=6`).then(r => setTabSeries(r.content || [])).catch(() => {});
     } else if (activeTab === 'inquiries') {
-      getApi(`/admin/inquiries?size=10`).then(r => setTabInquiries(r.content || [])).catch(() => {});
+      getApi(`/admin/inquiries?senderId=${id}&size=10`).then(r => setTabInquiries(r.content || [])).catch(() => {});
     }
   }, [activeTab, member, id]);
 
@@ -321,27 +342,6 @@ const MemberDetailPage = () => {
       {showSuspend && (
         <SuspendModal member={member} onClose={() => setShowSuspend(false)} onConfirm={handleSuspendConfirm} />
       )}
-    </div>
-  );
-};
-
-/* ── 사진 썸네일 (blur reveal) ── */
-const PhotoThumb = ({ photo }) => {
-  const [loaded, setLoaded] = useState(false);
-  return (
-    <div className="mdp-photo-card">
-      <div className="mdp-photo-img-wrap">
-        {photo.thumbnailUrl
-          ? <img
-              src={photo.thumbnailUrl}
-              alt={photo.title}
-              className={`mdp-photo-img${loaded ? ' loaded' : ''}`}
-              onLoad={() => setLoaded(true)}
-            />
-          : <div className="mdp-photo-placeholder"><Camera size={24} /></div>
-        }
-      </div>
-      <div className="mdp-photo-title">{photo.title || '제목 없음'}</div>
     </div>
   );
 };
