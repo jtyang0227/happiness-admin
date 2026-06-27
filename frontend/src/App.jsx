@@ -12,6 +12,10 @@ import PhotoListPage from './pages/PhotoListPage';
 import InquiryListPage from './pages/InquiryListPage';
 import SeriesListPage from './pages/SeriesListPage';
 import PortfolioListPage from './pages/PortfolioListPage';
+import SortPhotosPage from './pages/SortPhotosPage';
+import SortSeriesPage from './pages/SortSeriesPage';
+import SortSeriesDetailPage from './pages/SortSeriesDetailPage';
+import SortPortfolioPage from './pages/SortPortfolioPage';
 import StatsPage from './pages/StatsPage';
 import SystemPage from './pages/SystemPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -34,6 +38,10 @@ const AppRoutes = () => {
       <Route path="/inquiries" element={<ProtectedRoute><InquiryListPage /></ProtectedRoute>} />
       <Route path="/portfolios" element={<ProtectedRoute><PortfolioListPage /></ProtectedRoute>} />
       <Route path="/series" element={<ProtectedRoute><SeriesListPage /></ProtectedRoute>} />
+      <Route path="/sort/photos" element={<ProtectedRoute><SortPhotosPage /></ProtectedRoute>} />
+      <Route path="/sort/series" element={<ProtectedRoute><SortSeriesPage /></ProtectedRoute>} />
+      <Route path="/sort/series/:id" element={<ProtectedRoute><SortSeriesDetailPage /></ProtectedRoute>} />
+      <Route path="/sort/portfolios/:id" element={<ProtectedRoute><SortPortfolioPage /></ProtectedRoute>} />
       <Route path="/stats" element={<ProtectedRoute><StatsPage /></ProtectedRoute>} />
       <Route path="/system" element={<ProtectedRoute><SystemPage /></ProtectedRoute>} />
       <Route path="*" element={<NotFoundPage />} />

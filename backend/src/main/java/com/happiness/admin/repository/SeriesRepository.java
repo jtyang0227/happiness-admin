@@ -19,4 +19,7 @@ public interface SeriesRepository extends JpaRepository<Series, Long> {
                               Pageable pageable);
 
     long countByMemberId(Long memberId);
+
+    @Query("SELECT s FROM Series s ORDER BY CASE WHEN s.displayOrder = 0 THEN 1 ELSE 0 END ASC, s.displayOrder ASC, s.createdAt DESC, s.id DESC")
+    java.util.List<Series> findAllOrderedForSort();
 }

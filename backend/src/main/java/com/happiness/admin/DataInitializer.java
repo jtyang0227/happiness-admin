@@ -97,6 +97,7 @@ public class DataInitializer implements ApplicationRunner {
             Series series = Series.builder()
                     .title(seriesTitles[i]).description(seriesTitles[i] + " 시리즈입니다.")
                     .coverImageUrl("https://picsum.photos/seed/series" + i + "/600/400")
+                    .displayOrder(i + 1)
                     .member(author).build();
             series.getSeriesPhotos().add(SeriesPhoto.builder()
                     .series(series).photo(photos.get(i * 3 % photos.size())).displayOrder(0).build());
@@ -108,7 +109,7 @@ public class DataInitializer implements ApplicationRunner {
         // Seed category master (5 levels)
         seedCategories();
 
-        // Assign category codes to photos
+        // Assign category codes and displayOrder to photos
         String[] catCodes = {
             "0101010101","0101020201","0201010301","0201030102","0301020401",
             "0301010501","0102010101","0401020201","0501010301","0201020401",
@@ -120,6 +121,7 @@ public class DataInitializer implements ApplicationRunner {
         for (int i = 0; i < Math.min(photos.size(), catCodes.length); i++) {
             Photo ph = photos.get(i);
             ph.setCategoryCode(catCodes[i]);
+            ph.setDisplayOrder(i + 1);
             photoRepository.save(ph);
         }
 

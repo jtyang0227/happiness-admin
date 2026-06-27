@@ -24,6 +24,10 @@ public class Series {
     @Column(name = "cover_image_url")
     private String coverImageUrl;
 
+    @Column(name = "display_order", nullable = false)
+    @Builder.Default
+    private int displayOrder = 0;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
