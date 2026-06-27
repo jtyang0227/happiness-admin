@@ -197,6 +197,28 @@ font-family: 'Pretendard Variable', -apple-system, sans-serif;
 - 반복 작업 및 자동화는 **AI Studio**를 적극 활용한다.
 - 코드 구현 시 위 역할을 참고하여 일관된 개발 프로세스를 유지한다.
 
+## CI/CD
+
+### GitHub Actions (`.github/workflows/ci.yml`)
+
+| 항목 | 내용 |
+|---|---|
+| 트리거 | `push` → main, develop, `claude/**` / `pull_request` → main, develop |
+| Backend 빌드 | Java 21 (Temurin) + Gradle 8.14.4 → `cd backend && ./gradlew build` |
+| Frontend 빌드 | Node.js 20 → `npm ci` + `npm run build` |
+
+**환경 변수**
+
+| 변수 | 값 | 용도 |
+|---|---|---|
+| `JWT_SECRET` | `ci-test-secret-key-at-least-256-bits-long-for-hs256-algorithm` | 백엔드 테스트용 JWT 시크릿 |
+| `CI` | `false` | CRA ESLint 경고를 에러로 처리하지 않도록 설정 |
+
+**주의사항**
+
+- `backend/gradle.properties`에 `org.gradle.java.home` 을 절대 하드코딩하지 않는다. GitHub Actions 러너의 Java 경로는 `actions/setup-java`가 `JAVA_HOME`으로 자동 설정한다.
+- 로컬에서 특정 JDK 경로를 지정해야 하는 경우 `~/.gradle/gradle.properties`(사용자 홈)에 설정하고 프로젝트 파일에는 커밋하지 않는다.
+
 ## Working Rules
 
 1. **항상 기능 검증**: 코드 작성 후 반드시 백엔드는 `./gradlew build` + 서버 기동 후 API curl 테스트, 프론트엔드는 `npm run build` 로 빌드 성공을 확인한다.
