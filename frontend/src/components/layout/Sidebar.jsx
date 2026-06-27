@@ -1,13 +1,18 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Image, MessageSquare,
   BookOpen, BarChart2, Settings, LogOut,
   Sparkles, X, FolderOpen, Bell, Flag, ShieldCheck, LayoutPanelTop,
-  GripVertical, Star, SlidersHorizontal,
+  GripVertical, Star, SlidersHorizontal, ArrowUpDown, ChevronDown,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './Sidebar.css';
+
+const SORT_ITEMS = [
+  { path: '/sort/photos',  label: '사진 정렬' },
+  { path: '/sort/series',  label: '시리즈 정렬' },
+];
 
 const NAV_ITEMS = [
   { path: '/',               label: '대시보드',    Icon: LayoutDashboard },
@@ -31,10 +36,17 @@ const Sidebar = ({ isOpen = true, onClose }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [sortOpen, setSortOpen] = useState(() =>
+    location.pathname.startsWith('/sort')
+  );
 
   useEffect(() => {
     onClose?.();
   }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (location.pathname.startsWith('/sort')) setSortOpen(true);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
@@ -65,6 +77,29 @@ const Sidebar = ({ isOpen = true, onClose }) => {
             <span>{label}</span>
           </NavLink>
         ))}
+
+        {/* 정렬 관리 accordion */}
+        <div className={`sidebar-group${sortOpen ? ' open' : ''}`}>
+          <button
+            className={`sidebar-link sidebar-group-trigger${location.pathname.startsWith('/sort') ? ' active' : ''}`}
+            onClick={() => setSortOpen(v => !v)}
+          >
+            <span className="sidebar-icon"><ArrowUpDown size={16} strokeWidth={1.75} /></span>
+            <span>정렬 관리</span>
+            <ChevronDown size={13} className="sidebar-chevron" />
+          </button>
+          <div className="sidebar-sub">
+            {SORT_ITEMS.map(({ path, label }) => (
+              <NavLink
+                key={path}
+                to={path}
+                className={({ isActive }) => `sidebar-sub-link${isActive ? ' active' : ''}`}
+              >
+                {label}
+              </NavLink>
+            ))}
+          </div>
+        </div>
       </nav>
 
       <div className="sidebar-footer">

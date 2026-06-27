@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { ListOrdered } from 'lucide-react';
 import { getApi, deleteApi } from '../utils/api';
 import { useConfirm } from '../context/ConfirmContext';
 import Pagination from '../components/common/Pagination';
@@ -7,6 +9,7 @@ import ImgWithFallback from '../components/common/ImgWithFallback';
 import './SeriesListPage.css';
 
 const SeriesListPage = () => {
+  const navigate = useNavigate();
   const { confirm } = useConfirm();
   const [data, setData] = useState({ content: [], totalPages: 0, totalElements: 0 });
   const [search, setSearch] = useState('');
@@ -61,7 +64,7 @@ const SeriesListPage = () => {
       <div className="table-card">
         <table className="data-table">
           <thead>
-            <tr><th>커버</th><th>제목</th><th>작가</th><th>사진 수</th><th>생성일</th><th>관리</th></tr>
+            <tr><th>커버</th><th>제목</th><th>작가</th><th>사진 수</th><th>생성일</th><th>정렬</th><th>관리</th></tr>
           </thead>
           <tbody>
             {loading ? (
@@ -75,6 +78,16 @@ const SeriesListPage = () => {
                 <td>{s.authorName}</td>
                 <td>{s.photoCount}장</td>
                 <td>{s.createdAt?.slice(0, 10)}</td>
+                <td>
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                    onClick={() => navigate(`/sort/series/${s.id}`)}
+                    title="사진 순서 정렬"
+                  >
+                    <ListOrdered size={13} /> 사진 정렬
+                  </button>
+                </td>
                 <td>
                   <button className="btn-danger-sm" onClick={() => handleDelete(s.id, s.title)}>삭제</button>
                 </td>

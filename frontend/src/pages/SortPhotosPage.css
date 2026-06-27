@@ -1,0 +1,248 @@
+.sp-page {
+  padding: 32px 28px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.sp-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.sp-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sp-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-lg, 12px);
+  background: var(--color-brand-light, #fff0f1);
+  color: var(--color-brand);
+  flex-shrink: 0;
+}
+
+.sp-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 2px;
+}
+
+.sp-subtitle {
+  font-size: 13px;
+  color: var(--color-text-2);
+  margin: 0;
+}
+
+.sp-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.sp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-lg, 12px);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.sp-btn-ghost {
+  background: var(--color-surface-2);
+  color: var(--color-text-2);
+}
+
+.sp-btn-ghost:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+.sp-btn-brand {
+  background: var(--color-brand);
+  color: #fff;
+}
+
+.sp-btn-brand:hover {
+  background: var(--color-brand-hover, #ad081b);
+}
+
+.sp-btn-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.sp-dirty-banner {
+  background: var(--color-brand-light, #fff0f1);
+  color: var(--color-brand);
+  border: 1px solid color-mix(in srgb, var(--color-brand) 20%, transparent);
+  border-radius: var(--radius-lg, 12px);
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.sp-count {
+  font-size: 12px;
+  color: var(--color-text-2);
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.sp-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sp-skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sp-skeleton-row {
+  height: 64px;
+  border-radius: var(--radius-lg, 12px);
+  background: var(--color-surface-2);
+  animation: sp-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes sp-shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.sp-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-lg, 12px);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  cursor: grab;
+  user-select: none;
+  transition: box-shadow 0.15s, border-color 0.15s, transform 0.12s;
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.sp-row.visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.28s ease, transform 0.28s ease,
+              box-shadow 0.15s, border-color 0.15s;
+}
+
+.sp-row:hover {
+  border-color: var(--color-brand);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.sp-row.dragging {
+  opacity: 0.4;
+  border-color: var(--color-brand);
+  cursor: grabbing;
+}
+
+.sp-row.drag-over {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-brand) 25%, transparent);
+  transform: scale(1.01);
+}
+
+.sp-grip {
+  color: var(--color-text-2);
+  opacity: 0.5;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.sp-row:hover .sp-grip {
+  opacity: 1;
+  color: var(--color-brand);
+}
+
+.sp-num {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-2);
+  min-width: 24px;
+  text-align: right;
+}
+
+.sp-thumb {
+  width: 72px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+  filter: blur(4px);
+  transition: filter 0.35s ease;
+}
+
+.sp-thumb.loaded {
+  filter: blur(0);
+}
+
+.sp-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sp-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sp-meta {
+  font-size: 12px;
+  color: var(--color-text-2);
+}
+
+.sp-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.sp-badge-unset {
+  background: var(--color-surface-2);
+  color: var(--color-text-2);
+}
+
+@media (max-width: 600px) {
+  .sp-page { padding: 20px 16px; }
+  .sp-header { flex-direction: column; }
+  .sp-thumb { width: 56px; height: 42px; }
+}

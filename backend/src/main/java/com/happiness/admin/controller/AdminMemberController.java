@@ -21,9 +21,10 @@ public class AdminMemberController {
     public ResponseEntity<?> list(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String authority,
+            @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(memberService.getMembers(search, authority, page, size));
+        return ResponseEntity.ok(memberService.getMembers(search, authority, status, page, size));
     }
 
     @GetMapping("/{id}")
@@ -40,7 +41,7 @@ public class AdminMemberController {
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody StatusUpdateRequest req) {
-        memberService.updateStatus(id, req.getStatus(), req.getReason());
+        memberService.updateStatus(id, req.getStatus(), req.getReason(), req.getSuspendDays());
         return ResponseEntity.ok(Map.of("message", "회원 상태가 변경되었습니다."));
     }
 

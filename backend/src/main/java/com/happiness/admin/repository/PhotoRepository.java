@@ -66,4 +66,7 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
     long countByMemberId(Long memberId);
 
     List<Photo> findByMemberId(Long memberId);
+
+    @Query("SELECT p FROM Photo p ORDER BY CASE WHEN p.displayOrder = 0 THEN 1 ELSE 0 END ASC, p.displayOrder ASC, p.createdAt DESC, p.id DESC")
+    List<Photo> findAllOrderedForSort();
 }

@@ -25,4 +25,6 @@ public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
             Pageable pageable);
 
     long countByStatus(PortfolioStatus status);
+
+    long countByMemberId(Long memberId);
 }

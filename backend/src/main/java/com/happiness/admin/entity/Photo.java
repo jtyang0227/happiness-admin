@@ -44,7 +44,7 @@ public class Photo {
     @Builder.Default
     private String categoryCode = "0000000000";
 
-    @Column(name = "display_order")
+    @Column(name = "display_order", nullable = false)
     @Builder.Default
     private int displayOrder = 0;
 

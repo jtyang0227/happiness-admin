@@ -144,6 +144,60 @@
   color: #e2e8f0;
 }
 
+/* ── 정렬 관리 accordion ── */
+.sidebar-group { display: flex; flex-direction: column; }
+
+.sidebar-group-trigger {
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--text-base);
+  text-align: left;
+  justify-content: flex-start;
+}
+
+.sidebar-chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  color: var(--color-sidebar-text);
+}
+
+.sidebar-group.open .sidebar-chevron { transform: rotate(180deg); }
+
+.sidebar-sub {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+
+.sidebar-group.open .sidebar-sub { max-height: 200px; }
+
+.sidebar-sub-link {
+  display: flex;
+  align-items: center;
+  padding: 8px 20px 8px 50px;
+  color: var(--color-sidebar-text);
+  text-decoration: none;
+  font-size: 13px;
+  transition: color 0.15s, background 0.15s;
+  border-left: 3px solid transparent;
+}
+
+.sidebar-sub-link:hover {
+  background: var(--color-sidebar-hover);
+  color: #e2e8f0;
+  text-decoration: none;
+}
+
+.sidebar-sub-link.active {
+  color: var(--color-sidebar-active-text);
+  border-left-color: var(--color-sidebar-active-text);
+  font-weight: 600;
+}
+
 @media (max-width: 767px) {
   .sidebar {
     transform: translateX(-100%);

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { ListOrdered } from 'lucide-react';
 import { getApi, deleteApi, patchApi } from '../utils/api';
 import { useConfirm } from '../context/ConfirmContext';
 import Pagination from '../components/common/Pagination';
@@ -21,6 +22,7 @@ const StatCard = ({ label, value, active, onClick }) => (
 );
 
 const PortfolioListPage = () => {
+  const navigate = useNavigate();
   const { confirm } = useConfirm();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -301,6 +303,16 @@ const PortfolioListPage = () => {
               </div>
             )}
             <hr className="so-divider" />
+            <div className="so-field">
+              <span className="so-label">아이템 순서</span>
+              <button
+                className="btn btn-ghost btn-sm"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                onClick={() => navigate(`/sort/portfolios/${slidePortfolio.id}`)}
+              >
+                <ListOrdered size={13} /> 아이템 정렬
+              </button>
+            </div>
             <div className="so-field">
               <span className="so-label">관리자 메모 {slidePortfolio.status === 'PENDING' && <span style={{ color: 'var(--color-danger)', fontWeight: 400 }}>(반려 시 필수)</span>}</span>
               <textarea
