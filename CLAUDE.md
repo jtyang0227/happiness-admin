@@ -164,10 +164,10 @@ font-family: 'Pretendard Variable', -apple-system, sans-serif;
 
 ### Design Files
 
-- `PINTEREST_DESIGN_SPEC.md` — Pinterest 컨셉 전체 디자인 명세 (색상, 컴포넌트, 레이아웃)
-- `COSMOS_DESIGN_SPEC.md` — Cosmos × Pinterest 퓨전 명세 (다크모드, 고급 컴포넌트)
-- `CLAUDE_DESIGN_PROMPTS.md` — Claude에게 UI 구현 요청 시 사용할 재사용 가능한 프롬프트 라이브러리 (13개 컴포넌트)
-- `APP_TO_ADMIN_SPEC.md` — happiness-app에서 admin으로 이식할 기능 명세
+- `docs/design/PINTEREST_DESIGN_SPEC.md` — Pinterest 컨셉 전체 디자인 명세 (색상, 컴포넌트, 레이아웃)
+- `docs/design/COSMOS_DESIGN_SPEC.md` — Cosmos × Pinterest 퓨전 명세 (다크모드, 고급 컴포넌트)
+- `docs/design/CLAUDE_DESIGN_PROMPTS.md` — Claude에게 UI 구현 요청 시 사용할 재사용 가능한 프롬프트 라이브러리 (13개 컴포넌트)
+- `docs/planning/APP_TO_ADMIN_SPEC.md` — happiness-app에서 admin으로 이식할 기능 명세
 
 ### Design Rules
 
