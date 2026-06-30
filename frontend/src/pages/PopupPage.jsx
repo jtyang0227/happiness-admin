@@ -39,7 +39,6 @@ const PopupPage = () => {
     onDragEnd,
     dragIdx,
     overIdx,
-    toReorderPayload,
   } = useDragSort([]);
 
   const fetchData = useCallback(() => {
