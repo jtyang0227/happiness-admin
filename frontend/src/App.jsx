@@ -26,6 +26,7 @@ import VerificationListPage from './pages/VerificationListPage';
 import GalleryOrderPage from './pages/GalleryOrderPage';
 import FeaturedPage from './pages/FeaturedPage';
 import ContentPolicyPage from './pages/ContentPolicyPage';
+import PopupPage from './pages/PopupPage';
 import './styles/global.css';
 
 const ProtectedRoute = ({ children }) => {
@@ -58,6 +59,7 @@ const AppRoutes = () => {
       <Route path="/gallery-order" element={<ProtectedRoute><GalleryOrderPage /></ProtectedRoute>} />
       <Route path="/featured" element={<ProtectedRoute><FeaturedPage /></ProtectedRoute>} />
       <Route path="/content-policy" element={<ProtectedRoute><ContentPolicyPage /></ProtectedRoute>} />
+      <Route path="/popups" element={<ProtectedRoute><PopupPage /></ProtectedRoute>} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

@@ -2,6 +2,7 @@ package com.happiness.admin;
 
 import com.happiness.admin.entity.*;
 import com.happiness.admin.repository.*;
+import com.happiness.admin.entity.Popup;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -35,6 +36,7 @@ public class DataInitializer implements ApplicationRunner {
     private final FeaturedItemRepository featuredItemRepository;
     private final SystemConfigRepository systemConfigRepository;
     private final AdminActivityLogRepository activityLogRepository;
+    private final PopupRepository popupRepository;
 
     private static final String[] MOODS = {"WARM", "COOL", "NEUTRAL", "VIVID", "DARK", "SOFT"};
     private static final String[] SHOOT_TYPES = {"웨딩", "가족", "프로필", "스냅", "바디프로필", "커플"};
@@ -229,6 +231,27 @@ public class DataInitializer implements ApplicationRunner {
         for (Map.Entry<String, String> e : configs.entrySet()) {
             systemConfigRepository.save(SystemConfig.builder()
                     .key(e.getKey()).value(e.getValue()).build());
+        }
+
+        // ── 팝업 ──────────────────────────────────────────────
+        Object[][] popupData = {
+            {"여름 이벤트 팝업", "여름 사진전이 시작되었습니다!\n7월 한 달간 여름 사진을 올리고 상금을 받아가세요.", "https://picsum.photos/seed/popup1/600/400", "/events/summer", "HOME", true, true},
+            {"신규 기능 안내", "작가 인증 시스템이 새롭게 도입되었습니다.\n지금 바로 신청하세요!", null, "/verifications", "ALL", true, false},
+            {"서버 점검 안내", "6월 20일 새벽 2시~4시 서버 점검이 예정되어 있습니다.", null, null, "ALL", false, false},
+        };
+        for (int i = 0; i < popupData.length; i++) {
+            popupRepository.save(Popup.builder()
+                    .title((String) popupData[i][0])
+                    .content((String) popupData[i][1])
+                    .imageUrl((String) popupData[i][2])
+                    .linkUrl((String) popupData[i][3])
+                    .targetScreen((String) popupData[i][4])
+                    .isActive((Boolean) popupData[i][5])
+                    .showOnce((Boolean) popupData[i][6])
+                    .displayOrder(i + 1)
+                    .startsAt(LocalDateTime.now().minusDays(1))
+                    .endsAt(i == 2 ? LocalDateTime.now().plusDays(1) : LocalDateTime.now().plusDays(30))
+                    .build());
         }
 
         // ── 관리자 활동 로그 ───────────────────────────────────

@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, Image, MessageSquare,
   BookOpen, BarChart2, Settings, LogOut,
   Sparkles, X, FolderOpen, Bell, Flag, ShieldCheck, LayoutPanelTop,
-  GripVertical, Star, SlidersHorizontal, ArrowUpDown, ChevronDown,
+  GripVertical, Star, SlidersHorizontal, ArrowUpDown, ChevronDown, AppWindow,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './Sidebar.css';
@@ -25,6 +25,7 @@ const NAV_ITEMS = [
   { path: '/reports',        label: '신고 관리',   Icon: Flag },
   { path: '/notices',        label: '공지사항',    Icon: Bell },
   { path: '/banners',        label: '배너 관리',   Icon: LayoutPanelTop },
+  { path: '/popups',         label: '팝업 관리',   Icon: AppWindow },
   { path: '/verifications',  label: '작가 인증',   Icon: ShieldCheck },
   { path: '/gallery-order',  label: '갤러리 순서', Icon: GripVertical },
   { path: '/featured',       label: '피처드',      Icon: Star },
