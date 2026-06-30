@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { Monitor, Smartphone, Globe, Plus, Eye, EyeOff, CalendarClock, Link2, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Monitor, Smartphone, Globe, Plus, Eye, CalendarClock, Link2, ToggleLeft, ToggleRight, GripVertical, Save } from 'lucide-react';
 import { getApi, postApi, putApi, deleteApi, patchApi } from '../utils/api';
 import { useConfirm } from '../context/ConfirmContext';
+import { useDragSort } from '../hooks/useDragSort';
 import './PopupPage.css';
 
 const TARGET_OPTIONS = [
@@ -19,18 +20,34 @@ const EMPTY_FORM = {
 
 const PopupPage = () => {
   const { confirm } = useConfirm();
-  const [popups, setPopups] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+  const [reordering, setReordering] = useState(false);
   const [preview, setPreview] = useState(null);
+
+  const {
+    items: popups,
+    reset: resetSort,
+    isDirty,
+    setIsDirty,
+    onDragStart,
+    onDragOver,
+    onDrop,
+    onDragEnd,
+    dragIdx,
+    overIdx,
+    toReorderPayload,
+  } = useDragSort([]);
 
   const fetchData = useCallback(() => {
     setLoading(true);
-    getApi('/admin/popups').then(setPopups).finally(() => setLoading(false));
-  }, []);
+    getApi('/admin/popups')
+      .then(data => resetSort(data))
+      .finally(() => setLoading(false));
+  }, [resetSort]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -101,6 +118,19 @@ const PopupPage = () => {
     }
   };
 
+  const handleSaveOrder = async () => {
+    setReordering(true);
+    try {
+      await patchApi('/admin/popups/reorder', { orderedIds: popups.map(p => p.id) });
+      toast.success('노출 순서가 저장되었습니다.');
+      setIsDirty(false);
+    } catch {
+      toast.error('순서 저장에 실패했습니다.');
+    } finally {
+      setReordering(false);
+    }
+  };
+
   const isExpired = (p) => p.endsAt && new Date(p.endsAt) < new Date();
   const isScheduled = (p) => p.startsAt && new Date(p.startsAt) > new Date();
 
@@ -129,25 +159,57 @@ const PopupPage = () => {
         <span>— happiness-app에서 JWT 없이 호출 가능한 공개 API</span>
       </div>
 
+      {/* 순서 변경 저장 바 */}
+      {isDirty && (
+        <div className="popup-order-bar">
+          <span className="popup-order-bar-msg">노출 순서가 변경되었습니다. 저장하지 않으면 반영되지 않습니다.</span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="btn btn-ghost btn-sm" onClick={fetchData}>되돌리기</button>
+            <button className="btn btn-brand btn-sm" onClick={handleSaveOrder} disabled={reordering}>
+              <Save size={13} /> {reordering ? '저장 중...' : '순서 저장'}
+            </button>
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div className="loading-cell">로딩 중...</div>
       ) : popups.length === 0 ? (
         <div className="empty-state">등록된 팝업이 없습니다. 팝업을 추가해 보세요.</div>
       ) : (
         <div className="popup-grid">
-          {popups.map(p => {
+          {popups.map((p, idx) => {
             const { label, cls } = getStatusLabel(p);
             const TargetIcon = TARGET_OPTIONS.find(t => t.value === p.targetScreen)?.Icon || Globe;
             return (
-              <div key={p.id} className={`popup-card ${!p.isActive ? 'popup-card--inactive' : ''}`}>
+              <div
+                key={p.id}
+                className={[
+                  'popup-card',
+                  !p.isActive ? 'popup-card--inactive' : '',
+                  dragIdx === idx ? 'popup-card--dragging' : '',
+                  overIdx === idx && dragIdx !== idx ? 'popup-card--over' : '',
+                ].filter(Boolean).join(' ')}
+                draggable
+                onDragStart={e => onDragStart(e, idx)}
+                onDragOver={e => onDragOver(e, idx)}
+                onDrop={e => onDrop(e, idx)}
+                onDragEnd={onDragEnd}
+              >
                 <div className="popup-card-header">
-                  <div className="popup-card-badges">
-                    <span className={`popup-status ${cls}`}>{label}</span>
-                    <span className="popup-target-badge">
-                      <TargetIcon size={11} />
-                      {TARGET_OPTIONS.find(t => t.value === p.targetScreen)?.label}
+                  <div className="popup-card-left">
+                    <span className="popup-drag-handle" title="드래그하여 순서 변경">
+                      <GripVertical size={15} />
                     </span>
-                    {p.showOnce && <span className="popup-once-badge">하루 한 번</span>}
+                    <span className="popup-order-num">#{idx + 1}</span>
+                    <div className="popup-card-badges">
+                      <span className={`popup-status ${cls}`}>{label}</span>
+                      <span className="popup-target-badge">
+                        <TargetIcon size={11} />
+                        {TARGET_OPTIONS.find(t => t.value === p.targetScreen)?.label}
+                      </span>
+                      {p.showOnce && <span className="popup-once-badge">하루 한 번</span>}
+                    </div>
                   </div>
                   <button
                     className={`popup-toggle-btn ${p.isActive ? 'active' : ''}`}

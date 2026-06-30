@@ -72,6 +72,17 @@ public class AdminPopupService {
     }
 
     @Transactional
+    public void reorderPopups(List<Long> orderedIds) {
+        for (int i = 0; i < orderedIds.size(); i++) {
+            final int order = i + 1;
+            popupRepository.findById(orderedIds.get(i)).ifPresent(p -> {
+                p.setDisplayOrder(order);
+                popupRepository.save(p);
+            });
+        }
+    }
+
+    @Transactional
     public void deletePopup(Long id) {
         if (!popupRepository.existsById(id)) {
             throw new IllegalArgumentException("팝업을 찾을 수 없습니다.");

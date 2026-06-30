@@ -35,6 +35,12 @@ public class AdminPopupController {
         return ResponseEntity.ok(popupService.togglePopup(id));
     }
 
+    @PatchMapping("/reorder")
+    public ResponseEntity<?> reorder(@RequestBody PopupRequest req) {
+        popupService.reorderPopups(req.getOrderedIds());
+        return ResponseEntity.ok(Map.of("message", "순서가 저장되었습니다."));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         popupService.deletePopup(id);

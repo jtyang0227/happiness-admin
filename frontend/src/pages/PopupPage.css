@@ -32,11 +32,41 @@
 }
 .popup-card:hover { box-shadow: var(--shadow-lg); border-color: var(--color-brand-100); }
 .popup-card--inactive { opacity: 0.55; }
+.popup-card--dragging {
+  opacity: 0.45; transform: scale(0.97);
+  box-shadow: var(--shadow-xl); border-color: var(--color-brand);
+}
+.popup-card--over {
+  border-color: var(--color-brand); box-shadow: 0 0 0 3px var(--color-brand-100);
+}
+
+/* 순서 변경 저장 바 */
+.popup-order-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 10px 16px;
+  background: var(--color-warning-bg); border: 1px solid #fbbf24;
+  border-radius: var(--radius-md); margin-bottom: 16px;
+}
+.popup-order-bar-msg {
+  font-size: var(--text-sm); color: #92400e; flex: 1;
+}
 
 /* 카드 헤더 */
 .popup-card-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 12px 14px 8px;
+}
+.popup-card-left {
+  display: flex; align-items: center; gap: 6px; min-width: 0;
+}
+.popup-drag-handle {
+  color: var(--color-text-tertiary); cursor: grab; line-height: 0;
+  flex-shrink: 0;
+}
+.popup-drag-handle:active { cursor: grabbing; }
+.popup-order-num {
+  font-size: var(--text-xs); font-weight: var(--fw-semibold);
+  color: var(--color-text-tertiary); flex-shrink: 0;
 }
 .popup-card-badges { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 
