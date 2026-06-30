@@ -37,6 +37,7 @@ public class DataInitializer implements ApplicationRunner {
     private final SystemConfigRepository systemConfigRepository;
     private final AdminActivityLogRepository activityLogRepository;
     private final PopupRepository popupRepository;
+    private final BookingRepository bookingRepository;
 
     private static final String[] MOODS = {"WARM", "COOL", "NEUTRAL", "VIVID", "DARK", "SOFT"};
     private static final String[] SHOOT_TYPES = {"웨딩", "가족", "프로필", "스냅", "바디프로필", "커플"};
@@ -251,6 +252,43 @@ public class DataInitializer implements ApplicationRunner {
                     .displayOrder(i + 1)
                     .startsAt(LocalDateTime.now().minusDays(1))
                     .endsAt(i == 2 ? LocalDateTime.now().plusDays(1) : LocalDateTime.now().plusDays(30))
+                    .build());
+        }
+
+        // ── 촬영 예약 ──────────────────────────────────────────
+        Member[] bookingPhotographers = {wm, sa, users.get(0), users.get(1), users.get(2)};
+        Object[][] bookingData = {
+            // { photographerIdx, clientIdx, shootType, daysFromToday, status, budget }
+            {0, 3, "웨딩 스냅",    0,  "CONFIRMED",  "120만원"},
+            {1, 4, "가족 촬영",    0,  "CONFIRMED",  "80만원"},
+            {2, 5, "프로필",       1,  "CONFIRMED",  "30만원"},
+            {3, 6, "커플 스냅",    2,  "REQUESTED",  "50만원"},
+            {4, 7, "바디프로필",   3,  "CONFIRMED",  "150만원"},
+            {0, 8, "웨딩 스냅",    5,  "REQUESTED",  "200만원"},
+            {1, 9, "가족 촬영",    7,  "REQUESTED",  "90만원"},
+            {2, 3, "스냅",        10,  "CONFIRMED",  "40만원"},
+            {3, 4, "프로필",      14,  "REQUESTED",  "25만원"},
+            {4, 5, "커플 스냅",   21,  "CONFIRMED",  "60만원"},
+            {0, 6, "웨딩 스냅",  -10,  "CANCELLED",  "180만원"},
+            {1, 7, "가족 촬영",   -5,  "REJECTED",   "70만원"},
+        };
+        String[] locations = {"서울 용산구", "경기 하남시", "서울 성수동", "제주도 서귀포", "서울 마포구",
+                              "인천 송도", "부산 해운대", "서울 종로구", "경기 수원", "강원 강릉",
+                              "서울 광진구", "경기 판교"};
+        for (int i = 0; i < bookingData.length; i++) {
+            Object[] d = bookingData[i];
+            Member ph = bookingPhotographers[(int) d[0]];
+            Member cl = users.get((int) d[1] % users.size());
+            bookingRepository.save(Booking.builder()
+                    .photographer(ph)
+                    .client(cl)
+                    .clientName(cl.getName())
+                    .shootType((String) d[2])
+                    .shootDate(LocalDate.now().plusDays((int) d[3]))
+                    .shootLocation(locations[i])
+                    .budget((String) d[5])
+                    .message("안녕하세요! " + d[2] + " 촬영을 예약하고 싶습니다.")
+                    .status(BookingStatus.valueOf((String) d[4]))
                     .build());
         }
 

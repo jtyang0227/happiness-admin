@@ -4,6 +4,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { ArrowUpRight } from 'lucide-react';
 import { getApi } from '../utils/api';
 import ImgWithFallback from '../components/common/ImgWithFallback';
+import BookingCalendar from '../components/dashboard/BookingCalendar';
+import WeeklyBookingList from '../components/dashboard/WeeklyBookingList';
 import './DashboardPage.css';
 
 const StatCard = ({ icon, label, value, color, to }) => (
@@ -45,10 +47,12 @@ const DashboardPage = () => {
       <h1 className="page-title">대시보드</h1>
 
       <div className="stat-grid">
-        <StatCard icon="👥" label="전체 회원"     value={summary?.totalMembers}   color="#6366f1" to="/members" />
-        <StatCard icon="📷" label="전체 사진"     value={summary?.totalPhotos}    color="#22c55e" to="/photos" />
-        <StatCard icon="📬" label="오늘 신규 문의" value={summary?.todayInquiries} color="#f59e0b" to="/inquiries" />
+        <StatCard icon="👥" label="전체 회원"     value={summary?.totalMembers}    color="#6366f1" to="/members" />
+        <StatCard icon="📷" label="전체 사진"     value={summary?.totalPhotos}     color="#22c55e" to="/photos" />
+        <StatCard icon="📬" label="오늘 신규 문의" value={summary?.todayInquiries}  color="#f59e0b" to="/inquiries" />
         <StatCard icon="🔔" label="미읽음 문의"   value={summary?.unreadInquiries} color="#ef4444" to="/inquiries" />
+        <StatCard icon="📅" label="오늘 예약"     value={summary?.todayBookings}   color="#0ea5e9" to="/bookings" />
+        <StatCard icon="⏳" label="미확정 예약"   value={summary?.pendingBookings} color="#f59e0b" to="/bookings" />
       </div>
 
       <div className="dashboard-grid">
@@ -90,6 +94,10 @@ const DashboardPage = () => {
           </div>
         </div>
       </div>
+
+      <BookingCalendar />
+
+      <WeeklyBookingList />
 
       <div className="dashboard-card full-width">
         <div className="card-header">

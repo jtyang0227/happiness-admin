@@ -11,4 +11,6 @@ public class StatsSummaryDto {
     private long totalPhotos;
     private long todayInquiries;
     private long unreadInquiries;
+    private long todayBookings;
+    private long pendingBookings;
 }

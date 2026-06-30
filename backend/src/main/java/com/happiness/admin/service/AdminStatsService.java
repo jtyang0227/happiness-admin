@@ -5,6 +5,8 @@ import com.happiness.admin.dto.DistItemDto;
 import com.happiness.admin.dto.PhotographerStatDto;
 import com.happiness.admin.dto.StatsSummaryDto;
 import com.happiness.admin.dto.TopPhotoDto;
+import com.happiness.admin.entity.BookingStatus;
+import com.happiness.admin.repository.BookingRepository;
 import com.happiness.admin.repository.InquiryRepository;
 import com.happiness.admin.repository.MemberRepository;
 import com.happiness.admin.repository.PhotoRepository;
@@ -27,6 +29,7 @@ public class AdminStatsService {
     private final MemberRepository memberRepository;
     private final PhotoRepository photoRepository;
     private final InquiryRepository inquiryRepository;
+    private final BookingRepository bookingRepository;
 
     public StatsSummaryDto getSummary() {
         LocalDateTime todayStart = LocalDate.now().atStartOfDay();
@@ -36,6 +39,8 @@ public class AdminStatsService {
                 .totalPhotos(photoRepository.count())
                 .todayInquiries(inquiryRepository.countToday(todayStart, todayEnd))
                 .unreadInquiries(inquiryRepository.countByIsReadFalse())
+                .todayBookings(bookingRepository.countTodayConfirmed(LocalDate.now()))
+                .pendingBookings(bookingRepository.countByStatus(BookingStatus.REQUESTED))
                 .build();
     }
 

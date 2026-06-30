@@ -1,0 +1,25 @@
+.wbl-empty {
+  text-align: center;
+  color: var(--color-text-tertiary);
+  font-size: var(--text-sm);
+  padding: 28px 0;
+}
+.wbl-date {
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+  color: var(--color-text-primary);
+}
+.wbl-location {
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+}
+
+/* 상태 뱃지 — WeeklyBookingList 전용 */
+.badge.wbl-status-confirmed { background: var(--color-success-bg, #dcfce7); color: #16a34a; }
+.badge.wbl-status-requested { background: #fef9c3; color: #a16207; }
+.badge.wbl-status-rejected  { background: var(--color-danger-bg, #fee2e2); color: var(--color-danger, #dc2626); }
+.badge.wbl-status-cancelled { background: var(--color-surface-2); color: var(--color-text-tertiary); }
