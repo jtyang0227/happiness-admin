@@ -4,13 +4,13 @@
   --color-brand-hover: #AD081B;
   --color-brand-light: #fff0f1;
 
-  /* Brand — Indigo (secondary accent, kept for chart/link usage) */
+  /* Brand scale — alias to semantic brand tokens */
   --color-brand-50:  #eef2ff;
   --color-brand-100: #e0e7ff;
-  --color-brand-400: #818cf8;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
+  --color-brand-400: var(--color-brand);
+  --color-brand-500: var(--color-brand);
+  --color-brand-600: var(--color-brand-hover);
+  --color-brand-700: var(--color-brand-hover);
 
   /* Semantic */
   --color-success:    #22c55e;
@@ -183,6 +183,11 @@
     --color-info-bg:         #1E3A5F;
     --shadow-md: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
     --shadow-lg: 0 4px 6px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
+    --color-sidebar-bg:          #0B0D0E;
+    --color-sidebar-hover:       #161B22;
+    --color-sidebar-border:      #1F2329;
+    --color-sidebar-text:        #6B7280;
+    --color-sidebar-active-text: #A78BFA;
   }
 }
 
@@ -207,4 +212,9 @@
   --color-info-bg:         #1E3A5F;
   --shadow-md: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
   --shadow-lg: 0 4px 6px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
+  --color-sidebar-bg:          #0B0D0E;
+  --color-sidebar-hover:       #161B22;
+  --color-sidebar-border:      #1F2329;
+  --color-sidebar-text:        #6B7280;
+  --color-sidebar-active-text: #A78BFA;
 }

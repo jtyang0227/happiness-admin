@@ -1,13 +1,29 @@
-import React, { useState, useCallback } from 'react';
-import { Menu, Search, ChevronDown, LogOut } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Menu, Search, ChevronDown, LogOut, Sun, Moon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './AdminTopbar.css';
 
-const AdminTopbar = ({ onMenuClick, sidebarCollapsed }) => {
+const getStoredTheme = () => localStorage.getItem('theme') || 'light';
+
+const applyTheme = (theme) => {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+};
+
+const AdminTopbar = ({ onMenuClick, sidebarCollapsed, onSearchClick }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [profileOpen, setProfileOpen] = useState(false);
+  const [theme, setTheme] = useState(getStoredTheme);
+
+  useEffect(() => {
+    applyTheme(theme);
+  }, [theme]);
+
+  const toggleTheme = useCallback(() => {
+    setTheme(t => t === 'dark' ? 'light' : 'dark');
+  }, []);
 
   const handleLogout = useCallback(() => {
     logout();
@@ -29,16 +45,11 @@ const AdminTopbar = ({ onMenuClick, sidebarCollapsed }) => {
       </div>
 
       <div className="topbar-center">
-        <div className="topbar-search">
+        <button className="topbar-search" onClick={onSearchClick} type="button">
           <Search size={14} className="topbar-search-icon" />
-          <input
-            type="text"
-            className="topbar-search-input"
-            placeholder="페이지, 회원, 기능 검색..."
-            readOnly
-          />
+          <span className="topbar-search-placeholder">페이지, 회원, 기능 검색...</span>
           <span className="topbar-search-kbd">⌘K</span>
-        </div>
+        </button>
       </div>
 
       <div className="topbar-right">
@@ -46,6 +57,15 @@ const AdminTopbar = ({ onMenuClick, sidebarCollapsed }) => {
           <span className="topbar-status-dot topbar-status-dot--active" />
           <span className="topbar-status-label">시스템 정상</span>
         </div>
+
+        <button
+          className="topbar-theme-btn"
+          onClick={toggleTheme}
+          aria-label={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
+          title={theme === 'dark' ? '라이트 모드' : '다크 모드'}
+        >
+          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
 
         <div className="topbar-profile-wrap">
           <button
