@@ -6,26 +6,24 @@
 }
 
 .admin-main {
-  margin-left: 240px;
   flex: 1;
-  padding: 28px;
+  padding: 24px;
   min-height: 100vh;
   overflow: auto;
+  margin-top: var(--topbar-height);
+  transition: margin-left var(--dur-normal) var(--ease-default);
 }
 
 .sidebar-overlay {
-  display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 99;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: calc(var(--z-raised) - 1);
 }
-
-.sidebar-overlay.visible { display: block; }
 
 @media (max-width: 767px) {
   .admin-main {
-    margin-left: 0;
+    margin-left: 0 !important;
     padding: 16px;
   }
 }

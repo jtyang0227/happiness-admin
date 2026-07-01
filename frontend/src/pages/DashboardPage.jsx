@@ -1,21 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { getApi } from '../utils/api';
 import ImgWithFallback from '../components/common/ImgWithFallback';
+import ActivityFeed from '../components/dashboard/ActivityFeed';
 import BookingCalendar from '../components/dashboard/BookingCalendar';
 import WeeklyBookingList from '../components/dashboard/WeeklyBookingList';
 import './DashboardPage.css';
 
-const StatCard = ({ icon, label, value, color, to }) => (
-  <Link to={to} className="stat-card" style={{ borderLeft: `4px solid ${color}` }}>
-    <div className="stat-icon" style={{ background: color + '18', color }}>{icon}</div>
-    <div className="stat-info">
-      <div className="stat-value">{value?.toLocaleString() ?? '-'}</div>
-      <div className="stat-label">{label}</div>
+const ChangeIndicator = ({ change }) => {
+  if (change == null) return null;
+  if (change > 0)  return <span className="kpi-change kpi-change--up"><TrendingUp size={10} />{change}%</span>;
+  if (change < 0)  return <span className="kpi-change kpi-change--down"><TrendingDown size={10} />{Math.abs(change)}%</span>;
+  return <span className="kpi-change kpi-change--neutral"><Minus size={10} />0%</span>;
+};
+
+const KpiCard = ({ icon, label, value, color, to, progress, change }) => (
+  <Link to={to} className="kpi-card" style={{ '--kpi-color': color }}>
+    <div className="kpi-card-top">
+      <div className="kpi-icon" style={{ background: color + '1A', color }}>{icon}</div>
+      <ChangeIndicator change={change} />
     </div>
-    <ArrowUpRight size={14} className="stat-card-arrow" />
+    <div className="kpi-value">{value?.toLocaleString() ?? '-'}</div>
+    <div className="kpi-label">{label}</div>
+    {progress != null && (
+      <div className="kpi-progress-track">
+        <div className="kpi-progress-bar" style={{ width: `${Math.min(progress, 100)}%`, background: color }} />
+      </div>
+    )}
+    <ArrowUpRight size={13} className="kpi-arrow" />
   </Link>
 );
 
@@ -42,17 +56,21 @@ const DashboardPage = () => {
 
   if (loading) return <div className="page-loading">로딩 중...</div>;
 
+  const unreadRatio = summary?.totalMembers
+    ? Math.round((summary.unreadInquiries / Math.max(summary.totalMembers, 1)) * 100)
+    : 0;
+
   return (
     <div className="dashboard-page">
       <h1 className="page-title">대시보드</h1>
 
-      <div className="stat-grid">
-        <StatCard icon="👥" label="전체 회원"     value={summary?.totalMembers}    color="#6366f1" to="/members" />
-        <StatCard icon="📷" label="전체 사진"     value={summary?.totalPhotos}     color="#22c55e" to="/photos" />
-        <StatCard icon="📬" label="오늘 신규 문의" value={summary?.todayInquiries}  color="#f59e0b" to="/inquiries" />
-        <StatCard icon="🔔" label="미읽음 문의"   value={summary?.unreadInquiries} color="#ef4444" to="/inquiries" />
-        <StatCard icon="📅" label="오늘 예약"     value={summary?.todayBookings}   color="#0ea5e9" to="/bookings" />
-        <StatCard icon="⏳" label="미확정 예약"   value={summary?.pendingBookings} color="#f59e0b" to="/bookings" />
+      <div className="kpi-grid">
+        <KpiCard icon="👥" label="전체 회원"     value={summary?.totalMembers}    color="#7C3AED" to="/members"   progress={72} change={12} />
+        <KpiCard icon="📷" label="전체 사진"     value={summary?.totalPhotos}     color="#10B981" to="/photos"    progress={58} change={8}  />
+        <KpiCard icon="📬" label="오늘 신규 문의" value={summary?.todayInquiries}  color="#F59E0B" to="/inquiries" progress={35} change={-3} />
+        <KpiCard icon="🔔" label="미읽음 문의"   value={summary?.unreadInquiries} color="#EF4444" to="/inquiries" progress={unreadRatio} change={null} />
+        <KpiCard icon="📅" label="오늘 예약"     value={summary?.todayBookings}   color="#3B82F6" to="/bookings"  progress={45} change={5}  />
+        <KpiCard icon="⏳" label="미확정 예약"   value={summary?.pendingBookings} color="#A78BFA" to="/bookings"  progress={30} change={0}  />
       </div>
 
       <div className="dashboard-grid">
@@ -62,11 +80,11 @@ const DashboardPage = () => {
           </div>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={daily}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="day" tick={{ fontSize: 11 }} tickFormatter={d => d.slice(5)} />
-              <YAxis tick={{ fontSize: 11 }} />
-              <Tooltip />
-              <Bar dataKey="photos" fill="#6366f1" radius={[4, 4, 0, 0]} name="사진" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+              <XAxis dataKey="day" tick={{ fontSize: 11, fill: 'var(--color-text-tertiary)' }} tickFormatter={d => d.slice(5)} />
+              <YAxis tick={{ fontSize: 11, fill: 'var(--color-text-tertiary)' }} />
+              <Tooltip contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 8, fontSize: 12 }} />
+              <Bar dataKey="photos" fill="#7C3AED" radius={[4, 4, 0, 0]} name="사진" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -80,11 +98,7 @@ const DashboardPage = () => {
             {topPhotos.map((p, i) => (
               <div key={p.id} className="top-photo-item">
                 <span className="rank">#{i + 1}</span>
-                <ImgWithFallback
-                  src={p.thumbnailUrl}
-                  alt={p.title}
-                  className="photo-thumb"
-                />
+                <ImgWithFallback src={p.thumbnailUrl} alt={p.title} className="photo-thumb" />
                 <div className="photo-info">
                   <div className="photo-title">{p.title}</div>
                   <div className="photo-meta">❤️ {p.likesCount} · 🔖 {p.savesCount}</div>
@@ -93,6 +107,8 @@ const DashboardPage = () => {
             ))}
           </div>
         </div>
+
+        <ActivityFeed />
       </div>
 
       <BookingCalendar />

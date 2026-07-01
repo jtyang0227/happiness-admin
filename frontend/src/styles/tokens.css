@@ -138,42 +138,73 @@
   --color-status-approved: #22c55e;
   --color-status-rejected: #ef4444;
 
-  /* Dark mode surface tokens (applied via data-theme or media query) */
-  --color-bg-dark:           #0b1120;
-  --color-surface-dark:      #131f35;
-  --color-surface-2-dark:    #1a2845;
-  --color-border-dark:       #1e3a5f;
-  --color-text-primary-dark: #e2e8f0;
+  /* Dark mode surface tokens — Railway DNA */
+  --color-bg-dark:              #0B0D0E;
+  --color-surface-dark:         #161B22;
+  --color-surface-2-dark:       #1F2329;
+  --color-border-dark:          #2D3139;
+  --color-border-light-dark:    #3D4450;
+  --color-text-primary-dark:    #F5F5F5;
+  --color-text-secondary-dark:  #9BA3AF;
+  --color-text-tertiary-dark:   #4B5563;
+
+  /* Status colors (Railway-style) */
+  --color-status-active:   #10B981;
+  --color-status-building: #F59E0B;
+  --color-status-deploy:   #A78BFA;
+  --color-status-error:    #EF4444;
+  --color-status-idle:     #4B5563;
+
+  /* Topbar */
+  --topbar-height: 56px;
+  --sidebar-width-collapsed: 64px;
+  --sidebar-width-expanded: 240px;
 }
 
 /* Dark mode — system preference */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --color-bg:           var(--color-bg-dark);
-    --color-surface:      var(--color-surface-dark);
-    --color-surface-2:    var(--color-surface-2-dark);
-    --color-border:       var(--color-border-dark);
-    --color-text-primary: var(--color-text-primary-dark);
+    --color-bg:              var(--color-bg-dark);
+    --color-surface:         var(--color-surface-dark);
+    --color-surface-2:       var(--color-surface-2-dark);
+    --color-border:          var(--color-border-dark);
+    --color-border-light:    var(--color-border-light-dark);
+    --color-text-primary:    var(--color-text-primary-dark);
+    --color-text-secondary:  var(--color-text-secondary-dark);
+    --color-text-tertiary:   var(--color-text-tertiary-dark);
+    --color-brand:           #7C3AED;
+    --color-brand-hover:     #A78BFA;
+    --color-brand-50:        #2D1B69;
+    --color-brand-100:       #3D2B7A;
+    --color-brand-light:     rgba(124, 58, 237, 0.15);
+    --color-success-bg:      #064E3B;
+    --color-warning-bg:      #451A03;
+    --color-danger-bg:       #450A0A;
+    --color-info-bg:         #1E3A5F;
+    --shadow-md: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-lg: 0 4px 6px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
   }
 }
 
 /* Dark mode — manual override */
 [data-theme="dark"] {
-  --color-bg:           var(--color-bg-dark);
-  --color-surface:      var(--color-surface-dark);
-  --color-surface-2:    var(--color-surface-2-dark);
-  --color-border:       var(--color-border-dark);
-  --color-text-primary: var(--color-text-primary-dark);
-  --color-brand:        #FF4455;
-  --color-brand-hover:  #E60023;
-  --color-brand-light:  rgba(255, 68, 85, 0.12);
-}
-
-/* Dark mode — system preference */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --color-brand:        #FF4455;
-    --color-brand-hover:  #E60023;
-    --color-brand-light:  rgba(255, 68, 85, 0.12);
-  }
+  --color-bg:              var(--color-bg-dark);
+  --color-surface:         var(--color-surface-dark);
+  --color-surface-2:       var(--color-surface-2-dark);
+  --color-border:          var(--color-border-dark);
+  --color-border-light:    var(--color-border-light-dark);
+  --color-text-primary:    var(--color-text-primary-dark);
+  --color-text-secondary:  var(--color-text-secondary-dark);
+  --color-text-tertiary:   var(--color-text-tertiary-dark);
+  --color-brand:           #7C3AED;
+  --color-brand-hover:     #A78BFA;
+  --color-brand-50:        #2D1B69;
+  --color-brand-100:       #3D2B7A;
+  --color-brand-light:     rgba(124, 58, 237, 0.15);
+  --color-success-bg:      #064E3B;
+  --color-warning-bg:      #451A03;
+  --color-danger-bg:       #450A0A;
+  --color-info-bg:         #1E3A5F;
+  --shadow-md: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-lg: 0 4px 6px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
 }
