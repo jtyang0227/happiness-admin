@@ -76,10 +76,13 @@ jobs:
 
       - name: Build (production)
         env:
+          CI: false
           REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
         run: npm run build
 
       - run: npm test -- --watchAll=false --passWithNoTests
+        env:
+          CI: false
 
   # ────────────────────────────────────────────────────────────────────
   # 3. Docker — 이미지 빌드 & GHCR Push (master 브랜치만)
@@ -171,12 +174,13 @@ jobs:
         if: steps.railway-check.outputs.configured == 'true'
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service backend --detach
+        run: cd backend && railway up --service backend --detach
 
   # ────────────────────────────────────────────────────────────────────
   # 5. Deploy Frontend → Vercel (master 브랜치만)
   #
   # 필요한 시크릿: VERCEL_TOKEN / VERCEL_ORG_ID / VERCEL_PROJECT_ID
+  # 선택 시크릿: REACT_APP_API_URL (Railway 백엔드 URL — 미설정 시 localhost 폴백)
   # 미설정 시 경고 후 건너뜀.
   # ────────────────────────────────────────────────────────────────────
   deploy-frontend:
@@ -210,17 +214,29 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
+      - name: Install Vercel CLI
+        if: steps.vercel-check.outputs.configured == 'true'
+        run: npm install -g vercel@latest
+
       - name: Install dependencies
         if: steps.vercel-check.outputs.configured == 'true'
-        run: npm ci
         working-directory: frontend
+        run: npm ci
 
-      - name: Deploy to Vercel
+      - name: Pull Vercel project info
         if: steps.vercel-check.outputs.configured == 'true'
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: frontend
-          vercel-args: '--prod'
+        working-directory: frontend
+        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+
+      - name: Build via Vercel
+        if: steps.vercel-check.outputs.configured == 'true'
+        working-directory: frontend
+        env:
+          CI: false
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+        run: vercel build --prod --token=$VERCEL_TOKEN
+
+      - name: Deploy to Vercel (prebuilt)
+        if: steps.vercel-check.outputs.configured == 'true'
+        working-directory: frontend
+        run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
