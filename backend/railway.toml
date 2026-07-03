@@ -1,3 +1,22 @@
+# ── Railway 배포 설정 ─────────────────────────────────────────────────
+# 비용 절감: happiness-app 과 같은 Railway 프로젝트에 추가 서비스로 배포
+# GitHub Secrets 에 RAILWAY_PROJECT_ID 를 추가하면 기존 프로젝트에 배포됨
+#
+# Railway 대시보드에서 설정할 환경 변수:
+#   SPRING_PROFILES_ACTIVE = prod
+#   JWT_SECRET             = (랜덤 256비트 이상 문자열)
+#   DB_SCHEMA              = admin
+#
+# DB 공유 시 (같은 프로젝트 PostgreSQL):
+#   DB_URL      = ${{Postgres.DATABASE_URL}}   ← Railway 변수 참조
+#   DB_USERNAME = ${{Postgres.PGUSER}}
+#   DB_PASSWORD = ${{Postgres.PGPASSWORD}}
+#
+# DB 독립 시:
+#   DB_URL      = postgresql://user:pass@host:5432/happiness_admin
+#   DB_USERNAME = (PostgreSQL 사용자)
+#   DB_PASSWORD = (PostgreSQL 패스워드)
+
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
