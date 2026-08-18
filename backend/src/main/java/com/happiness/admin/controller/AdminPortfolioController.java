@@ -29,6 +29,11 @@ public class AdminPortfolioController {
         return ResponseEntity.ok(portfolioService.getStatusCounts());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> detail(@PathVariable Long id) {
+        return ResponseEntity.ok(portfolioService.getPortfolio(id));
+    }
+
     @PatchMapping("/{id}/approve")
     public ResponseEntity<?> approve(@PathVariable Long id, @RequestBody(required = false) Map<String, String> body) {
         String note = body != null ? body.getOrDefault("adminNote", null) : null;

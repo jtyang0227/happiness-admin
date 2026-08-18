@@ -151,7 +151,7 @@
 .mdp-tab.active { color: var(--color-brand, #E60023); font-weight: 700; }
 .mdp-tab-indicator {
   position: absolute; bottom: -2px; height: 2px;
-  background: var(--color-brand, #E60023); border-radius: 2px;
+  background: var(--color-brand, #E60023); border-radius: 0;
   transition: left 0.22s var(--ease-default), width 0.22s var(--ease-default);
 }
 

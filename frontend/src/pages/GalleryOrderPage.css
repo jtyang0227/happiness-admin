@@ -16,7 +16,7 @@
 .btn-sm-outline {
   padding: 5px 12px;
   border: 1px solid var(--color-border);
-  border-radius: 6px;
+  border-radius: 0;
   background: var(--color-surface);
   color: var(--color-text);
   font-size: 12px;
@@ -32,7 +32,7 @@
   background: #fef3c7;
   border: 1px solid #fbbf24;
   color: #92400e;
-  border-radius: 8px;
+  border-radius: 0;
   padding: 10px 16px;
   margin-bottom: 16px;
   font-size: 13px;
@@ -43,7 +43,7 @@
   background: var(--color-brand);
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 0;
   font-size: 13px;
   cursor: pointer;
   font-weight: 600;
@@ -54,7 +54,7 @@
   background: #d1fae5;
   border: 1px solid #34d399;
   color: #065f46;
-  border-radius: 8px;
+  border-radius: 0;
   padding: 10px 16px;
   margin-bottom: 16px;
   font-size: 13px;
@@ -76,14 +76,14 @@
 .go-card {
   position: relative;
   background: var(--color-surface);
-  border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  border-radius: 0;
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
   cursor: grab;
   transition: box-shadow 0.15s, transform 0.15s;
   user-select: none;
 }
-.go-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+.go-card:hover { box-shadow: var(--shadow-md); }
 .go-card.dragging { opacity: 0.4; transform: scale(1.03); cursor: grabbing; }
 .go-card.drag-over { outline: 2px dashed var(--color-brand); background: color-mix(in srgb, var(--color-brand) 8%, var(--color-surface)); }
 
@@ -95,7 +95,7 @@
   height: 22px;
   background: var(--color-brand);
   color: #fff;
-  border-radius: 50%;
+  border-radius: 0;
   font-size: 11px;
   font-weight: 700;
   display: flex;

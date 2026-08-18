@@ -29,6 +29,12 @@ public class AdminPortfolioService {
         return PageResponse.of(portfolioRepository.searchPortfolios(st, vis, s, pageable).map(AdminPortfolioDto::from));
     }
 
+    public AdminPortfolioDto getPortfolio(Long id) {
+        Portfolio p = portfolioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("포트폴리오를 찾을 수 없습니다."));
+        return AdminPortfolioDto.from(p);
+    }
+
     public Map<String, Long> getStatusCounts() {
         return Map.of(
             "DRAFT",    portfolioRepository.countByStatus(PortfolioStatus.DRAFT),
