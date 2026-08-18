@@ -105,79 +105,92 @@ React SPA using React Router v6 + Recharts:
 
 ### Design References
 
-이 프로젝트의 UI는 두 앱에서 영감을 받은 **Cosmos × Pinterest 퓨전 디자인**을 사용한다.
+현재(4차) 디자인 컨셉은 **和ドット(와도트)** — 패미컴 시대 JRPG 대화창 미학 × 전통 일본
+색채(藍色·朱色·墨·生成り)를 도트(픽셀) UI 문법 위에 결합한다. 1~3차(Cosmos × Pinterest →
+Railway DNA → Pixel Arcade)는 레거시이며 `docs/design/`에 기록만 남아있다.
 
-| Reference | DNA | Key Elements |
-|---|---|---|
-| **Pinterest** | Light mode base, warm neutrals, masonry layout | Pin Red (#E60023), cream bg (#FAFAF8), column-count masonry, card hover overlay |
-| **Cosmos** | Dark mode DNA, minimal black, collage hero | Pure black (#000000), tracked title, italic pill search, 2px-gap collage, underline tabs |
+| DNA | Key Elements |
+|---|---|
+| **도트(유지)** | 각진 모서리(`radius:0`), 픽셀 폰트 포인트, 하드/이중 프레임 |
+| **전통 일본 색채** | 朱色(#C7361B) 브랜드, 藍色(#0F1B2A) 다크 배경, 라이트/다크 보더-배경 명암 반전 |
 
 ### CSS Variable System
 
-모든 색상은 CSS 변수 단일 인터페이스를 통해 light/dark 자동 전환된다.
+모든 색상은 CSS 변수 단일 인터페이스를 통해 light/dark 자동 전환된다. **실제 존재하는
+토큰만 사용할 것** — `--color-text`, `--color-text-2` 같은 이름은 정의되어 있지 않다
+(과거 이 문서에 잘못 기재되어 있었고, 상속으로 우연히 렌더링되던 잠재 버그의 원인이었다).
 
 ```css
-/* Light mode (Pinterest base) */
+/* frontend/src/styles/tokens.css 실제 정의 (발췌) */
 :root {
-  --color-bg:       #FAFAF8;
-  --color-surface:  #FFFFFF;
-  --color-surface-2: #F5F5F3;
-  --color-text:     #1A1A1A;
-  --color-text-2:   #767676;
-  --color-border:   #E5E5E5;
-  --color-brand:    #E60023;   /* Pin Red */
-  --color-brand-2:  #AD081B;
+  --color-bg:             #F1E9D8;  /* 生成り 기나리 (라이트) */
+  --color-surface:        #FBF6EA;
+  --color-border:         #1C1B19;  /* 墨 스미 — 먹선 */
+  --color-text-primary:   #1C1B19;
+  --color-text-secondary: #4A4038;
+  --color-text-tertiary:  #8A7D66;
+  --color-brand:          #C7361B;  /* 朱色 슈이로 */
+  --color-success/-warning/-danger/-info: ... /* 각각 -bg 페어 존재 */
+  --font-pixel:  'DotGothic16', ...;   /* 브랜드 로고·KPI 숫자 전용 */
+  --font-serif:  'Noto Serif KR', ...; /* 페이지 타이틀 전용 */
+  --shadow-ring: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-border); /* JRPG 이중 프레임 */
 }
 
-/* Dark mode (Cosmos DNA) */
+/* 다크모드: 보더-배경 명암이 반전된다 (기나리 보더 위 藍色 배경) */
 [data-theme="dark"], @media (prefers-color-scheme: dark) {
-  --color-bg:       #000000;
-  --color-surface:  #111111;
-  --color-surface-2: #1A1A1A;
-  --color-text:     #F5F5F5;
-  --color-text-2:   #A0A0A0;
-  --color-border:   #2A2A2A;
-  --color-brand:    #FF4455;
-  --color-brand-2:  #E60023;
+  --color-bg:     #0F1B2A;  /* 藍色 아이이로 */
+  --color-border: #F1E9D8;  /* 生成り — 밤엔 크림 보더 */
+  --color-text-primary: #F1E9D8;
+  --color-brand:  #E2571C;
 }
 ```
+
+색상 이름·전체 팔레트는 `docs/design/WA_DOT_DESIGN_SPEC.md` 참고.
 
 ### Key Component Patterns
 
 | Component | Pattern | Notes |
 |---|---|---|
-| **Masonry grid** | `column-count` CSS (no JS) | `break-inside: avoid` on cards |
-| **SlideOver** | Right panel, ESC to close, body scroll lock | Spring animation: `transform: translateX` |
-| **Category tabs** | Sliding underline indicator | JS measures `offsetLeft + offsetWidth` of active tab |
-| **Collage hero** | 3–5 images, 2px gap CSS grid | Named areas: `"a b" "a c"` |
+| **카드/테이블/모달** | `border: 2px solid var(--color-border)` + `box-shadow: var(--shadow-ring)` | 블러 없는 이중 프레임 |
+| **StatusDot** | `clip-path: polygon(...)` 다이아몬드 | 원형/사각 아님 |
+| **Sidebar active** | `::before { content: '▶' }` | 좌측 바 아님 — JRPG 커서 |
+| **버튼 클릭 피드백** | `translate(2px,2px)` + `box-shadow: none` | `--shadow-sm/md` 하드 오프셋 전용, 패널에는 미사용 |
+| **로그인 화면** | 항상 다크 고정, 로컬 스코프 변수(`--lp-*`)로 테마 독립 | `pages/LoginPage.css` |
 | **Image blur reveal** | `filter: blur(4px) → blur(0)` on `onLoad` | `transition: filter 0.4s ease` |
-| **Scroll entrance** | `IntersectionObserver` + `.visible` class | `opacity 0→1, translateY 16px→0` |
-| **Pin card** | `position: relative`, hover shows overlay | `border-radius: 16px`, `overflow: hidden` |
-| **Board card** | 3-split cover (CSS grid named areas) | Portfolio 대표 이미지 3장 |
+| **Scroll entrance** | `IntersectionObserver` + `.visible`/`.kpi-visible` 클래스 | `opacity 0→1, translateY→0` — 트리거까지 최대 ~1초 소요될 수 있음(자동화 테스트 시 유의) |
+| **SlideOver** | 우측 패널, 좌측 엣지만 이중선 프레임 | `border-left` + 2겹 `box-shadow` |
+| **Masonry grid** | `column-count` CSS (no JS) | 사진 목록 등 일부 페이지에서 유지 |
 
 ### Font
 
-```css
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css');
-font-family: 'Pretendard Variable', -apple-system, sans-serif;
+```html
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Serif+KR:wght@500;700&display=swap" rel="stylesheet" />
+<!-- Pretendard는 기존 jsdelivr CDN 유지 -->
 ```
 
 ### Design Files
 
-- `docs/design/PINTEREST_DESIGN_SPEC.md` — Pinterest 컨셉 전체 디자인 명세 (색상, 컴포넌트, 레이아웃)
-- `docs/design/COSMOS_DESIGN_SPEC.md` — Cosmos × Pinterest 퓨전 명세 (다크모드, 고급 컴포넌트)
-- `docs/design/CLAUDE_DESIGN_PROMPTS.md` — Claude에게 UI 구현 요청 시 사용할 재사용 가능한 프롬프트 라이브러리 (13개 컴포넌트)
+- `docs/design/WA_DOT_DESIGN_SPEC.md` — **현재(4차) 디자인 구현 기록** (팔레트·컴포넌트·QA 이력)
+- `docs/planning/JAPANESE_DOT_DESIGN_SPEC.md` — 4차 최초 기획 원본
+- `docs/design/PIXEL_ARCADE_DESIGN_SPEC.md` — 3차 구현 기록 (레거시)
+- `docs/planning/RAILWAY_DESIGN_SPEC.md`, `docs/planning/PIXEL_DOT_DESIGN_SPEC.md` — 2·3차 기획 원본 (레거시)
+- `docs/design/PINTEREST_DESIGN_SPEC.md`, `COSMOS_DESIGN_SPEC.md` — 1차 명세 (레거시)
+- `docs/design/CLAUDE_DESIGN_PROMPTS.md` — 1차 시절 프롬프트 라이브러리 (레거시, 팔레트만 최신 토큰으로 치환해 참고)
 - `docs/planning/APP_TO_ADMIN_SPEC.md` — happiness-app에서 admin으로 이식할 기능 명세
 
 ### Design Rules
 
-1. **CSS 변수만 사용**: 하드코딩된 색상값 금지. 반드시 `var(--color-*)` 사용.
+1. **CSS 변수만 사용**: 하드코딩된 색상값 금지. 반드시 실제 존재하는 `var(--color-*)` 사용 —
+   작업 전 `frontend/src/styles/tokens.css`에서 토큰명을 확인할 것(이 문서의 표기만 믿지 말 것).
 2. **다크모드 기본 지원**: 새 컴포넌트는 CSS 변수 시스템에 따라 자동으로 양쪽 테마를 지원해야 한다.
-3. **이미지 blur reveal**: 모든 이미지는 `onLoad`에서 blur → clear 전환 적용.
-4. **column-count 마소니**: JS 기반 마소니 라이브러리(Masonry.js, react-masonry-css) 사용 금지. 순수 CSS `column-count` 방식 사용.
+   와도트는 보더-배경 명암이 테마마다 반전되므로 하드코딩된 보더/배경 조합을 피할 것.
+3. **각진 모서리 유지**: `border-radius`를 새로 하드코딩하지 말 것 — `var(--radius-*)`는 전부 `0`.
+4. **이미지 blur reveal**: 모든 이미지는 `onLoad`에서 blur → clear 전환 적용.
 5. **IntersectionObserver 입장 애니메이션**: 카드 리스트 페이지에서 스크롤 진입 시 fade+slide up 적용.
-6. **Pretendard Variable 폰트**: 모든 페이지에 CDN 로드 필수.
-7. **새 UI 구현 시**: `CLAUDE_DESIGN_PROMPTS.md`의 해당 프롬프트 섹션을 참조하여 일관성 유지.
+6. **폰트 역할 분리**: 픽셀 폰트(`--font-pixel`)는 숫자·브랜드 로고 전용(한글 미지원), 페이지
+   타이틀은 명조체(`--font-serif`), 본문은 Pretendard.
+7. **패널은 `--shadow-ring`, 버튼은 `--shadow-sm/md`**: 정적 카드/모달과 클릭 가능한 버튼의
+   섀도우 체계가 다르다 — 혼용하지 말 것.
 
 ## AI Roles
 
