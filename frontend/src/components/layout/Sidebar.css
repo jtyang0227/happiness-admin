@@ -11,7 +11,7 @@
   z-index: var(--z-raised);
   transition: width var(--dur-normal) var(--ease-default);
   overflow: hidden;
-  border-right: 1px solid var(--color-sidebar-border);
+  border-right: 2px solid var(--color-sidebar-border);
 }
 
 .sidebar--collapsed {
@@ -23,21 +23,23 @@
   align-items: center;
   gap: 10px;
   padding: 16px;
-  border-bottom: 1px solid var(--color-sidebar-border);
+  border-bottom: 2px solid var(--color-sidebar-border);
   height: 52px;
   flex-shrink: 0;
 }
 
 .sidebar-brand-icon {
-  color: var(--color-brand-400);
+  color: var(--color-sidebar-active-text);
   flex-shrink: 0;
 }
 
 .sidebar-brand-text {
-  font-size: var(--text-sm);
-  font-weight: var(--fw-bold);
-  color: #e2e8f0;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  font-weight: 400;
+  color: #F0F0F5;
   white-space: nowrap;
+  letter-spacing: 0.02em;
 }
 
 .sidebar-nav {
@@ -56,7 +58,7 @@
   text-decoration: none;
   font-size: var(--text-sm);
   transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
-  border-left: 2px solid transparent;
+  border-left: 3px solid transparent;
   white-space: nowrap;
   cursor: pointer;
   width: 100%;
@@ -71,7 +73,7 @@
 .sidebar--collapsed .sidebar-link {
   padding: 10px 0;
   justify-content: center;
-  border-left: 2px solid transparent;
+  border-left: 3px solid transparent;
 }
 
 .sidebar-link:hover {
@@ -81,10 +83,10 @@
 }
 
 .sidebar-link.active {
-  background: rgba(124, 58, 237, 0.1);
-  color: #A78BFA;
-  border-left-color: #7C3AED;
-  font-weight: var(--fw-semibold);
+  background: var(--color-sidebar-hover);
+  color: var(--color-sidebar-active-text);
+  border-left-color: var(--color-sidebar-active-text);
+  font-weight: var(--fw-bold);
 }
 
 .sidebar-icon {
@@ -135,7 +137,7 @@
   text-decoration: none;
   font-size: var(--text-xs);
   transition: color var(--dur-fast), background var(--dur-fast);
-  border-left: 2px solid transparent;
+  border-left: 3px solid transparent;
   white-space: nowrap;
 }
 
@@ -146,8 +148,8 @@
 }
 
 .sidebar-sub-link.active {
-  color: #A78BFA;
-  border-left-color: #7C3AED;
+  color: var(--color-sidebar-active-text);
+  border-left-color: var(--color-sidebar-active-text);
   font-weight: var(--fw-semibold);
 }
 

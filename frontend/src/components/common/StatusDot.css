@@ -9,25 +9,26 @@
 .status-dot-wrap--lg .status-dot { width: 10px; height: 10px; }
 
 .status-dot {
-  border-radius: var(--radius-full);
+  border-radius: 0;
   flex-shrink: 0;
+  image-rendering: pixelated;
 }
 
 .status-dot--active {
   background: var(--color-status-active);
   box-shadow: 0 0 0 0 var(--color-status-active);
-  animation: status-pulse-active 2s ease-in-out infinite;
+  animation: status-pulse-active 1.2s var(--ease-pixel) infinite;
 }
 
 .status-dot--building {
   background: var(--color-status-building);
-  animation: status-blink 1s step-end infinite;
+  animation: status-blink 0.8s steps(1) infinite;
 }
 
 .status-dot--deploy {
   background: var(--color-status-deploy);
   box-shadow: 0 0 0 0 var(--color-status-deploy);
-  animation: status-pulse-deploy 2s ease-in-out infinite;
+  animation: status-pulse-deploy 1.2s var(--ease-pixel) infinite;
 }
 
 .status-dot--error {
@@ -46,18 +47,18 @@
 }
 
 @keyframes status-pulse-active {
-  0%   { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
-  70%  { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  0%   { box-shadow: 2px 2px 0 0 rgba(57, 255, 136, 0.5); }
+  50%  { box-shadow: 4px 4px 0 0 rgba(57, 255, 136, 0); }
+  100% { box-shadow: 2px 2px 0 0 rgba(57, 255, 136, 0.5); }
 }
 
 @keyframes status-pulse-deploy {
-  0%   { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.6); }
-  70%  { box-shadow: 0 0 0 6px rgba(167, 139, 250, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0); }
+  0%   { box-shadow: 2px 2px 0 0 rgba(76, 224, 255, 0.5); }
+  50%  { box-shadow: 4px 4px 0 0 rgba(76, 224, 255, 0); }
+  100% { box-shadow: 2px 2px 0 0 rgba(76, 224, 255, 0.5); }
 }
 
 @keyframes status-blink {
   0%, 100% { opacity: 1; }
-  50%       { opacity: 0.3; }
+  50%       { opacity: 0.25; }
 }

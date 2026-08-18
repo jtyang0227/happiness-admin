@@ -17,13 +17,13 @@ const ChangeIndicator = ({ change }) => {
 };
 
 const KpiCard = ({ icon, label, value, color, to, progress, change }) => (
-  <Link to={to} className="kpi-card" style={{ '--kpi-color': color }}>
-    <div className="kpi-card-top">
-      <div className="kpi-icon" style={{ background: color + '1A', color }}>{icon}</div>
+  <Link to={to} className="dash-kpi-card" style={{ '--kpi-color': color }}>
+    <div className="dash-kpi-card-top">
+      <div className="dash-kpi-icon" style={{ background: color + '1A', color }}>{icon}</div>
       <ChangeIndicator change={change} />
     </div>
-    <div className="kpi-value">{value?.toLocaleString() ?? '-'}</div>
-    <div className="kpi-label">{label}</div>
+    <div className="dash-kpi-value">{value?.toLocaleString() ?? '-'}</div>
+    <div className="dash-kpi-label">{label}</div>
     {progress != null && (
       <div className="kpi-progress-track">
         <div className="kpi-progress-bar" style={{ width: `${Math.min(progress, 100)}%`, background: color }} />
