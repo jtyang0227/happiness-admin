@@ -16,11 +16,12 @@
 
 .confirm-dialog {
   background: var(--color-surface);
+  border: 2px solid var(--color-border);
   border-radius: var(--radius-xl);
   padding: 28px 28px 24px;
   width: 100%;
   max-width: 420px;
-  box-shadow: var(--shadow-xl);
+  box-shadow: var(--shadow-modal);
   animation: confirm-slide-up 0.18s ease;
 }
 

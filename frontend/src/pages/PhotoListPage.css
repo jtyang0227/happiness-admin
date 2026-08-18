@@ -34,8 +34,8 @@
   padding: 2px 7px; border-radius: 0;
   backdrop-filter: blur(4px);
 }
-.cat-badge-l1 { background: rgba(253,242,248,0.88); color: #be185d; }
-.cat-badge-l2 { background: rgba(240,253,244,0.88); color: #15803d; left: auto; right: 8px; bottom: 8px; }
+.cat-badge-l1 { background: color-mix(in srgb, var(--color-brand-50) 88%, transparent); color: var(--color-brand); }
+.cat-badge-l2 { background: color-mix(in srgb, var(--color-success-bg) 88%, transparent); color: var(--color-success); left: auto; right: 8px; bottom: 8px; }
 
 /* Photo card cursor */
 .photo-card { cursor: pointer; }

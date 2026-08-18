@@ -46,9 +46,9 @@
 }
 
 .topbar-logo-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 0;
+  width: 9px;
+  height: 9px;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
   background: var(--color-brand);
   flex-shrink: 0;
 }
@@ -133,22 +133,20 @@
 }
 
 .topbar-status-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 0;
+  width: 9px;
+  height: 9px;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
   flex-shrink: 0;
 }
 
 .topbar-status-dot--active {
   background: var(--color-status-active);
-  box-shadow: 0 0 0 0 var(--color-status-active);
   animation: topbar-pulse 1.2s var(--ease-pixel) infinite;
 }
 
 @keyframes topbar-pulse {
-  0%   { box-shadow: 2px 2px 0 0 rgba(57, 255, 136, 0.5); }
-  50%  { box-shadow: 4px 4px 0 0 rgba(57, 255, 136, 0); }
-  100% { box-shadow: 2px 2px 0 0 rgba(57, 255, 136, 0.5); }
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.25); opacity: 0.7; }
 }
 
 .topbar-status-label {

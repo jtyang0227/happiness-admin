@@ -1,7 +1,7 @@
 .gallery-order-page { padding: 24px; }
 
 .go-header { margin-bottom: 20px; }
-.go-subtitle { color: var(--color-text-2); font-size: 13px; margin-top: 4px; }
+.go-subtitle { color: var(--color-text-secondary); font-size: 13px; margin-top: 4px; }
 
 .go-toolbar {
   display: flex;
@@ -10,7 +10,7 @@
   margin-bottom: 16px;
   flex-wrap: wrap;
 }
-.go-count { color: var(--color-text-2); font-size: 13px; }
+.go-count { color: var(--color-text-secondary); font-size: 13px; }
 .go-sort-btns { display: flex; gap: 6px; }
 
 .btn-sm-outline {
@@ -18,7 +18,7 @@
   border: 1px solid var(--color-border);
   border-radius: 0;
   background: var(--color-surface);
-  color: var(--color-text);
+  color: var(--color-text-primary);
   font-size: 12px;
   cursor: pointer;
   transition: border-color 0.15s;
@@ -29,9 +29,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #fef3c7;
-  border: 1px solid #fbbf24;
-  color: #92400e;
+  background: var(--color-warning-bg);
+  border: 2px solid var(--color-warning);
+  color: var(--color-warning);
   border-radius: 0;
   padding: 10px 16px;
   margin-bottom: 16px;
@@ -62,7 +62,7 @@
 
 .go-empty {
   text-align: center;
-  color: var(--color-text-2);
+  color: var(--color-text-secondary);
   padding: 60px 0;
   font-size: 14px;
 }
@@ -122,7 +122,7 @@
 .go-meta {
   padding: 0 8px 6px;
   font-size: 11px;
-  color: var(--color-text-2);
+  color: var(--color-text-secondary);
 }
 .go-drag-handle {
   position: absolute;

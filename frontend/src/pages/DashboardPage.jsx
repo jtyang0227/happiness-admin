@@ -65,12 +65,12 @@ const DashboardPage = () => {
       <h1 className="page-title">대시보드</h1>
 
       <div className="kpi-grid">
-        <KpiCard icon="👥" label="전체 회원"     value={summary?.totalMembers}    color="#7C3AED" to="/members"   progress={72} change={12} />
-        <KpiCard icon="📷" label="전체 사진"     value={summary?.totalPhotos}     color="#10B981" to="/photos"    progress={58} change={8}  />
-        <KpiCard icon="📬" label="오늘 신규 문의" value={summary?.todayInquiries}  color="#F59E0B" to="/inquiries" progress={35} change={-3} />
-        <KpiCard icon="🔔" label="미읽음 문의"   value={summary?.unreadInquiries} color="#EF4444" to="/inquiries" progress={unreadRatio} change={null} />
-        <KpiCard icon="📅" label="오늘 예약"     value={summary?.todayBookings}   color="#3B82F6" to="/bookings"  progress={45} change={5}  />
-        <KpiCard icon="⏳" label="미확정 예약"   value={summary?.pendingBookings} color="#A78BFA" to="/bookings"  progress={30} change={0}  />
+        <KpiCard icon="👥" label="전체 회원"     value={summary?.totalMembers}    color="#C7361B" to="/members"   progress={72} change={12} />
+        <KpiCard icon="📷" label="전체 사진"     value={summary?.totalPhotos}     color="#3F8A57" to="/photos"    progress={58} change={8}  />
+        <KpiCard icon="📬" label="오늘 신규 문의" value={summary?.todayInquiries}  color="#B8791E" to="/inquiries" progress={35} change={-3} />
+        <KpiCard icon="🔔" label="미읽음 문의"   value={summary?.unreadInquiries} color="#A82530" to="/inquiries" progress={unreadRatio} change={null} />
+        <KpiCard icon="📅" label="오늘 예약"     value={summary?.todayBookings}   color="#2F7A8C" to="/bookings"  progress={45} change={5}  />
+        <KpiCard icon="⏳" label="미확정 예약"   value={summary?.pendingBookings} color="#6A5B8C" to="/bookings"  progress={30} change={0}  />
       </div>
 
       <div className="dashboard-grid">
@@ -83,8 +83,8 @@ const DashboardPage = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
               <XAxis dataKey="day" tick={{ fontSize: 11, fill: 'var(--color-text-tertiary)' }} tickFormatter={d => d.slice(5)} />
               <YAxis tick={{ fontSize: 11, fill: 'var(--color-text-tertiary)' }} />
-              <Tooltip contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 8, fontSize: 12 }} />
-              <Bar dataKey="photos" fill="#7C3AED" radius={[4, 4, 0, 0]} name="사진" />
+              <Tooltip contentStyle={{ background: 'var(--color-surface)', border: '2px solid var(--color-border)', borderRadius: 0, fontSize: 12 }} />
+              <Bar dataKey="photos" fill="#C7361B" radius={[0, 0, 0, 0]} name="사진" />
             </BarChart>
           </ResponsiveContainer>
         </div>

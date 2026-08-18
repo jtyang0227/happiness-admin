@@ -1,54 +1,57 @@
 :root {
-  /* Brand — Pixel Arcade Neon Magenta */
-  --color-brand:     #E6006B;
-  --color-brand-hover: #B80057;
-  --color-brand-light: #FFE6F2;
+  /* Brand — 和ドット 朱色 (Shu-iro, vermillion) */
+  --color-brand:     #C7361B;
+  --color-brand-hover: #9E2812;
+  --color-brand-light: #F7DCD3;
 
   /* Brand scale — alias to semantic brand tokens */
-  --color-brand-50:  #FFE6F2;
-  --color-brand-100: #FFCCE5;
+  --color-brand-50:  #F7DCD3;
+  --color-brand-100: #F0C4B4;
   --color-brand-400: var(--color-brand);
   --color-brand-500: var(--color-brand);
   --color-brand-600: var(--color-brand-hover);
   --color-brand-700: var(--color-brand-hover);
 
-  /* Semantic — neon arcade palette */
-  --color-success:    #0DB84A;
-  --color-success-bg: #DFF7E6;
-  --color-warning:    #B8860B;
-  --color-warning-bg: #FFF6DC;
-  --color-danger:     #D91E36;
-  --color-danger-bg:  #FFE1E5;
-  --color-info:       #0891B2;
-  --color-info-bg:    #DEF7FC;
+  /* Semantic — 전통 일본 색채 */
+  --color-success:    #3F8A57; /* 若竹色 Wakatake-iro */
+  --color-success-bg: #E1F0E5;
+  --color-warning:    #B8791E; /* 山吹色 Yamabuki-iro */
+  --color-warning-bg: #F5E7D0;
+  --color-danger:     #A82530; /* 紅 Beni */
+  --color-danger-bg:  #F5DBDD;
+  --color-info:       #2F7A8C; /* 浅葱色 Asagi-iro */
+  --color-info-bg:    #DCEEF1;
 
-  /* Neutral — arcade cream */
-  --color-bg:           #F4F1E8;
-  --color-surface:      #FFFFFF;
-  --color-surface-2:    #ECE7D8;
-  --color-border:       #1A1A1A;
-  --color-border-light: #D8D2BE;
+  /* Neutral — 生成り(화지) 라이트 */
+  --color-bg:           #F1E9D8;
+  --color-surface:      #FBF6EA;
+  --color-surface-2:    #E8DCC4;
+  --color-border:       #1C1B19; /* 墨 Sumi — 먹선 */
+  --color-border-light: #C9BCA0;
 
   /* Text */
-  --color-text-primary:   #14141C;
-  --color-text-secondary: #4A4740;
-  --color-text-tertiary:  #8B8676;
-  --color-text-inverse:   #ffffff;
+  --color-text-primary:   #1C1B19;
+  --color-text-secondary: #4A4038;
+  --color-text-tertiary:  #8A7D66;
+  --color-text-inverse:   #FBF6EA;
 
-  /* Sidebar */
-  --color-sidebar-bg:          #14141C;
-  --color-sidebar-hover:       #1F1F2C;
-  --color-sidebar-border:      #2E2E3E;
-  --color-sidebar-text:        #8B8FA3;
-  --color-sidebar-active-text: #FF3D81;
+  /* Sidebar — 항상 藍色(남색) 밤 화면 유지 */
+  --color-sidebar-bg:          #0F1B2A;
+  --color-sidebar-hover:       #16283B;
+  --color-sidebar-border:      #F1E9D8;
+  --color-sidebar-text:        #B9AF9C;
+  --color-sidebar-active-text: #E2571C;
 
-  /* Shadow — hard pixel offset (no blur) */
+  /* Shadow — 버튼용 하드 픽셀 오프셋 (도트 DNA 유지) */
   --shadow-sm: 2px 2px 0 var(--color-border);
   --shadow-md: 3px 3px 0 var(--color-border);
   --shadow-lg: 4px 4px 0 var(--color-border);
   --shadow-xl: 6px 6px 0 var(--color-border);
 
-  /* Radius — sharp corners everywhere */
+  /* Shadow-ring — 패널/카드용 JRPG 이중 액자 테두리 */
+  --shadow-ring: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-border);
+
+  /* Radius — 각진 모서리 유지 */
   --radius-sm:   0px;
   --radius-md:   0px;
   --radius-lg:   0px;
@@ -70,7 +73,8 @@
   /* Font */
   --font-sans: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
-  --font-pixel: 'Press Start 2P', 'JetBrains Mono', monospace;
+  --font-pixel: 'DotGothic16', 'JetBrains Mono', monospace;
+  --font-serif: 'Noto Serif KR', 'Pretendard', serif;
   --text-xs:   11px;
   --text-sm:   13px;
   --text-base: 14px;
@@ -111,12 +115,16 @@
   --ease-pixel:   steps(4, end);
 
   /* Shadow additions */
-  --shadow-focus: 0 0 0 3px rgba(230, 0, 107, 0.35);
-  --shadow-modal: 8px 8px 0 var(--color-border);
+  --shadow-focus: 0 0 0 3px rgba(199, 54, 27, 0.35);
+  --shadow-modal: 0 0 0 3px var(--color-bg), 0 0 0 6px var(--color-border);
 
-  /* Dot-grid texture (light) */
-  --dot-grid: radial-gradient(var(--color-border-light) 1px, transparent 1px);
-  --dot-grid-size: 14px 14px;
+  /* 세이가이하(青海波) 물결무늬 텍스처 */
+  --dot-grid:
+    repeating-radial-gradient(circle at 0 100%,
+      transparent 0, transparent 9px,
+      var(--color-border-light) 10px, var(--color-border-light) 11px,
+      transparent 12px);
+  --dot-grid-size: 28px 28px;
 
   /* Category colors (1차 촬영종류) */
   --color-cat-wedding:  #f9a8d4;
@@ -139,27 +147,27 @@
   --color-mood-film:    #d97706;
 
   /* Portfolio / Review status colors */
-  --color-status-draft:    #8B8676;
-  --color-status-pending:  #B8860B;
-  --color-status-approved: #0DB84A;
-  --color-status-rejected: #D91E36;
+  --color-status-draft:    #8A7D66;
+  --color-status-pending:  #B8791E;
+  --color-status-approved: #3F8A57;
+  --color-status-rejected: #A82530;
 
-  /* Dark mode surface tokens — Pixel Arcade */
-  --color-bg-dark:              #0A0A0F;
-  --color-surface-dark:         #14141C;
-  --color-surface-2-dark:       #1C1C28;
-  --color-border-dark:          #3D3D52;
-  --color-border-light-dark:    #2E2E3E;
-  --color-text-primary-dark:    #F0F0F5;
-  --color-text-secondary-dark:  #9B9BB0;
-  --color-text-tertiary-dark:   #5C5C70;
+  /* Dark mode surface tokens — 藍色(남색) 밤 */
+  --color-bg-dark:              #0F1B2A;
+  --color-surface-dark:         #16283B;
+  --color-surface-2-dark:       #1E3448;
+  --color-border-dark:          #F1E9D8; /* 生成り — 밤에는 크림 보더로 반전 */
+  --color-border-light-dark:    #3A4C60;
+  --color-text-primary-dark:    #F1E9D8;
+  --color-text-secondary-dark:  #B9AF9C;
+  --color-text-tertiary-dark:   #6B7A8A;
 
-  /* Status colors (arcade neon) */
-  --color-status-active:   #39FF88;
-  --color-status-building: #FFD23F;
-  --color-status-deploy:   #4CE0FF;
-  --color-status-error:    #FF3355;
-  --color-status-idle:     #5C5C70;
+  /* Status colors (전통 색채, 다크 튜닝) */
+  --color-status-active:   #6BBF82;
+  --color-status-building: #F2B84D;
+  --color-status-deploy:   #5FB8CC;
+  --color-status-error:    #E0454C;
+  --color-status-idle:     #6B7A8A;
 
   /* Topbar */
   --topbar-height: 56px;
@@ -178,30 +186,35 @@
     --color-text-primary:    var(--color-text-primary-dark);
     --color-text-secondary:  var(--color-text-secondary-dark);
     --color-text-tertiary:   var(--color-text-tertiary-dark);
-    --color-brand:           #FF3D81;
-    --color-brand-hover:     #FF6BA3;
-    --color-brand-50:        #3D0F26;
-    --color-brand-100:       #5C1638;
-    --color-brand-light:     rgba(255, 61, 129, 0.15);
-    --color-success:         #39FF88;
-    --color-success-bg:      #0F3D24;
-    --color-warning:         #FFD23F;
-    --color-warning-bg:      #3D2E0A;
-    --color-danger:          #FF3355;
-    --color-danger-bg:       #3D0F16;
-    --color-info:            #4CE0FF;
-    --color-info-bg:         #0A2E3D;
+    --color-brand:           #E2571C;
+    --color-brand-hover:     #FF7A47;
+    --color-brand-50:        #3A1F16;
+    --color-brand-100:       #4A2A1D;
+    --color-brand-light:     rgba(226, 87, 28, 0.18);
+    --color-success:         #6BBF82;
+    --color-success-bg:      #16301F;
+    --color-warning:         #F2B84D;
+    --color-warning-bg:      #332616;
+    --color-danger:          #E0454C;
+    --color-danger-bg:       #331419;
+    --color-info:            #5FB8CC;
+    --color-info-bg:         #12262B;
     --shadow-sm: 2px 2px 0 var(--color-border-dark);
     --shadow-md: 3px 3px 0 var(--color-border-dark);
     --shadow-lg: 4px 4px 0 var(--color-border-dark);
     --shadow-xl: 6px 6px 0 var(--color-border-dark);
-    --shadow-modal: 8px 8px 0 var(--color-border-dark);
-    --dot-grid: radial-gradient(var(--color-border-light-dark) 1px, transparent 1px);
-    --color-sidebar-bg:          #0A0A0F;
-    --color-sidebar-hover:       #1C1C28;
-    --color-sidebar-border:      #2E2E3E;
-    --color-sidebar-text:        #6B6B85;
-    --color-sidebar-active-text: #FF3D81;
+    --shadow-ring: 0 0 0 3px var(--color-bg-dark), 0 0 0 5px var(--color-border-dark);
+    --shadow-modal: 0 0 0 3px var(--color-bg-dark), 0 0 0 6px var(--color-border-dark);
+    --dot-grid:
+      repeating-radial-gradient(circle at 0 100%,
+        transparent 0, transparent 9px,
+        var(--color-border-light-dark) 10px, var(--color-border-light-dark) 11px,
+        transparent 12px);
+    --color-sidebar-bg:          #0A1420;
+    --color-sidebar-hover:       #16283B;
+    --color-sidebar-border:      #F1E9D8;
+    --color-sidebar-text:        #8A93A3;
+    --color-sidebar-active-text: #E2571C;
   }
 }
 
@@ -215,28 +228,33 @@
   --color-text-primary:    var(--color-text-primary-dark);
   --color-text-secondary:  var(--color-text-secondary-dark);
   --color-text-tertiary:   var(--color-text-tertiary-dark);
-  --color-brand:           #FF3D81;
-  --color-brand-hover:     #FF6BA3;
-  --color-brand-50:        #3D0F26;
-  --color-brand-100:       #5C1638;
-  --color-brand-light:     rgba(255, 61, 129, 0.15);
-  --color-success:         #39FF88;
-  --color-success-bg:      #0F3D24;
-  --color-warning:         #FFD23F;
-  --color-warning-bg:      #3D2E0A;
-  --color-danger:          #FF3355;
-  --color-danger-bg:       #3D0F16;
-  --color-info:            #4CE0FF;
-  --color-info-bg:         #0A2E3D;
+  --color-brand:           #E2571C;
+  --color-brand-hover:     #FF7A47;
+  --color-brand-50:        #3A1F16;
+  --color-brand-100:       #4A2A1D;
+  --color-brand-light:     rgba(226, 87, 28, 0.18);
+  --color-success:         #6BBF82;
+  --color-success-bg:      #16301F;
+  --color-warning:         #F2B84D;
+  --color-warning-bg:      #332616;
+  --color-danger:          #E0454C;
+  --color-danger-bg:       #331419;
+  --color-info:            #5FB8CC;
+  --color-info-bg:         #12262B;
   --shadow-sm: 2px 2px 0 var(--color-border-dark);
   --shadow-md: 3px 3px 0 var(--color-border-dark);
   --shadow-lg: 4px 4px 0 var(--color-border-dark);
   --shadow-xl: 6px 6px 0 var(--color-border-dark);
-  --shadow-modal: 8px 8px 0 var(--color-border-dark);
-  --dot-grid: radial-gradient(var(--color-border-light-dark) 1px, transparent 1px);
-  --color-sidebar-bg:          #0A0A0F;
-  --color-sidebar-hover:       #1C1C28;
-  --color-sidebar-border:      #2E2E3E;
-  --color-sidebar-text:        #6B6B85;
-  --color-sidebar-active-text: #FF3D81;
+  --shadow-ring: 0 0 0 3px var(--color-bg-dark), 0 0 0 5px var(--color-border-dark);
+  --shadow-modal: 0 0 0 3px var(--color-bg-dark), 0 0 0 6px var(--color-border-dark);
+  --dot-grid:
+    repeating-radial-gradient(circle at 0 100%,
+      transparent 0, transparent 9px,
+      var(--color-border-light-dark) 10px, var(--color-border-light-dark) 11px,
+      transparent 12px);
+  --color-sidebar-bg:          #0A1420;
+  --color-sidebar-hover:       #16283B;
+  --color-sidebar-border:      #F1E9D8;
+  --color-sidebar-text:        #8A93A3;
+  --color-sidebar-active-text: #E2571C;
 }

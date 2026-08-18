@@ -6,18 +6,18 @@
 
 .count-card {
   flex: 1; padding: var(--space-4); border-radius: var(--radius-lg);
-  text-align: center; cursor: pointer; border: 2px solid transparent;
-  box-shadow: var(--shadow-sm); transition: border-color 0.15s, box-shadow 0.15s;
+  text-align: center; cursor: pointer; border: 2px solid var(--color-border);
+  box-shadow: var(--shadow-ring); transition: border-color 0.15s;
   background: var(--color-surface);
 }
-.count-card.active { box-shadow: var(--shadow-md); }
-.count-num { font-size: 28px; font-weight: 800; }
+.count-card.active { border-color: var(--color-brand); }
+.count-num { font-family: var(--font-pixel); font-size: 20px; font-weight: 400; }
 .count-label { font-size: var(--text-xs); color: var(--color-text-tertiary); margin-top: 4px; font-weight: 600; }
 
 .count-red .count-num { color: var(--color-danger); }
 .count-red.active { border-color: var(--color-danger); }
-.count-yellow .count-num { color: #d97706; }
-.count-yellow.active { border-color: #d97706; }
+.count-yellow .count-num { color: var(--color-warning); }
+.count-yellow.active { border-color: var(--color-warning); }
 .count-green .count-num { color: var(--color-success); }
 .count-green.active { border-color: var(--color-success); }
 .count-gray .count-num { color: var(--color-text-tertiary); }

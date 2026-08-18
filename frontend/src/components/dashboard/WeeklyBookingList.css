@@ -19,7 +19,7 @@
 }
 
 /* 상태 뱃지 — WeeklyBookingList 전용 */
-.badge.wbl-status-confirmed { background: var(--color-success-bg, #dcfce7); color: #16a34a; }
-.badge.wbl-status-requested { background: #fef9c3; color: #a16207; }
-.badge.wbl-status-rejected  { background: var(--color-danger-bg, #fee2e2); color: var(--color-danger, #dc2626); }
+.badge.wbl-status-confirmed { background: var(--color-success-bg); color: var(--color-success); }
+.badge.wbl-status-requested { background: var(--color-warning-bg); color: var(--color-warning); }
+.badge.wbl-status-rejected  { background: var(--color-danger-bg); color: var(--color-danger); }
 .badge.wbl-status-cancelled { background: var(--color-surface-2); color: var(--color-text-tertiary); }
