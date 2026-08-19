@@ -141,7 +141,7 @@
   transition: max-height var(--dur-slow) var(--ease-default);
 }
 
-.sidebar-group.open .sidebar-sub { max-height: 200px; }
+.sidebar-group.open .sidebar-sub { max-height: 260px; }
 
 .sidebar-sub-link {
   display: flex;
@@ -178,6 +178,14 @@
 
 .sidebar-sub-link.active::before {
   content: '▶';
+}
+
+.sidebar-sub-hint {
+  margin: 4px 20px 8px 36px;
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--color-sidebar-text);
+  opacity: 0.6;
 }
 
 @media (max-width: 767px) {

@@ -22,9 +22,11 @@ public class AdminSortService {
     private final SeriesPhotoRepository seriesPhotoRepository;
     private final PortfolioItemRepository portfolioItemRepository;
 
-    public List<SortPhotoDto> getPhotosForSort() {
-        return photoRepository.findAllOrderedForSort()
-                .stream().map(SortPhotoDto::from).collect(Collectors.toList());
+    public List<SortPhotoDto> getPhotosForSort(Long memberId) {
+        List<Photo> photos = (memberId != null)
+                ? photoRepository.findAllOrderedForSort(memberId)
+                : photoRepository.findAllOrderedForSort();
+        return photos.stream().map(SortPhotoDto::from).collect(Collectors.toList());
     }
 
     @Transactional
