@@ -9,6 +9,9 @@ import BookingCalendar from '../components/dashboard/BookingCalendar';
 import WeeklyBookingList from '../components/dashboard/WeeklyBookingList';
 import './DashboardPage.css';
 
+const PROCESS_STATUS_LABELS = { NEW: '신규', IN_PROGRESS: '처리중', RESOLVED: '완료', ON_HOLD: '보류' };
+const PROCESS_STATUS_BADGES = { NEW: 'badge-red', IN_PROGRESS: 'badge-yellow', RESOLVED: 'badge-green', ON_HOLD: 'badge-draft' };
+
 const ChangeIndicator = ({ change }) => {
   if (change == null) return null;
   if (change > 0)  return <span className="kpi-change kpi-change--up"><TrendingUp size={10} />{change}%</span>;
@@ -132,6 +135,9 @@ const DashboardPage = () => {
                 <td>
                   <span className={`badge ${(i.read || i.isRead) ? 'badge-green' : 'badge-red'}`}>
                     {(i.read || i.isRead) ? '읽음' : '미읽음'}
+                  </span>{' '}
+                  <span className={`badge ${PROCESS_STATUS_BADGES[i.processStatus] || 'badge-draft'}`}>
+                    {PROCESS_STATUS_LABELS[i.processStatus] || i.processStatus}
                   </span>
                 </td>
               </tr>

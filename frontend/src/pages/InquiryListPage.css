@@ -23,6 +23,26 @@
   line-height: 1.7;
 }
 
+.inquiry-process-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.inquiry-process-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+}
+
+.role-select {
+  border: none; background: transparent; cursor: pointer;
+  font-size: var(--text-xs); font-weight: 600;
+  padding: 3px 8px; border-radius: var(--radius-full); outline: none;
+  appearance: none;
+}
+
 .action-cell { display: flex; gap: 6px; align-items: center; }
 
 .btn-action {
