@@ -1,9 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getApi, postApi } from '../utils/api';
 import { useConfirm } from '../context/ConfirmContext';
 import Pagination from '../components/common/Pagination';
+import ImgWithFallback from '../components/common/ImgWithFallback';
 import './ReportListPage.css';
+
+const TARGET_ENDPOINTS = { PHOTO: '/admin/photos', MEMBER: '/admin/members', SERIES: '/admin/series' };
 
 const STATUS_LABELS = { PENDING: '대기중', IN_REVIEW: '검토중', ACTION_TAKEN: '처리완료', DISMISSED: '기각' };
 const STATUS_CLASSES = { PENDING: 'badge-red', IN_REVIEW: 'badge-yellow', ACTION_TAKEN: 'badge-green', DISMISSED: 'badge-gray' };
@@ -19,6 +23,7 @@ const ACTIONS = [
 
 const ReportListPage = () => {
   const { confirm } = useConfirm();
+  const navigate = useNavigate();
   const [data, setData] = useState({ content: [], totalPages: 0, totalElements: 0 });
   const [counts, setCounts] = useState({});
   const [status, setStatus] = useState('');
@@ -29,6 +34,9 @@ const ReportListPage = () => {
   const [action, setAction] = useState('DISMISS');
   const [memo, setMemo] = useState('');
   const [processing, setProcessing] = useState(false);
+  const [target, setTarget] = useState(null);
+  const [targetLoading, setTargetLoading] = useState(false);
+  const [targetError, setTargetError] = useState(false);
 
   const fetchData = useCallback(() => {
     setLoading(true);
@@ -44,7 +52,20 @@ const ReportListPage = () => {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const openReview = (report) => { setSelected(report); setAction('DISMISS'); setMemo(''); };
+  const openReview = (report) => {
+    setSelected(report);
+    setAction('DISMISS');
+    setMemo('');
+    setTarget(null);
+    setTargetError(false);
+    const endpoint = TARGET_ENDPOINTS[report.targetType];
+    if (!endpoint) return;
+    setTargetLoading(true);
+    getApi(`${endpoint}/${report.targetId}`)
+      .then(setTarget)
+      .catch(() => setTargetError(true))
+      .finally(() => setTargetLoading(false));
+  };
 
   const handleProcess = async () => {
     const ok = await confirm({
@@ -113,7 +134,11 @@ const ReportListPage = () => {
             ) : data.content.map(r => (
               <tr key={r.id} className={r.status === 'PENDING' ? 'row-pending' : ''}>
                 <td>{r.reporterName || '(탈퇴 회원)'}</td>
-                <td><span className="notice-type-badge">{TARGET_LABELS[r.targetType] || r.targetType} #{r.targetId}</span></td>
+                <td>
+                  <button className="notice-type-badge notice-type-badge--link" onClick={() => openReview(r)}>
+                    {TARGET_LABELS[r.targetType] || r.targetType} #{r.targetId}
+                  </button>
+                </td>
                 <td className="name-cell">{r.reason}</td>
                 <td>{r.createdAt?.slice(0, 10)}</td>
                 <td><span className={`badge ${STATUS_CLASSES[r.status] || 'badge-gray'}`}>{STATUS_LABELS[r.status] || r.status}</span></td>
@@ -136,14 +161,50 @@ const ReportListPage = () => {
               <h3 className="modal-title">신고 #{selected.id} 검토</h3>
               <button className="review-close" onClick={() => setSelected(null)}>✕</button>
             </div>
+            <div className="review-target-preview">
+              {targetLoading ? (
+                <div className="review-target-skeleton">
+                  <div className="skeleton review-target-skeleton-thumb" />
+                  <div className="review-target-skeleton-lines">
+                    <div className="skeleton review-target-skeleton-line" style={{ width: '70%' }} />
+                    <div className="skeleton review-target-skeleton-line" style={{ width: '45%' }} />
+                  </div>
+                </div>
+              ) : targetError ? (
+                <div className="review-target-error">삭제되었거나 존재하지 않는 콘텐츠입니다.</div>
+              ) : target ? (
+                selected.targetType === 'MEMBER' ? (
+                  <div className="review-target-row">
+                    <div className="review-target-avatar">{(target.name || '?').slice(0, 1)}</div>
+                    <div className="review-target-info">
+                      <div className="review-target-title">{target.name}</div>
+                      <div className="review-target-sub">{target.email} · {target.status}</div>
+                    </div>
+                    <button className="btn-sm btn-outline" onClick={() => navigate(`/members/${target.id}`)}>회원 상세 보기 ↗</button>
+                  </div>
+                ) : (
+                  <div className="review-target-row">
+                    <ImgWithFallback
+                      src={target.thumbnailUrl || target.coverImageUrl}
+                      alt={target.title}
+                      className="review-target-thumb"
+                    />
+                    <div className="review-target-info">
+                      <div className="review-target-title">{target.title}</div>
+                      <div className="review-target-sub">{target.authorName} · {target.createdAt?.slice(0, 10)}</div>
+                    </div>
+                  </div>
+                )
+              ) : null}
+            </div>
             <div className="review-info-grid">
               <div><span className="review-label">신고자</span><span className="review-val">{selected.reporterName} ({selected.reporterEmail})</span></div>
               <div><span className="review-label">신고 유형</span><span className="review-val">{selected.reason}</span></div>
-              <div><span className="review-label">대상</span><span className="review-val">{TARGET_LABELS[selected.targetType]} #{selected.targetId}</span></div>
               {selected.details && (
                 <div className="review-details"><span className="review-label">상세 내용</span><p className="review-val">{selected.details}</p></div>
               )}
             </div>
+            {(selected.status === 'PENDING' || selected.status === 'IN_REVIEW') && (
             <div className="review-section">
               <p className="review-label">처리 방법</p>
               {ACTIONS.map(a => (
@@ -153,22 +214,31 @@ const ReportListPage = () => {
                 </label>
               ))}
             </div>
-            <div className="review-section">
-              <label className="modal-label">처리 메모</label>
-              <textarea
-                className="modal-textarea"
-                value={memo}
-                onChange={e => setMemo(e.target.value)}
-                placeholder="처리 내용을 기록하세요 (선택)"
-                rows={3}
-              />
-            </div>
-            <div className="modal-actions">
-              <button className="btn-secondary" onClick={() => setSelected(null)} disabled={processing}>취소</button>
-              <button className="btn-danger-modal" onClick={handleProcess} disabled={processing}>
-                {processing ? '처리 중...' : '처리 완료'}
-              </button>
-            </div>
+            )}
+            {(selected.status === 'PENDING' || selected.status === 'IN_REVIEW') ? (
+              <>
+                <div className="review-section">
+                  <label className="modal-label">처리 메모</label>
+                  <textarea
+                    className="modal-textarea"
+                    value={memo}
+                    onChange={e => setMemo(e.target.value)}
+                    placeholder="처리 내용을 기록하세요 (선택)"
+                    rows={3}
+                  />
+                </div>
+                <div className="modal-actions">
+                  <button className="btn-secondary" onClick={() => setSelected(null)} disabled={processing}>취소</button>
+                  <button className="btn-danger-modal" onClick={handleProcess} disabled={processing}>
+                    {processing ? '처리 중...' : '처리 완료'}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="modal-actions">
+                <button className="btn-secondary" onClick={() => setSelected(null)}>닫기</button>
+              </div>
+            )}
           </div>
         </div>
       )}

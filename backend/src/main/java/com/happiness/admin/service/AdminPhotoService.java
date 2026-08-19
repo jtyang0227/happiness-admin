@@ -61,6 +61,12 @@ public class AdminPhotoService {
                         .map(AdminPhotoDto::from));
     }
 
+    public AdminPhotoDto getPhoto(Long id) {
+        Photo photo = photoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("사진을 찾을 수 없습니다."));
+        return AdminPhotoDto.from(photo);
+    }
+
     @Transactional
     public void deletePhoto(Long id) {
         Photo photo = photoRepository.findById(id)

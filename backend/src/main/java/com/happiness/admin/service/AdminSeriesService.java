@@ -24,6 +24,12 @@ public class AdminSeriesService {
                 seriesRepository.searchSeries(memberId, searchTerm, pageable).map(AdminSeriesDto::from));
     }
 
+    public AdminSeriesDto getSeriesDetail(Long id) {
+        Series series = seriesRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("시리즈를 찾을 수 없습니다."));
+        return AdminSeriesDto.from(series);
+    }
+
     @Transactional
     public void deleteSeries(Long id) {
         Series series = seriesRepository.findById(id)

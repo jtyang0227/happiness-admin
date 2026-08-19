@@ -2,11 +2,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: calc(100vh - 70px);
+  min-height: 60vh;
   padding: 2rem;
-  background: var(--color-bg);
-  background-image: var(--dot-grid);
-  background-size: var(--dot-grid-size);
 }
 
 .not-found-container {

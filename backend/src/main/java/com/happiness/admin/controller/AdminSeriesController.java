@@ -23,6 +23,11 @@ public class AdminSeriesController {
         return ResponseEntity.ok(seriesService.getSeries(memberId, search, page, size));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> detail(@PathVariable Long id) {
+        return ResponseEntity.ok(seriesService.getSeriesDetail(id));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         seriesService.deleteSeries(id);

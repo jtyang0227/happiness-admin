@@ -32,6 +32,11 @@ public class AdminPhotoController {
         return ResponseEntity.ok(photoService.getPhotos(memberId, colorMood, l1, l2, l3, l4, l5, search, sortBy, page, size));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> detail(@PathVariable Long id) {
+        return ResponseEntity.ok(photoService.getPhoto(id));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         photoService.deletePhoto(id);

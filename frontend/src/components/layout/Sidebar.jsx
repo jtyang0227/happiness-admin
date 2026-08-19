@@ -5,6 +5,7 @@ import {
   BookOpen, BarChart2, Settings,
   Sparkles, FolderOpen, Bell, Flag, ShieldCheck, LayoutPanelTop,
   GripVertical, Star, SlidersHorizontal, ArrowUpDown, ChevronDown, AppWindow,
+  CalendarDays,
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -20,6 +21,7 @@ const NAV_ITEMS = [
   { path: '/portfolios',     label: '포트폴리오',  Icon: FolderOpen },
   { path: '/series',         label: '시리즈',      Icon: BookOpen },
   { path: '/inquiries',      label: '문의 관리',   Icon: MessageSquare },
+  { path: '/bookings',       label: '예약 관리',   Icon: CalendarDays },
   { path: '/stats',          label: '통계',        Icon: BarChart2 },
   { path: '/reports',        label: '신고 관리',   Icon: Flag },
   { path: '/notices',        label: '공지사항',    Icon: Bell },

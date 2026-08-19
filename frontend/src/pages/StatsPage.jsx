@@ -101,12 +101,14 @@ const StatsPage = () => {
           <h2 className="card-title">색채 무드 분포</h2>
           <ResponsiveContainer width="100%" height={240}>
             <PieChart>
-              <Pie data={moodDist} dataKey="count" nameKey="label" cx="50%" cy="50%"
-                outerRadius={90} label={({ label, percent }) => `${label} ${(percent * 100).toFixed(0)}%`}
+              <Pie data={moodDist} dataKey="count" nameKey="label" cx="50%" cy="45%"
+                outerRadius={75} label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
                 labelLine={false} fontSize={11}>
                 {moodDist.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
               </Pie>
               <Tooltip formatter={(v, n) => [v + '개', n]} />
+              <Legend verticalAlign="bottom" height={36}
+                formatter={(value, entry) => `${entry.payload.label} (${entry.payload.count}개)`} />
             </PieChart>
           </ResponsiveContainer>
         </div>

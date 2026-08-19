@@ -2,7 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Menu, Search, ChevronDown, LogOut, Sun, Moon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { getApi } from '../../utils/api';
 import './AdminTopbar.css';
+
+const STATUS_CHECK_INTERVAL = 60000;
 
 const getStoredTheme = () => localStorage.getItem('theme') || 'light';
 
@@ -16,10 +19,23 @@ const AdminTopbar = ({ onMenuClick, sidebarCollapsed, onSearchClick }) => {
   const navigate = useNavigate();
   const [profileOpen, setProfileOpen] = useState(false);
   const [theme, setTheme] = useState(getStoredTheme);
+  const [systemStatus, setSystemStatus] = useState('checking');
 
   useEffect(() => {
     applyTheme(theme);
   }, [theme]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const checkStatus = () => {
+      getApi('/admin/system/status')
+        .then(() => { if (!cancelled) setSystemStatus('active'); })
+        .catch(() => { if (!cancelled) setSystemStatus('error'); });
+    };
+    checkStatus();
+    const timer = setInterval(checkStatus, STATUS_CHECK_INTERVAL);
+    return () => { cancelled = true; clearInterval(timer); };
+  }, []);
 
   const toggleTheme = useCallback(() => {
     setTheme(t => t === 'dark' ? 'light' : 'dark');
@@ -53,10 +69,12 @@ const AdminTopbar = ({ onMenuClick, sidebarCollapsed, onSearchClick }) => {
       </div>
 
       <div className="topbar-right">
-        <div className="topbar-status">
-          <span className="topbar-status-dot topbar-status-dot--active" />
-          <span className="topbar-status-label">시스템 정상</span>
-        </div>
+        <button className="topbar-status" onClick={() => navigate('/system')} type="button">
+          <span className={`topbar-status-dot topbar-status-dot--${systemStatus}`} />
+          <span className="topbar-status-label">
+            {systemStatus === 'active' ? '시스템 정상' : systemStatus === 'error' ? '시스템 오류' : '확인 중'}
+          </span>
+        </button>
 
         <button
           className="topbar-theme-btn"

@@ -6,6 +6,7 @@ import { ConfirmProvider } from './context/ConfirmContext';
 import AdminLayout from './components/layout/AdminLayout';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import BookingListPage from './pages/BookingListPage';
 import MemberListPage from './pages/MemberListPage';
 import MemberDetailPage from './pages/MemberDetailPage';
 import PhotoListPage from './pages/PhotoListPage';
@@ -40,6 +41,7 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
       <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+      <Route path="/bookings" element={<ProtectedRoute><BookingListPage /></ProtectedRoute>} />
       <Route path="/members" element={<ProtectedRoute><MemberListPage /></ProtectedRoute>} />
       <Route path="/members/:id" element={<ProtectedRoute><MemberDetailPage /></ProtectedRoute>} />
       <Route path="/photos" element={<ProtectedRoute><PhotoListPage /></ProtectedRoute>} />
@@ -60,7 +62,7 @@ const AppRoutes = () => {
       <Route path="/featured" element={<ProtectedRoute><FeaturedPage /></ProtectedRoute>} />
       <Route path="/content-policy" element={<ProtectedRoute><ContentPolicyPage /></ProtectedRoute>} />
       <Route path="/popups" element={<ProtectedRoute><PopupPage /></ProtectedRoute>} />
-      <Route path="*" element={<NotFoundPage />} />
+      <Route path="*" element={<ProtectedRoute><NotFoundPage /></ProtectedRoute>} />
     </Routes>
   );
 };

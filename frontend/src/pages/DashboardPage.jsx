@@ -56,21 +56,17 @@ const DashboardPage = () => {
 
   if (loading) return <div className="page-loading">로딩 중...</div>;
 
-  const unreadRatio = summary?.totalMembers
-    ? Math.round((summary.unreadInquiries / Math.max(summary.totalMembers, 1)) * 100)
-    : 0;
-
   return (
     <div className="dashboard-page">
       <h1 className="page-title">대시보드</h1>
 
       <div className="kpi-grid">
-        <KpiCard icon="👥" label="전체 회원"     value={summary?.totalMembers}    color="#C7361B" to="/members"   progress={72} change={12} />
-        <KpiCard icon="📷" label="전체 사진"     value={summary?.totalPhotos}     color="#3F8A57" to="/photos"    progress={58} change={8}  />
-        <KpiCard icon="📬" label="오늘 신규 문의" value={summary?.todayInquiries}  color="#B8791E" to="/inquiries" progress={35} change={-3} />
-        <KpiCard icon="🔔" label="미읽음 문의"   value={summary?.unreadInquiries} color="#A82530" to="/inquiries" progress={unreadRatio} change={null} />
-        <KpiCard icon="📅" label="오늘 예약"     value={summary?.todayBookings}   color="#2F7A8C" to="/bookings"  progress={45} change={5}  />
-        <KpiCard icon="⏳" label="미확정 예약"   value={summary?.pendingBookings} color="#6A5B8C" to="/bookings"  progress={30} change={0}  />
+        <KpiCard icon="👥" label="전체 회원"     value={summary?.totalMembers}    color="#C7361B" to="/members" />
+        <KpiCard icon="📷" label="전체 사진"     value={summary?.totalPhotos}     color="#3F8A57" to="/photos" />
+        <KpiCard icon="📬" label="오늘 신규 문의" value={summary?.todayInquiries}  color="#B8791E" to="/inquiries" />
+        <KpiCard icon="🔔" label="미읽음 문의"   value={summary?.unreadInquiries} color="#A82530" to="/inquiries" />
+        <KpiCard icon="📅" label="오늘 예약"     value={summary?.todayBookings}   color="#2F7A8C" to="/bookings" />
+        <KpiCard icon="⏳" label="미확정 예약"   value={summary?.pendingBookings} color="#6A5B8C" to="/bookings" />
       </div>
 
       <div className="dashboard-grid">
