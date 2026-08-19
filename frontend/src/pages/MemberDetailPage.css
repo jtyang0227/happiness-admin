@@ -183,6 +183,17 @@
 .mdp-info-row span:last-child  { color: var(--color-text-primary); font-weight: 500; }
 .mdp-verified-text   { color: var(--color-info) !important; }
 .mdp-unverified-text { color: var(--color-text-tertiary) !important; }
+.mdp-inline-link {
+  background: none; border: none; cursor: pointer; padding: 0;
+  font-size: inherit; font-weight: inherit; color: var(--color-brand) !important;
+  text-decoration: underline;
+}
+.role-select {
+  border: none; background: transparent; cursor: pointer;
+  font-size: var(--text-xs); font-weight: 600;
+  padding: 3px 8px; border-radius: var(--radius-full); outline: none;
+  appearance: none;
+}
 
 /* 사진 그리드 */
 .mdp-photos-grid {

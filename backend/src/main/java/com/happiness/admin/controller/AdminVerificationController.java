@@ -16,9 +16,10 @@ public class AdminVerificationController {
     @GetMapping
     public ResponseEntity<?> list(
             @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long memberId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(verificationService.getVerifications(status, page, size));
+        return ResponseEntity.ok(verificationService.getVerifications(status, memberId, page, size));
     }
 
     @GetMapping("/counts")

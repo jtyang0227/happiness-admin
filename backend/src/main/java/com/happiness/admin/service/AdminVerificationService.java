@@ -23,10 +23,11 @@ public class AdminVerificationService {
     private final VerificationRequestRepository verificationRepository;
     private final MemberRepository memberRepository;
 
-    public PageResponse<AdminVerificationDto> getVerifications(String status, int page, int size) {
+    public PageResponse<AdminVerificationDto> getVerifications(String status, Long memberId, int page, int size) {
         var pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         return PageResponse.of(verificationRepository.searchVerifications(
                 (status != null && !status.isBlank()) ? status : null,
+                memberId,
                 pageable
         ).map(AdminVerificationDto::from));
     }
