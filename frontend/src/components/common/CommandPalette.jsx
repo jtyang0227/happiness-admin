@@ -1,17 +1,19 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Image, MessageSquare, BookOpen,
   BarChart2, Settings, FolderOpen, Bell, Flag, ShieldCheck,
-  LayoutPanelTop, AppWindow, Star, SlidersHorizontal,
-  GripVertical, ArrowUpDown, Search, X,
+  LayoutPanelTop, AppWindow, Star, SlidersHorizontal, CalendarDays,
+  GripVertical, ArrowUpDown, Search, X, User,
 } from 'lucide-react';
+import { getApi } from '../../utils/api';
 import './CommandPalette.css';
 
 const COMMANDS = [
   { path: '/',               label: '대시보드',    Icon: LayoutDashboard,   group: '페이지' },
   { path: '/members',        label: '회원 관리',   Icon: Users,             group: '페이지' },
   { path: '/photos',         label: '사진 관리',   Icon: Image,             group: '페이지' },
+  { path: '/bookings',       label: '예약 관리',   Icon: CalendarDays,      group: '페이지' },
   { path: '/portfolios',     label: '포트폴리오',  Icon: FolderOpen,        group: '페이지' },
   { path: '/series',         label: '시리즈',      Icon: BookOpen,          group: '페이지' },
   { path: '/inquiries',      label: '문의 관리',   Icon: MessageSquare,     group: '페이지' },
@@ -32,22 +34,53 @@ const COMMANDS = [
 const CommandPalette = ({ open, onClose }) => {
   const [query, setQuery] = useState('');
   const [activeIdx, setActiveIdx] = useState(0);
+  const [memberResults, setMemberResults] = useState([]);
+  const [memberLoading, setMemberLoading] = useState(false);
   const navigate = useNavigate();
   const inputRef = useRef(null);
+  const searchTimerRef = useRef(null);
 
-  const filtered = query
+  const pageMatches = query
     ? COMMANDS.filter(c => c.label.includes(query) || c.path.includes(query))
     : COMMANDS;
+
+  const memberItems = memberResults.map(m => ({
+    path: `/members/${m.id}`,
+    label: m.name,
+    sub: m.email,
+    Icon: User,
+    group: '회원',
+  }));
+
+  const filtered = useMemo(() => [...pageMatches, ...memberItems], [pageMatches, memberItems]);
 
   useEffect(() => {
     if (open) {
       setQuery('');
       setActiveIdx(0);
+      setMemberResults([]);
       setTimeout(() => inputRef.current?.focus(), 10);
     }
   }, [open]);
 
   useEffect(() => { setActiveIdx(0); }, [query]);
+
+  useEffect(() => {
+    clearTimeout(searchTimerRef.current);
+    if (query.trim().length < 2) {
+      setMemberResults([]);
+      setMemberLoading(false);
+      return;
+    }
+    setMemberLoading(true);
+    searchTimerRef.current = setTimeout(() => {
+      getApi(`/admin/members?search=${encodeURIComponent(query.trim())}&size=5`)
+        .then(res => setMemberResults(res.content || []))
+        .catch(() => setMemberResults([]))
+        .finally(() => setMemberLoading(false));
+    }, 300);
+    return () => clearTimeout(searchTimerRef.current);
+  }, [query]);
 
   const handleSelect = useCallback((path) => {
     navigate(path);
@@ -77,6 +110,7 @@ const CommandPalette = ({ open, onClose }) => {
   if (!open) return null;
 
   const groups = [...new Set(filtered.map(c => c.group))];
+  const showEmpty = filtered.length === 0 && !memberLoading;
 
   return (
     <div className="cmd-overlay" onMouseDown={onClose}>
@@ -96,7 +130,7 @@ const CommandPalette = ({ open, onClose }) => {
         </div>
 
         <div className="cmd-list">
-          {filtered.length === 0 ? (
+          {showEmpty ? (
             <div className="cmd-empty">검색 결과가 없습니다</div>
           ) : (
             groups.map(group => {
@@ -115,13 +149,19 @@ const CommandPalette = ({ open, onClose }) => {
                       >
                         <span className="cmd-item-icon"><cmd.Icon size={14} /></span>
                         <span className="cmd-item-label">{cmd.label}</span>
-                        <span className="cmd-item-path">{cmd.path}</span>
+                        <span className="cmd-item-path">{cmd.sub || cmd.path}</span>
                       </button>
                     );
                   })}
                 </div>
               );
             })
+          )}
+          {query.trim().length >= 2 && memberLoading && (
+            <div className="cmd-group">
+              <div className="cmd-group-label">회원</div>
+              <div className="cmd-loading">검색 중...</div>
+            </div>
           )}
         </div>
 

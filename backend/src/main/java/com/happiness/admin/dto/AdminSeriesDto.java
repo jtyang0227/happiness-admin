@@ -16,6 +16,8 @@ public class AdminSeriesDto {
     private Long memberId;
     private String authorName;
     private int photoCount;
+    private int likesCount;
+    private int viewCount;
     private LocalDateTime createdAt;
 
     public static AdminSeriesDto from(Series s) {
@@ -26,6 +28,8 @@ public class AdminSeriesDto {
                 .memberId(s.getMember().getId())
                 .authorName(s.getMember().getName())
                 .photoCount(s.getSeriesPhotos().size())
+                .likesCount(s.getLikesCount())
+                .viewCount(s.getViewCount())
                 .createdAt(s.getCreatedAt())
                 .build();
     }

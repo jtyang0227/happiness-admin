@@ -145,6 +145,12 @@
   font-family: var(--font-mono);
 }
 
+.cmd-loading {
+  padding: 9px 10px;
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+}
+
 .cmd-empty {
   text-align: center;
   padding: 32px;

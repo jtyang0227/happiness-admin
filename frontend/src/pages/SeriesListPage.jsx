@@ -13,6 +13,7 @@ const SeriesListPage = () => {
   const { confirm } = useConfirm();
   const [data, setData] = useState({ content: [], totalPages: 0, totalElements: 0 });
   const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('latest');
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const searchTimerRef = useRef(null);
@@ -21,10 +22,11 @@ const SeriesListPage = () => {
     setLoading(true);
     const params = new URLSearchParams({ page, size: 20 });
     if (search) params.set('search', search);
+    if (sortBy === 'likes') params.set('sortBy', 'likes');
     getApi(`/admin/series?${params}`)
       .then(setData)
       .finally(() => setLoading(false));
-  }, [page, search]);
+  }, [page, search, sortBy]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -60,15 +62,19 @@ const SeriesListPage = () => {
             searchTimerRef.current = setTimeout(() => { setSearch(val); setPage(0); }, 300);
           }}
         />
+        <select className="filter-select" value={sortBy} onChange={e => { setSortBy(e.target.value); setPage(0); }}>
+          <option value="latest">최신순</option>
+          <option value="likes">좋아요순</option>
+        </select>
       </div>
       <div className="table-card">
         <table className="data-table">
           <thead>
-            <tr><th>커버</th><th>제목</th><th>작가</th><th>사진 수</th><th>생성일</th><th>정렬</th><th>관리</th></tr>
+            <tr><th>커버</th><th>제목</th><th>작가</th><th>사진 수</th><th>좋아요</th><th>생성일</th><th>정렬</th><th>관리</th></tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan="6" className="loading-cell">로딩 중...</td></tr>
+              <tr><td colSpan="8" className="loading-cell">로딩 중...</td></tr>
             ) : data.content.map(s => (
               <tr key={s.id}>
                 <td>
@@ -77,6 +83,7 @@ const SeriesListPage = () => {
                 <td className="series-title">{s.title}</td>
                 <td>{s.authorName}</td>
                 <td>{s.photoCount}장</td>
+                <td>❤️ {s.likesCount}</td>
                 <td>{s.createdAt?.slice(0, 10)}</td>
                 <td>
                   <button

@@ -17,11 +17,16 @@ public class AdminSeriesService {
 
     private final SeriesRepository seriesRepository;
 
-    public PageResponse<AdminSeriesDto> getSeries(Long memberId, String search, int page, int size) {
-        var pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+    public PageResponse<AdminSeriesDto> getSeries(Long memberId, String search, String sortBy, int page, int size) {
+        var pageable = PageRequest.of(page, size, resolveSort(sortBy));
         String searchTerm = (search != null && !search.isBlank()) ? search.trim() : null;
         return PageResponse.of(
                 seriesRepository.searchSeries(memberId, searchTerm, pageable).map(AdminSeriesDto::from));
+    }
+
+    private Sort resolveSort(String sortBy) {
+        if ("likes".equals(sortBy)) return Sort.by("likesCount").descending();
+        return Sort.by("createdAt").descending();
     }
 
     public AdminSeriesDto getSeriesDetail(Long id) {
