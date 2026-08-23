@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Image, MessageSquare,
   BookOpen, BarChart2, Settings,
-  Sparkles, FolderOpen, Bell, Flag, ShieldCheck, LayoutPanelTop,
+  Target, FolderOpen, Bell, Flag, ShieldCheck, LayoutPanelTop,
   Star, SlidersHorizontal, ArrowUpDown, ChevronDown, AppWindow,
   CalendarDays,
 } from 'lucide-react';
@@ -44,7 +44,7 @@ const Sidebar = ({ collapsed = false, className = '' }) => {
   return (
     <aside className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''} ${className}`}>
       <div className="sidebar-brand">
-        <Sparkles size={16} className="sidebar-brand-icon" />
+        <Target size={16} className="sidebar-brand-icon" />
         {!collapsed && <span className="sidebar-brand-text">Happiness</span>}
       </div>
 

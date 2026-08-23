@@ -26,7 +26,7 @@ body {
   line-height: 1.4; display: flex; align-items: center; gap: 10px;
 }
 .page-title::before {
-  content: '⛩'; font-size: 0.85em; color: var(--color-brand); flex-shrink: 0;
+  content: '◉'; font-size: 0.7em; color: var(--color-brand); flex-shrink: 0;
 }
 .page-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
 .total-count { font-size: var(--text-sm); color: var(--color-text-tertiary); }

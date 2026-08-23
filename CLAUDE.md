@@ -105,14 +105,17 @@ React SPA using React Router v6 + Recharts:
 
 ### Design References
 
-현재(4차) 디자인 컨셉은 **和ドット(와도트)** — 패미컴 시대 JRPG 대화창 미학 × 전통 일본
-색채(藍色·朱色·墨·生成り)를 도트(픽셀) UI 문법 위에 결합한다. 1~3차(Cosmos × Pinterest →
-Railway DNA → Pixel Arcade)는 레거시이며 `docs/design/`에 기록만 남아있다.
+현재(5차) 디자인 컨셉은 **AKIRA Neo-Tokyo** — 블랙/화이트 기반 + 레드·시안 포인트의
+사이버펑크 포스터 × HUD 터미널 미학이다. 1~4차(Cosmos × Pinterest → Railway DNA →
+Pixel Arcade → 和ドット/와도트)는 레거시이며 `docs/design/`에 기록만 남아있다. 5차는
+4차의 구조적 DNA(CSS 변수 단일 인터페이스, `radius:0`, 하드 오프셋 섀도우, 라이트/다크
+보더-배경 명암 반전)를 그대로 계승하고 팔레트·타이포그래피만 교체한 톤 전환이다.
 
 | DNA | Key Elements |
 |---|---|
-| **도트(유지)** | 각진 모서리(`radius:0`), 픽셀 폰트 포인트, 하드/이중 프레임 |
-| **전통 일본 색채** | 朱色(#C7361B) 브랜드, 藍色(#0F1B2A) 다크 배경, 라이트/다크 보더-배경 명암 반전 |
+| **각진 프레임(계승)** | 각진 모서리(`radius:0`), 하드/이중 프레임(`--shadow-ring`), 하드 오프셋 버튼 섀도우 |
+| **AKIRA Neo-Tokyo 팔레트** | 紅(#E8112D) 브랜드, 시안(#0097A7) 보조 액센트, 블랙(라이트 보더)/화이트(다크 보더) 반전, 다크 모드는 네온 채도 강화 |
+| **시그니처 디테일(신규)** | 해저드 스트라이프(`--hazard-stripe`, 상단바), 네온 글로우(`--shadow-glow-red/-cyan`), CRT 스캔라인 배경(`--dot-grid`) |
 
 ### CSS Variable System
 
@@ -123,29 +126,34 @@ Railway DNA → Pixel Arcade)는 레거시이며 `docs/design/`에 기록만 남
 ```css
 /* frontend/src/styles/tokens.css 실제 정의 (발췌) */
 :root {
-  --color-bg:             #F1E9D8;  /* 生成り 기나리 (라이트) */
-  --color-surface:        #FBF6EA;
-  --color-border:         #1C1B19;  /* 墨 스미 — 먹선 */
-  --color-text-primary:   #1C1B19;
-  --color-text-secondary: #4A4038;
-  --color-text-tertiary:  #8A7D66;
-  --color-brand:          #C7361B;  /* 朱色 슈이로 */
+  --color-bg:             #F4F4F4;  /* 화이트 베이스 (라이트) */
+  --color-surface:        #FFFFFF;
+  --color-border:         #0A0A0A;  /* 포스터 블랙 라인 */
+  --color-text-primary:   #0A0A0A;
+  --color-text-secondary: #3D3D3D;
+  --color-text-tertiary:  #7A7A7A;
+  --color-brand:          #E8112D;  /* AKIRA 레드 */
+  --color-accent:         #0097A7;  /* Neo-Tokyo 시안 (보조 액센트) */
   --color-success/-warning/-danger/-info: ... /* 각각 -bg 페어 존재 */
-  --font-pixel:  'DotGothic16', ...;   /* 브랜드 로고·KPI 숫자 전용 */
-  --font-serif:  'Noto Serif KR', ...; /* 페이지 타이틀 전용 */
-  --shadow-ring: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-border); /* JRPG 이중 프레임 */
+  --font-pixel:  'Orbitron', ...;      /* 브랜드 로고·KPI 숫자 전용(한글 미지원) */
+  --font-serif:  'Black Han Sans', ...; /* 페이지 타이틀 전용(볼드 포스터체) */
+  --shadow-ring: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-border); /* 이중 프레임 */
+  --shadow-glow-red/-cyan: ...; /* CTA·활성 요소 네온 글로우 (신규) */
+  --hazard-stripe: repeating-linear-gradient(-45deg, ...); /* 경고 스트라이프 (신규) */
 }
 
-/* 다크모드: 보더-배경 명암이 반전된다 (기나리 보더 위 藍色 배경) */
+/* 다크모드: 보더-배경 명암이 반전된다 (화이트 보더 위 블랙 배경, 네온 채도 강화) */
 [data-theme="dark"], @media (prefers-color-scheme: dark) {
-  --color-bg:     #0F1B2A;  /* 藍色 아이이로 */
-  --color-border: #F1E9D8;  /* 生成り — 밤엔 크림 보더 */
-  --color-text-primary: #F1E9D8;
-  --color-brand:  #E2571C;
+  --color-bg:     #0A0A0C;
+  --color-border: #FFFFFF;  /* 다크 모드는 화이트 라인 */
+  --color-text-primary: #FFFFFF;
+  --color-brand:  #FF2D46;  /* 다크에서 더 밝은 네온 레드 */
+  --color-accent: #00E5FF;  /* 다크에서 풀 네온 시안 */
 }
 ```
 
-색상 이름·전체 팔레트는 `docs/design/WA_DOT_DESIGN_SPEC.md` 참고.
+색상 이름·전체 팔레트는 `docs/design/AKIRA_NEOTOKYO_DESIGN_SPEC.md` 참고
+(레거시 4차 기록: `docs/design/WA_DOT_DESIGN_SPEC.md`).
 
 ### Key Component Patterns
 
@@ -153,7 +161,7 @@ Railway DNA → Pixel Arcade)는 레거시이며 `docs/design/`에 기록만 남
 |---|---|---|
 | **카드/테이블/모달** | `border: 2px solid var(--color-border)` + `box-shadow: var(--shadow-ring)` | 블러 없는 이중 프레임 |
 | **StatusDot** | `clip-path: polygon(...)` 다이아몬드 | 원형/사각 아님 |
-| **Sidebar active** | `::before { content: '▶' }` | 좌측 바 아님 — JRPG 커서 |
+| **Sidebar active** | `::before { content: '▶' }` | 좌측 바 아님 — 화살표 커서 |
 | **버튼 클릭 피드백** | `translate(2px,2px)` + `box-shadow: none` | `--shadow-sm/md` 하드 오프셋 전용, 패널에는 미사용 |
 | **로그인 화면** | 항상 다크 고정, 로컬 스코프 변수(`--lp-*`)로 테마 독립 | `pages/LoginPage.css` |
 | **Image blur reveal** | `filter: blur(4px) → blur(0)` on `onLoad` | `transition: filter 0.4s ease` |
@@ -164,14 +172,15 @@ Railway DNA → Pixel Arcade)는 레거시이며 `docs/design/`에 기록만 남
 ### Font
 
 ```html
-<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Serif+KR:wght@500;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Black+Han+Sans&display=swap" rel="stylesheet" />
 <!-- Pretendard는 기존 jsdelivr CDN 유지 -->
 ```
 
 ### Design Files
 
-- `docs/design/WA_DOT_DESIGN_SPEC.md` — **현재(4차) 디자인 구현 기록** (팔레트·컴포넌트·QA 이력)
-- `docs/planning/JAPANESE_DOT_DESIGN_SPEC.md` — 4차 최초 기획 원본
+- `docs/design/AKIRA_NEOTOKYO_DESIGN_SPEC.md` — **현재(5차) 디자인 구현 기록** (팔레트·컴포넌트·적용 범위)
+- `docs/design/WA_DOT_DESIGN_SPEC.md` — 4차 구현 기록 (레거시)
+- `docs/planning/JAPANESE_DOT_DESIGN_SPEC.md` — 4차 최초 기획 원본 (레거시)
 - `docs/design/PIXEL_ARCADE_DESIGN_SPEC.md` — 3차 구현 기록 (레거시)
 - `docs/planning/RAILWAY_DESIGN_SPEC.md`, `docs/planning/PIXEL_DOT_DESIGN_SPEC.md` — 2·3차 기획 원본 (레거시)
 - `docs/design/PINTEREST_DESIGN_SPEC.md`, `COSMOS_DESIGN_SPEC.md` — 1차 명세 (레거시)
@@ -183,12 +192,13 @@ Railway DNA → Pixel Arcade)는 레거시이며 `docs/design/`에 기록만 남
 1. **CSS 변수만 사용**: 하드코딩된 색상값 금지. 반드시 실제 존재하는 `var(--color-*)` 사용 —
    작업 전 `frontend/src/styles/tokens.css`에서 토큰명을 확인할 것(이 문서의 표기만 믿지 말 것).
 2. **다크모드 기본 지원**: 새 컴포넌트는 CSS 변수 시스템에 따라 자동으로 양쪽 테마를 지원해야 한다.
-   와도트는 보더-배경 명암이 테마마다 반전되므로 하드코딩된 보더/배경 조합을 피할 것.
+   보더-배경 명암이 테마마다 반전되므로(라이트=화이트 배경/블랙 보더, 다크=블랙 배경/화이트
+   보더) 하드코딩된 보더/배경 조합을 피할 것.
 3. **각진 모서리 유지**: `border-radius`를 새로 하드코딩하지 말 것 — `var(--radius-*)`는 전부 `0`.
 4. **이미지 blur reveal**: 모든 이미지는 `onLoad`에서 blur → clear 전환 적용.
 5. **IntersectionObserver 입장 애니메이션**: 카드 리스트 페이지에서 스크롤 진입 시 fade+slide up 적용.
-6. **폰트 역할 분리**: 픽셀 폰트(`--font-pixel`)는 숫자·브랜드 로고 전용(한글 미지원), 페이지
-   타이틀은 명조체(`--font-serif`), 본문은 Pretendard.
+6. **폰트 역할 분리**: 픽셀 폰트(`--font-pixel`, Orbitron)는 숫자·브랜드 로고 전용(한글 미지원),
+   페이지 타이틀은 포스터 디스플레이체(`--font-serif`, Black Han Sans), 본문은 Pretendard.
 7. **패널은 `--shadow-ring`, 버튼은 `--shadow-sm/md`**: 정적 카드/모달과 클릭 가능한 버튼의
    섀도우 체계가 다르다 — 혼용하지 말 것.
 

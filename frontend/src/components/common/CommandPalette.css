@@ -21,7 +21,7 @@
   background: var(--color-surface);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-modal);
+  box-shadow: var(--shadow-modal), var(--shadow-glow-cyan);
   overflow: hidden;
   animation: cmd-slide-down var(--dur-normal) var(--ease-spring);
 }
