@@ -28,18 +28,15 @@
   flex-shrink: 0;
 }
 
-.sidebar-brand-icon {
-  color: var(--color-sidebar-active-text);
+.sidebar-brand-logo {
+  height: 20px;
+  width: auto;
   flex-shrink: 0;
+  filter: invert(1); /* 사이드바는 항상 다크 — 로고를 화이트로 반전 */
 }
 
-.sidebar-brand-text {
-  font-family: var(--font-pixel);
-  font-size: 9px;
-  font-weight: 400;
-  color: #F1E9D8;
-  white-space: nowrap;
-  letter-spacing: 0.02em;
+.sidebar-brand-logo--collapsed {
+  height: 18px;
 }
 
 .sidebar-nav {

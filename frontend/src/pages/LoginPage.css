@@ -22,7 +22,8 @@
   box-shadow: 0 0 0 3px var(--lp-bg), 0 0 0 6px var(--lp-border);
   text-align: center;
 }
-.login-logo { font-size: 40px; margin-bottom: 12px; color: var(--lp-brand); display: flex; justify-content: center; }
+.login-logo { margin-bottom: 24px; display: flex; justify-content: center; }
+.login-logo-img { height: 44px; width: auto; filter: invert(1); /* 로그인 화면은 항상 다크 */ }
 .password-wrap { position: relative; }
 .password-wrap input { padding-right: 40px; }
 .password-toggle {
@@ -31,11 +32,6 @@
   transition: color 0.15s;
 }
 .password-toggle:hover { color: var(--lp-text); }
-.login-title {
-  font-family: var(--font-pixel); font-size: 18px; font-weight: 700;
-  color: var(--lp-text); margin: 0 0 12px; letter-spacing: 0.08em;
-  line-height: 1.6;
-}
 .login-subtitle { color: var(--lp-text-2); font-size: 14px; margin: 0 0 28px; }
 .login-form { text-align: left; }
 .form-group { margin-bottom: 16px; }

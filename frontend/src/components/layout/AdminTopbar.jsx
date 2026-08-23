@@ -3,6 +3,7 @@ import { Menu, Search, ChevronDown, LogOut, Sun, Moon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getApi } from '../../utils/api';
+import logo from '../../assets/logo.png';
 import './AdminTopbar.css';
 
 const STATUS_CHECK_INTERVAL = 60000;
@@ -55,8 +56,7 @@ const AdminTopbar = ({ onMenuClick, sidebarCollapsed, onSearchClick }) => {
           <Menu size={18} />
         </button>
         <span className="topbar-logo">
-          <span className="topbar-logo-dot" />
-          <span className="topbar-logo-text">Happiness Admin</span>
+          <img src={logo} alt="hapis" className="topbar-logo-img" />
         </span>
       </div>
 

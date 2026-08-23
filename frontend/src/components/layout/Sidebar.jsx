@@ -3,10 +3,11 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Image, MessageSquare,
   BookOpen, BarChart2, Settings,
-  Target, FolderOpen, Bell, Flag, ShieldCheck, LayoutPanelTop,
+  FolderOpen, Bell, Flag, ShieldCheck, LayoutPanelTop,
   Star, SlidersHorizontal, ArrowUpDown, ChevronDown, AppWindow,
   CalendarDays,
 } from 'lucide-react';
+import logo from '../../assets/logo.png';
 import './Sidebar.css';
 
 const SORT_ITEMS = [
@@ -44,8 +45,7 @@ const Sidebar = ({ collapsed = false, className = '' }) => {
   return (
     <aside className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''} ${className}`}>
       <div className="sidebar-brand">
-        <Target size={16} className="sidebar-brand-icon" />
-        {!collapsed && <span className="sidebar-brand-text">Happiness</span>}
+        <img src={logo} alt="hapis" className={`sidebar-brand-logo ${collapsed ? 'sidebar-brand-logo--collapsed' : ''}`} />
       </div>
 
       <nav className="sidebar-nav">

@@ -54,21 +54,20 @@
   gap: 8px;
 }
 
-.topbar-logo-dot {
-  width: 9px;
-  height: 9px;
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-  background: var(--color-brand);
+.topbar-logo-img {
+  height: 16px;
+  width: auto;
   flex-shrink: 0;
 }
 
-.topbar-logo-text {
-  font-family: var(--font-pixel);
-  font-size: 10px;
-  font-weight: 400;
-  color: var(--color-text-primary);
-  white-space: nowrap;
-  letter-spacing: 0.02em;
+[data-theme="dark"] .topbar-logo-img {
+  filter: invert(1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .topbar-logo-img {
+    filter: invert(1);
+  }
 }
 
 .topbar-center {
@@ -341,7 +340,6 @@
 
 @media (max-width: 767px) {
   .topbar-left { width: auto; }
-  .topbar-logo-text { display: none; }
   .topbar-status-label { display: none; }
   .topbar-username { display: none; }
 }

@@ -19,6 +19,10 @@ body {
 }
 
 /* 공용 유틸리티 */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
 .page-loading { text-align: center; padding: 80px; color: var(--color-text-tertiary); font-size: var(--text-md); }
 .page-title {
   font-family: var(--font-serif); font-size: var(--text-xl); font-weight: 700;

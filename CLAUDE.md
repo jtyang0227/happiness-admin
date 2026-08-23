@@ -107,8 +107,9 @@ React SPA using React Router v6 + Recharts:
 
 현재(5차) 디자인 컨셉은 **AKIRA Neo-Tokyo** — 블랙/화이트 기반 + 레드·시안 포인트의
 사이버펑크 포스터 × HUD 터미널 미학이다. 1~4차(Cosmos × Pinterest → Railway DNA →
-Pixel Arcade → 和ドット/와도트)는 레거시이며 `docs/design/`에 기록만 남아있다. 5차는
-4차의 구조적 DNA(CSS 변수 단일 인터페이스, `radius:0`, 하드 오프셋 섀도우, 라이트/다크
+Pixel Arcade → 和ドット/와도트)는 폐기되었다 — 관련 기록 문서는 더 이상 리포지토리에
+없다(과거 세대의 팔레트·컴포넌트 디테일이 필요하면 git 히스토리 참고). 5차는 4차의
+구조적 DNA(CSS 변수 단일 인터페이스, `radius:0`, 하드 오프셋 섀도우, 라이트/다크
 보더-배경 명암 반전)를 그대로 계승하고 팔레트·타이포그래피만 교체한 톤 전환이다.
 
 | DNA | Key Elements |
@@ -152,8 +153,7 @@ Pixel Arcade → 和ドット/와도트)는 레거시이며 `docs/design/`에 �
 }
 ```
 
-색상 이름·전체 팔레트는 `docs/design/AKIRA_NEOTOKYO_DESIGN_SPEC.md` 참고
-(레거시 4차 기록: `docs/design/WA_DOT_DESIGN_SPEC.md`).
+색상 이름·전체 팔레트는 `docs/design/AKIRA_NEOTOKYO_DESIGN_SPEC.md` 참고.
 
 ### Key Component Patterns
 
@@ -179,12 +179,6 @@ Pixel Arcade → 和ドット/와도트)는 레거시이며 `docs/design/`에 �
 ### Design Files
 
 - `docs/design/AKIRA_NEOTOKYO_DESIGN_SPEC.md` — **현재(5차) 디자인 구현 기록** (팔레트·컴포넌트·적용 범위)
-- `docs/design/WA_DOT_DESIGN_SPEC.md` — 4차 구현 기록 (레거시)
-- `docs/planning/JAPANESE_DOT_DESIGN_SPEC.md` — 4차 최초 기획 원본 (레거시)
-- `docs/design/PIXEL_ARCADE_DESIGN_SPEC.md` — 3차 구현 기록 (레거시)
-- `docs/planning/RAILWAY_DESIGN_SPEC.md`, `docs/planning/PIXEL_DOT_DESIGN_SPEC.md` — 2·3차 기획 원본 (레거시)
-- `docs/design/PINTEREST_DESIGN_SPEC.md`, `COSMOS_DESIGN_SPEC.md` — 1차 명세 (레거시)
-- `docs/design/CLAUDE_DESIGN_PROMPTS.md` — 1차 시절 프롬프트 라이브러리 (레거시, 팔레트만 최신 토큰으로 치환해 참고)
 - `docs/planning/APP_TO_ADMIN_SPEC.md` — happiness-app에서 admin으로 이식할 기능 명세
 
 ### Design Rules
