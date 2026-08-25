@@ -171,7 +171,7 @@ const StatsPage = () => {
               <tr key={pg.memberId}>
                 <td className="rank-cell">{i + 1}</td>
                 <td className="name-cell">{pg.name}</td>
-                <td style={{ color: 'var(--color-text-2)', fontSize: 12 }}>{pg.profileName}</td>
+                <td style={{ color: 'var(--color-text-tertiary)', fontSize: 12 }}>{pg.profileName}</td>
                 <td>{pg.photoCount.toLocaleString()}</td>
                 <td>❤️ {pg.totalLikes.toLocaleString()}</td>
                 <td>🔖 {pg.totalSaves.toLocaleString()}</td>

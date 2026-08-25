@@ -93,13 +93,13 @@ const SystemPage = () => {
                 <tr><td colSpan="5" className="loading-cell">활동 로그가 없습니다.</td></tr>
               ) : logs.map(log => (
                 <tr key={log.id}>
-                  <td style={{ fontSize: 12, color: 'var(--color-text-2)' }}>{log.createdAt?.replace('T', ' ').slice(0, 16)}</td>
+                  <td style={{ fontSize: 12, color: 'var(--color-text-tertiary)' }}>{log.createdAt?.replace('T', ' ').slice(0, 16)}</td>
                   <td>{log.adminName}</td>
                   <td>
                     <span className="badge badge-blue">{ACTION_LABELS[log.action] || log.action}</span>
                   </td>
                   <td style={{ fontSize: 12 }}>{log.targetType && `${log.targetType} #${log.targetId}`}</td>
-                  <td style={{ fontSize: 12, color: 'var(--color-text-2)' }}>{log.details}</td>
+                  <td style={{ fontSize: 12, color: 'var(--color-text-tertiary)' }}>{log.details}</td>
                 </tr>
               ))}
             </tbody>

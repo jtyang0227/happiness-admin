@@ -339,7 +339,14 @@
 .topbar-dropdown-item--danger:hover { background: var(--color-danger-bg); color: var(--color-danger); }
 
 @media (max-width: 767px) {
+  .admin-topbar { gap: 8px; padding: 0 10px; }
   .topbar-left { width: auto; }
   .topbar-status-label { display: none; }
   .topbar-username { display: none; }
+  .topbar-center { min-width: 0; margin: 0; max-width: none; }
+  .topbar-search { width: auto; padding: 0 9px; }
+  .topbar-search-placeholder, .topbar-search-kbd { display: none; }
+  .topbar-right { gap: 8px; }
+  .topbar-profile-btn { padding: 4px; gap: 0; }
+  .topbar-chevron { display: none; }
 }
