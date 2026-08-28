@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ArrowUpRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { getApi } from '../utils/api';
 import ImgWithFallback from '../components/common/ImgWithFallback';
@@ -38,21 +37,18 @@ const KpiCard = ({ icon, label, value, color, to, progress, change }) => (
 
 const DashboardPage = () => {
   const [summary, setSummary] = useState(null);
-  const [daily, setDaily] = useState([]);
-  const [topPhotos, setTopPhotos] = useState([]);
+  const [pendingPortfolios, setPendingPortfolios] = useState([]);
   const [recentInquiries, setRecentInquiries] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       getApi('/admin/stats/summary'),
-      getApi('/admin/stats/daily?days=7'),
-      getApi('/admin/stats/top-photos?sortBy=likes'),
+      getApi('/admin/portfolios?status=PENDING&size=5'),
       getApi('/admin/inquiries?page=0&size=5'),
-    ]).then(([sum, dl, photos, inqs]) => {
+    ]).then(([sum, portfolios, inqs]) => {
       setSummary(sum);
-      setDaily(dl);
-      setTopPhotos(photos.slice(0, 5));
+      setPendingPortfolios(portfolios.content || []);
       setRecentInquiries(inqs.content || []);
     }).finally(() => setLoading(false));
   }, []);
@@ -70,41 +66,30 @@ const DashboardPage = () => {
         <KpiCard icon="🔔" label="미읽음 문의"   value={summary?.unreadInquiries} color="#A82530" to="/inquiries" />
         <KpiCard icon="📅" label="오늘 예약"     value={summary?.todayBookings}   color="#2F7A8C" to="/bookings" />
         <KpiCard icon="⏳" label="미확정 예약"   value={summary?.pendingBookings} color="#6A5B8C" to="/bookings" />
+        <KpiCard icon="📋" label="심사 대기 포트폴리오" value={summary?.pendingPortfolios} color="#7A5C1E" to="/portfolios?status=PENDING" />
       </div>
 
       <div className="dashboard-grid">
-        <div className="dashboard-card">
+        <div className="dashboard-card span-2">
           <div className="card-header">
-            <h2 className="card-title">최근 7일 사진 업로드</h2>
+            <h2 className="card-title">심사 대기 포트폴리오</h2>
+            <Link to="/portfolios?status=PENDING" className="card-link">전체 보기 <ArrowUpRight size={12} /></Link>
           </div>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={daily}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis dataKey="day" tick={{ fontSize: 11, fill: 'var(--color-text-tertiary)' }} tickFormatter={d => d.slice(5)} />
-              <YAxis tick={{ fontSize: 11, fill: 'var(--color-text-tertiary)' }} />
-              <Tooltip contentStyle={{ background: 'var(--color-surface)', border: '2px solid var(--color-border)', borderRadius: 0, fontSize: 12 }} />
-              <Bar dataKey="photos" fill="#C7361B" radius={[0, 0, 0, 0]} name="사진" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="dashboard-card">
-          <div className="card-header">
-            <h2 className="card-title">인기 사진 TOP 5</h2>
-            <Link to="/stats" className="card-link">전체 통계 <ArrowUpRight size={12} /></Link>
-          </div>
-          <div className="top-photos-list">
-            {topPhotos.map((p, i) => (
-              <div key={p.id} className="top-photo-item">
-                <span className="rank">#{i + 1}</span>
-                <ImgWithFallback src={p.thumbnailUrl} alt={p.title} className="photo-thumb" />
-                <div className="photo-info">
-                  <div className="photo-title">{p.title}</div>
-                  <div className="photo-meta">❤️ {p.likesCount} · 🔖 {p.savesCount}</div>
-                </div>
-              </div>
-            ))}
-          </div>
+          {pendingPortfolios.length === 0 ? (
+            <div className="empty-state">심사 대기 중인 포트폴리오가 없습니다.</div>
+          ) : (
+            <div className="top-photos-list">
+              {pendingPortfolios.map(p => (
+                <Link key={p.id} to="/portfolios?status=PENDING" className="top-photo-item">
+                  <ImgWithFallback src={p.coverImageUrl} alt={p.title} className="photo-thumb" />
+                  <div className="photo-info">
+                    <div className="photo-title">{p.title}</div>
+                    <div className="photo-meta">{p.authorName} · {p.createdAt?.slice(0, 10)}</div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
         <ActivityFeed />

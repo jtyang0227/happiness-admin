@@ -3,13 +3,11 @@
 /* ── KPI Cards ── */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
 
-@media (max-width: 1280px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 768px)  { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 480px)  { .kpi-grid { gap: 10px; } }
 
 .dash-kpi-card {
@@ -139,6 +137,7 @@
 }
 
 .dashboard-card.full-width { grid-column: 1 / -1; }
+.dashboard-card.span-2 { grid-column: span 2; }
 
 .card-header {
   display: flex;
@@ -168,9 +167,13 @@
 
 .top-photos-list { display: flex; flex-direction: column; gap: 10px; }
 
-.top-photo-item { display: flex; align-items: center; gap: 12px; }
-
-.rank { width: 24px; font-size: var(--text-sm); font-weight: var(--fw-bold); color: var(--color-brand); }
+.top-photo-item {
+  display: flex; align-items: center; gap: 12px;
+  text-decoration: none; color: inherit;
+  padding: 4px; margin: -4px;
+  transition: background var(--dur-fast);
+}
+.top-photo-item:hover { background: var(--color-surface-2); text-decoration: none; }
 
 .photo-thumb {
   width: 44px;
