@@ -115,6 +115,24 @@
   text-overflow: ellipsis;
 }
 
+/* ── 도메인 그룹 구분 ── */
+.sidebar-group-title {
+  padding: 14px 16px 4px;
+  font-size: 10px;
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-sidebar-text);
+  opacity: 0.5;
+  white-space: nowrap;
+}
+
+.sidebar-divider {
+  height: 1px;
+  margin: 8px 12px;
+  background: var(--color-sidebar-border);
+}
+
 /* ── 정렬 관리 accordion ── */
 .sidebar-group { display: flex; flex-direction: column; }
 
