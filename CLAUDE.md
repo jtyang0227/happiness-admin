@@ -242,6 +242,7 @@ Pixel Arcade → 和ドット/와도트)는 폐기되었다 — 관련 기록 �
 2. **검증 완료 후 커밋·푸시**: 기능 검증이 통과된 경우에만 `git add → git commit → git push` 를 수행한다. 검증 실패 시 먼저 수정 후 재검증한다.
 3. **기획 요청 시 전체 구현**: 기획(스펙 문서 작성)을 요청받으면 문서 작성에서 그치지 않고 백엔드·프론트엔드 개발과 디자인까지 end-to-end로 구현한다.
 4. **푸시 전 빌드 필수**: `git push` 직전에 반드시 프론트엔드(`npm run build`)와 백엔드(`./gradlew build -x test`)를 모두 빌드하여 성공을 확인한다. ESLint 경고도 0개여야 한다. 빌드 실패 또는 경고가 있으면 수정 후 재빌드하고, 통과한 뒤에만 푸시한다.
+5. **UI/디자인 작업은 `design` 스킬 필수 사용**: 새 컴포넌트·페이지 디자인, 기존 화면 리디자인, 스타일 방향 탐색 등 시각적 디자인이 관련된 모든 작업은 `.claude/skills/design/SKILL.md`(Stitch 디자이너 에이전트)를 통해 진행한다. 이 스킬 밖에서 즉흥적으로 HTML 목업이나 별도 아티팩트로 디자인 탐색을 하지 않는다 — `design` 스킬의 워크플로우(UNDERSTAND → PLAN → GENERATE → BUILD → **PREVIEW(Playwright 자가 검증, 생략 불가)** → ITERATE)를 항상 따른다.
 
 ## Tech Stack
 
