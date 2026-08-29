@@ -2,8 +2,8 @@
 .system-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .system-card {
   background: var(--color-surface);
-  border: 2px solid var(--color-border);
-  border-radius: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-ring);
   padding: 20px;
 }
@@ -23,6 +23,24 @@
 .system-value.warn { color: var(--color-warning); }
 .system-value.ok { color: var(--color-success); }
 
+.heatmap-wrap { display: flex; flex-direction: column; gap: 12px; }
+.heatmap-grid { display: flex; gap: 4px; }
+.heatmap-col { display: flex; flex-direction: column; gap: 4px; }
+.heatmap-cell {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--color-border-light);
+  flex-shrink: 0;
+}
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+.heatmap-legend .heatmap-cell { border: 1px solid var(--color-border-light); }
+
 .sys-log-pagination {
   display: flex;
   align-items: center;
@@ -35,7 +53,7 @@
 .page-btn {
   padding: 5px 12px;
   border: 1px solid var(--color-border);
-  border-radius: 0;
+  border-radius: var(--radius-sm);
   background: var(--color-surface);
   color: var(--color-text-primary);
   font-size: 12px;

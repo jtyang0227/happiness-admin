@@ -8,6 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Repository
 public interface AdminActivityLogRepository extends JpaRepository<AdminActivityLog, Long> {
 
@@ -18,4 +21,8 @@ public interface AdminActivityLogRepository extends JpaRepository<AdminActivityL
     Page<AdminActivityLog> searchLogs(@Param("adminId") Long adminId,
                                       @Param("action") String action,
                                       Pageable pageable);
+
+    @Query("SELECT cast(l.createdAt as LocalDate) as day, COUNT(l) as cnt FROM AdminActivityLog l " +
+           "WHERE l.createdAt >= :since GROUP BY cast(l.createdAt as LocalDate) ORDER BY day")
+    List<Object[]> dailyActivity(@Param("since") LocalDateTime since);
 }

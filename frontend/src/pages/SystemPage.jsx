@@ -31,6 +31,51 @@ const ACTION_LABELS = {
   VERIFICATION_REJECT: '작가 인증 반려',
 };
 
+const HEATMAP_LEVELS = [
+  { max: 0, opacity: 0 },
+  { max: 2, opacity: 0.35 },
+  { max: 4, opacity: 0.65 },
+  { max: Infinity, opacity: 1 },
+];
+
+const heatmapOpacity = (count) => HEATMAP_LEVELS.find(l => count <= l.max).opacity;
+
+const ActivityHeatmap = ({ days }) => {
+  const weeks = [];
+  for (let i = 0; i < days.length; i += 7) weeks.push(days.slice(i, i + 7));
+
+  return (
+    <div className="heatmap-wrap">
+      <div className="heatmap-grid">
+        {weeks.map((week, wi) => (
+          <div className="heatmap-col" key={wi}>
+            {week.map(d => (
+              <div
+                key={d.day}
+                className="heatmap-cell"
+                style={
+                  d.count === 0
+                    ? { background: 'var(--color-surface-2)' }
+                    : { background: 'var(--color-success)', opacity: heatmapOpacity(d.count) }
+                }
+                title={`${d.day} · ${d.count}건`}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className="heatmap-legend">
+        <span>적음</span>
+        <span className="heatmap-cell" style={{ background: 'var(--color-surface-2)' }} />
+        <span className="heatmap-cell" style={{ background: 'var(--color-success)', opacity: 0.35 }} />
+        <span className="heatmap-cell" style={{ background: 'var(--color-success)', opacity: 0.65 }} />
+        <span className="heatmap-cell" style={{ background: 'var(--color-success)', opacity: 1 }} />
+        <span>많음</span>
+      </div>
+    </div>
+  );
+};
+
 const SystemPage = () => {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -38,9 +83,11 @@ const SystemPage = () => {
   const [logsPage, setLogsPage] = useState(0);
   const [logsTotalPages, setLogsTotalPages] = useState(0);
   const [logsLoading, setLogsLoading] = useState(false);
+  const [heatmap, setHeatmap] = useState([]);
 
   useEffect(() => {
     getApi('/admin/system/status').then(setStatus).finally(() => setLoading(false));
+    getApi('/admin/system/activity-heatmap?weeks=7').then(setHeatmap);
   }, []);
 
   const loadLogs = useCallback(async (page) => {
@@ -77,6 +124,11 @@ const SystemPage = () => {
           { label: 'DB 종류', value: status?.dbType, status: 'ok' },
           { label: '활성 프로필', value: status?.activeProfile, status: 'ok' },
         ]} />
+      </div>
+
+      <div className="system-card" style={{ marginTop: 20 }}>
+        <h2 className="system-card-title">관리자 활동 히트맵 (최근 7주)</h2>
+        <ActivityHeatmap days={heatmap} />
       </div>
 
       <div className="system-card" style={{ marginTop: 20 }}>
