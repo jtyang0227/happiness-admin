@@ -6,7 +6,7 @@
 
 .count-card {
   flex: 1; padding: var(--space-4); border-radius: var(--radius-lg);
-  text-align: center; cursor: pointer; border: 2px solid var(--color-border);
+  text-align: center; cursor: pointer; border: 1px solid var(--color-border);
   box-shadow: var(--shadow-ring); transition: border-color 0.15s;
   background: var(--color-surface);
 }
@@ -26,7 +26,7 @@
 .row-pending { background: var(--color-danger-bg); }
 
 .report-review-dialog {
-  background: var(--color-surface); border: 2px solid var(--color-border); border-radius: var(--radius-lg);
+  background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg);
   padding: 28px 32px; width: 560px; max-width: 95vw; max-height: 90vh;
   overflow-y: auto; box-shadow: var(--shadow-modal);
   animation: modal-slide-up 0.2s ease;
@@ -65,7 +65,7 @@
 
 /* ── 신고 대상 미리보기 ── */
 .review-target-preview {
-  border: 2px solid var(--color-border); background: var(--color-surface-2);
+  border: 1px solid var(--color-border); background: var(--color-surface-2);
   padding: 12px 14px; margin-bottom: var(--space-4);
 }
 .review-target-row { display: flex; align-items: center; gap: 12px; }

@@ -1,29 +1,24 @@
 .login-page {
-  --lp-bg:      #0A0A0C;
-  --lp-surface: #131316;
-  --lp-border:  #FFFFFF;
-  --lp-line:    #3A3A3E;
-  --lp-text:    #FFFFFF;
-  --lp-text-2:  #8A8A8A;
-  --lp-brand:   #FF2D46;
-  --lp-brand-hover: #FF5C70;
+  --lp-bg:      #F2F4F6;
+  --lp-surface: #FFFFFF;
+  --lp-border:  #E5E8EB;
+  --lp-line:    #E5E8EB;
+  --lp-text:    #191F28;
+  --lp-text-2:  #8B95A1;
+  --lp-brand:   #3182F6;
+  --lp-brand-hover: #1B64DA;
 
   min-height: 100vh; display: flex; align-items: center; justify-content: center;
   background: var(--lp-bg);
-  background-image:
-    repeating-linear-gradient(0deg,
-      transparent 0, transparent 3px,
-      rgba(255, 255, 255, 0.045) 3px, rgba(255, 255, 255, 0.045) 4px);
-  background-size: 100% 4px;
 }
 .login-card {
-  background: var(--lp-surface); border: 2px solid var(--lp-border);
-  border-radius: 0; padding: 40px; width: 100%; max-width: 400px;
-  box-shadow: 0 0 0 3px var(--lp-bg), 0 0 0 6px var(--lp-border);
+  background: var(--lp-surface); border: none;
+  border-radius: 24px; padding: 40px; width: 100%; max-width: 400px;
+  box-shadow: 0 24px 60px -20px rgba(25, 31, 40, 0.18);
   text-align: center;
 }
 .login-logo { margin-bottom: 24px; display: flex; justify-content: center; }
-.login-logo-img { height: 44px; width: auto; filter: invert(1); /* 로그인 화면은 항상 다크 */ }
+.login-logo-img { height: 32px; width: auto; }
 .password-wrap { position: relative; }
 .password-wrap input { padding-right: 40px; }
 .password-toggle {
@@ -35,25 +30,23 @@
 .login-subtitle { color: var(--lp-text-2); font-size: 14px; margin: 0 0 28px; }
 .login-form { text-align: left; }
 .form-group { margin-bottom: 16px; }
-.form-group label { display: block; font-size: 13px; font-weight: 700; color: var(--lp-text-2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.03em; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--lp-text-2); margin-bottom: 6px; }
 .form-group input {
-  width: 100%; padding: 10px 14px; border: 2px solid var(--lp-line); border-radius: 0;
+  width: 100%; padding: 12px 14px; border: 1px solid var(--lp-line); border-radius: 12px;
   font-size: 14px; outline: none; transition: border-color 0.15s; box-sizing: border-box;
   background: var(--lp-bg); color: var(--lp-text);
 }
-.form-group input:focus { border-color: var(--lp-brand); }
+.form-group input:focus { border-color: var(--lp-brand); background: var(--lp-surface); }
 .login-error {
-  background: #33121A; border: 2px solid #FF1744; color: #FF1744; border-radius: 0;
-  padding: 10px 14px; font-size: 13px; margin-bottom: 14px; font-weight: 600;
+  background: #FDE8EA; border: none; color: #F04452; border-radius: 12px;
+  padding: 10px 14px; font-size: 13px; margin-bottom: 14px; font-weight: 500;
 }
 .login-btn {
-  width: 100%; padding: 12px; background: var(--lp-brand); color: var(--lp-text); border: 2px solid var(--lp-border);
-  border-radius: 0; font-size: 15px; font-weight: 700; cursor: pointer;
-  text-transform: uppercase; letter-spacing: 0.03em;
-  box-shadow: 2px 2px 0 var(--lp-border);
-  transition: transform var(--dur-fast), box-shadow var(--dur-fast), background 0.15s;
+  width: 100%; padding: 13px; background: var(--lp-brand); color: #fff; border: none;
+  border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer;
+  transition: background 0.15s, transform var(--dur-fast) var(--ease-out);
 }
-.login-btn:hover:not(:disabled) { background: var(--lp-brand-hover); transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--lp-border), var(--shadow-glow-red); }
-.login-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: none; }
-.login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.login-btn:hover:not(:disabled) { background: var(--lp-brand-hover); }
+.login-btn:active:not(:disabled) { transform: scale(0.98); }
+.login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .login-hint { font-size: 12px; color: var(--lp-text-2); margin-top: 20px; }

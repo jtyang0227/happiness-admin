@@ -74,8 +74,8 @@ components/dashboard/XxxWidget.jsx + .css   ← 대시보드 전용
 --color-text-primary  /* 제목, 강조 텍스트 */
 --color-text-secondary /* 본문 텍스트 */
 --color-text-tertiary  /* 힌트, 메타 텍스트 */
---color-brand         /* 紅(레드) — CTA, 강조. 라이트 #E8112D / 다크 #FF2D46 */
---color-accent        /* 시안 보조 액센트. 라이트 #0097A7 / 다크 #00E5FF */
+--color-brand         /* Toss Blue — CTA, 강조. 라이트 #3182F6 / 다크 #4C8FFF */
+--color-accent        /* sky 보조 액센트. 라이트 #0EA5E9 / 다크 #38BDF8 */
 --color-brand-50      /* brand 배경 (아주 연함) */
 --color-brand-100     /* brand 테두리 (연함) */
 --color-success       --color-success-bg
@@ -90,12 +90,12 @@ components/dashboard/XxxWidget.jsx + .css   ← 대시보드 전용
 --text-lg   /* 16-18px */
 --text-xl   /* 20-24px */
 --fw-normal --fw-medium --fw-semibold --fw-bold
---font-pixel  /* Orbitron — 숫자·로고 전용, 한글 미지원 */
---font-serif  /* Black Han Sans — 페이지 타이틀 전용, 볼드 포스터체 */
+--font-pixel  /* var(--font-sans) 별칭 — 전용 디스플레이 서체 없음 */
+--font-serif  /* var(--font-sans) 별칭 — 동일 */
 
 /* 여백·반경·그림자 */
---radius-sm  --radius-md  --radius-lg  --radius-xl  --radius-full  /* 전부 0 — 각진 모서리 유지 */
---shadow-sm  --shadow-md  --shadow-lg  --shadow-xl  --shadow-modal  /* 하드 오프셋(2~6px), 블러 없음 */
+--radius-sm  --radius-md  --radius-lg  --radius-xl  --radius-full  /* 8px ~ 999px, 둥근 모서리 */
+--shadow-sm  --shadow-md  --shadow-lg  --shadow-xl  --shadow-modal  /* 소프트 블러 엘리베이션, 하드 오프셋 없음 */
 --shadow-ring          /* 패널/카드용 이중 프레임 */
 --shadow-glow-red      /* CTA·활성 요소 네온 글로우 */
 --shadow-glow-cyan     /* 보조 강조 네온 글로우 */
@@ -113,49 +113,47 @@ components/dashboard/XxxWidget.jsx + .css   ← 대시보드 전용
 
 ---
 
-## 디자인 언어 — AKIRA Neo-Tokyo
+## 디자인 언어 — Toss
 
-블랙/화이트 기반 + 레드·시안 포인트, 사이버펑크 포스터 × HUD 터미널 미학.
-상세는 `docs/design/AKIRA_NEOTOKYO_DESIGN_SPEC.md` 참고.
+흰 캔버스 위 파랑 하나, 둥근 모서리와 소프트 섀도우로 신뢰감을 만드는 절제된 문법.
+상세는 `docs/design/TOSS_DESIGN_SPEC.md` 참고.
 
 ### 핵심 원칙
-- **각진 모서리**: `border-radius`는 항상 `var(--radius-*)`(전부 0) — 절대 둥글게 하지 않는다.
-- **하드 오프셋 섀도우, 블러 금지**: hover 시 `translateY`/`box-shadow` 확대 애니메이션(Pinterest식
-  들어올리기) 대신 `translate(-1px,-1px)` + 섀도우 오프셋 증가, 클릭 시 `translate(2px,2px)` +
-  `box-shadow: none`(눌림 효과) 패턴을 쓴다.
-- **이중 프레임**: 정적 카드/모달/패널은 `border: 2px solid var(--color-border)` +
-  `box-shadow: var(--shadow-ring)`. 버튼처럼 클릭 가능한 요소만 `--shadow-sm/md` 하드 오프셋.
-- **라이트/다크 보더-배경 반전**: 라이트=화이트 배경+블랙 보더, 다크=블랙 배경+화이트 보더.
-  하드코딩된 보더/배경 조합 금지 — 토큰만 쓰면 자동 반전된다.
-- **네온 포인트는 절제**: `--shadow-glow-red/-cyan`, `--hazard-stripe`는 CTA hover나 활성 상태
-  1~2곳에만 — 화면 전체에 남용하면 채도 피로가 생긴다.
+- **둥근 모서리**: `border-radius`는 항상 `var(--radius-*)` 사용 — `0`으로 하드코딩하지 않는다.
+- **소프트 섀도우, 하드 오프셋 금지**: hover는 `filter: brightness(0.96)` 또는 소프트
+  `box-shadow` 상승, 클릭 시 `transform: scale(0.97)`(스퀴시) 패턴을 쓴다.
+  `translate(Npx,Npx)` 픽셀 오프셋은 쓰지 않는다.
+- **소프트 엘리베이션**: 정적 카드/모달/패널은 `border: 1px solid var(--color-border)` +
+  `box-shadow: var(--shadow-ring)`(블러 기반 소프트 그림자, 이중 프레임 아님).
+- **라이트/다크 모두 옅은 보더 유지**: 반전하지 않는다 — 다크모드도 어둡게 톤만 낮추고
+  보더는 여전히 "옅은 회색"이다. 하드코딩된 보더/배경 조합 금지 — 토큰만 쓰면 자동 대응된다.
+- **액센트는 절제**: 브랜드 블루 하나를 CTA·활성 상태에 집중해서 쓰고, 텍스처·글로우 남용 금지.
 - **이미지 reveal**: `onLoad` 시 `filter: blur(4px) → 0` 전환은 유지.
 - **Masonry Grid**: `column-count: 3~4`, `break-inside: avoid` (JS 라이브러리 금지) — 사진 목록
   등에서 유지.
 
 ### 공통 패턴
 ```css
-/* 정적 카드(패널) — 이중 프레임, hover 없음 */
+/* 정적 카드(패널) — 소프트 엘리베이션, 하드 오프셋 없음 */
 .some-card {
   background: var(--color-surface);
   border-radius: var(--radius-lg);
-  border: 2px solid var(--color-border);
+  border: 1px solid var(--color-border);
   box-shadow: var(--shadow-ring);
 }
 
-/* 버튼 — 하드 오프셋 + 클릭 피드백 */
+/* 버튼 — 테두리 없는 채움 + 스퀴시 클릭 피드백 */
 .some-btn {
-  border: 2px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
-  transition: transform var(--dur-fast), box-shadow var(--dur-fast);
+  border: none;
+  transition: transform var(--dur-fast) var(--ease-out), filter var(--dur-fast);
 }
-.some-btn:hover  { transform: translate(-1px, -1px); box-shadow: var(--shadow-md); }
-.some-btn:active { transform: translate(2px, 2px);  box-shadow: none; }
+.some-btn:hover  { filter: brightness(0.96); }
+.some-btn:active { transform: scale(0.97); }
 
 /* 입력창 기본 */
 .some-input {
   padding: 9px 12px;
-  border: 2px solid var(--color-border);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
   color: var(--color-text-primary);
@@ -166,7 +164,7 @@ components/dashboard/XxxWidget.jsx + .css   ← 대시보드 전용
 .some-input:focus { border-color: var(--color-brand); }
 
 /* 뱃지 기본 */
-.badge { padding: 2px 8px; border-radius: var(--radius-full); border: 1.5px solid currentColor; font-size: var(--text-xs); font-weight: var(--fw-semibold); }
+.badge { padding: 2px 8px; border-radius: var(--radius-full); border: none; font-size: var(--text-xs); font-weight: var(--fw-semibold); }
 .badge-green { background: var(--color-success-bg); color: var(--color-success); }
 .badge-red   { background: var(--color-danger-bg);  color: var(--color-danger); }
 .badge-blue  { background: var(--color-info-bg);    color: var(--color-info); }

@@ -82,7 +82,7 @@
   color: #fff;
   width: 26px;
   height: 26px;
-  border-radius: 0;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -96,7 +96,7 @@
 .cal-dot {
   width: 6px;
   height: 6px;
-  border-radius: 0;
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
 }
 

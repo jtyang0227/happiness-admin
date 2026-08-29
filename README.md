@@ -93,14 +93,13 @@ npm start   # http://localhost:3001
 
 ## 디자인 시스템
 
-**AKIRA Neo-Tokyo** — 블랙/화이트 기반 + 레드·시안 포인트, CSS 변수 단일 인터페이스로
-라이트/다크 자동 전환.
+**Toss** — 흰 캔버스 위 파랑 하나, CSS 변수 단일 인터페이스로 라이트/다크 자동 전환.
 
-- 브랜드: 紅(#E8112D 라이트 / #FF2D46 다크), 시안 보조 액센트(#0097A7 / #00E5FF 다크)
-- 각진 모서리(`radius:0`), 하드 오프셋 섀도우, 라이트/다크 보더-배경 명암 반전
-- 폰트: Pretendard(본문), Orbitron(숫자·로고), Black Han Sans(페이지 타이틀)
+- 브랜드: 파랑(#3182F6 라이트 / #4C8FFF 다크), sky 보조 액센트(#0EA5E9 / #38BDF8 다크)
+- 둥근 모서리(`--radius-sm` 8px ~ `--radius-2xl` 24px), 소프트 엘리베이션 섀도우, 라이트/다크 모두 옅은 회색 보더 유지(반전 없음)
+- 폰트: Pretendard 단일 체계(전용 디스플레이 서체 없음)
 
-자세한 내용: `docs/design/AKIRA_NEOTOKYO_DESIGN_SPEC.md`
+자세한 내용: `docs/design/TOSS_DESIGN_SPEC.md`
 
 ## 기획 문서 목록
 
@@ -113,7 +112,7 @@ npm start   # http://localhost:3001
 | `docs/planning/PHOTO_SEARCH_SPEC.md` | 사진 5단계 카테고리 & 검색 기획 |
 | `docs/planning/UI_IMPROVEMENT_PLAN.md` | UI/UX 개선 기획서 |
 | `docs/planning/UI_IMPROVEMENT_DESIGN.md` | UI/UX 개선 설계서 |
-| `docs/design/AKIRA_NEOTOKYO_DESIGN_SPEC.md` | 현재 디자인 시스템 구현 기록 |
+| `docs/design/TOSS_DESIGN_SPEC.md` | 현재 디자인 시스템 구현 기록 |
 | `CLAUDE_HARNESS_GUIDE.md` | Claude Code 활용 가이드 |
 
 ---

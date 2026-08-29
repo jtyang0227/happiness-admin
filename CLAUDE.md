@@ -105,18 +105,18 @@ React SPA using React Router v6 + Recharts:
 
 ### Design References
 
-현재(5차) 디자인 컨셉은 **AKIRA Neo-Tokyo** — 블랙/화이트 기반 + 레드·시안 포인트의
-사이버펑크 포스터 × HUD 터미널 미학이다. 1~4차(Cosmos × Pinterest → Railway DNA →
-Pixel Arcade → 和ドット/와도트)는 폐기되었다 — 관련 기록 문서는 더 이상 리포지토리에
-없다(과거 세대의 팔레트·컴포넌트 디테일이 필요하면 git 히스토리 참고). 5차는 4차의
-구조적 DNA(CSS 변수 단일 인터페이스, `radius:0`, 하드 오프셋 섀도우, 라이트/다크
-보더-배경 명암 반전)를 그대로 계승하고 팔레트·타이포그래피만 교체한 톤 전환이다.
+현재(6차) 디자인 컨셉은 **Toss** — 흰 캔버스 위 파랑 하나, 둥근 모서리와 소프트 섀도우로
+신뢰감을 만드는 절제된 금융 UI 문법이다. 1~5차(Cosmos × Pinterest → Railway DNA →
+Pixel Arcade → 和ドット → AKIRA Neo-Tokyo)는 전부 폐기되었다 — 관련 기록 문서는 더 이상
+리포지토리에 없다(과거 세대의 팔레트·컴포넌트 디테일이 필요하면 git 히스토리 참고). 5차
+AKIRA의 각진 프레임·하드 오프셋 섀도우·네온 포인트·CRT 텍스처는 전부 폐기했다 — 6차는
+톤 전환이 아니라 구조 자체의 전환이다.
 
 | DNA | Key Elements |
 |---|---|
-| **각진 프레임(계승)** | 각진 모서리(`radius:0`), 하드/이중 프레임(`--shadow-ring`), 하드 오프셋 버튼 섀도우 |
-| **AKIRA Neo-Tokyo 팔레트** | 紅(#E8112D) 브랜드, 시안(#0097A7) 보조 액센트, 블랙(라이트 보더)/화이트(다크 보더) 반전, 다크 모드는 네온 채도 강화 |
-| **시그니처 디테일(신규)** | 해저드 스트라이프(`--hazard-stripe`, 상단바), 네온 글로우(`--shadow-glow-red/-cyan`), CRT 스캔라인 배경(`--dot-grid`) |
+| **둥근 카드** | 둥근 모서리(`--radius-sm` 8px ~ `--radius-2xl` 24px), 소프트 엘리베이션 섀도우(`--shadow-ring`), 하드 오프셋 없음 |
+| **Toss 팔레트** | 파랑(#3182F6) 브랜드, sky(#0EA5E9) 보조 액센트, 라이트/다크 모두 옅은 회색 보더 유지(반전 없음) |
+| **인터랙션** | 클릭 시 `scale(0.97)` 스퀴시, hover 시 `filter: brightness(0.96)` 또는 소프트 리프트 — 하드 오프셋/픽셀 블링크 없음 |
 
 ### CSS Variable System
 
@@ -127,58 +127,57 @@ Pixel Arcade → 和ドット/와도트)는 폐기되었다 — 관련 기록 �
 ```css
 /* frontend/src/styles/tokens.css 실제 정의 (발췌) */
 :root {
-  --color-bg:             #F4F4F4;  /* 화이트 베이스 (라이트) */
+  --color-bg:             #F2F4F6;  /* 밝은 회색 캔버스 (라이트) */
   --color-surface:        #FFFFFF;
-  --color-border:         #0A0A0A;  /* 포스터 블랙 라인 */
-  --color-text-primary:   #0A0A0A;
-  --color-text-secondary: #3D3D3D;
-  --color-text-tertiary:  #7A7A7A;
-  --color-brand:          #E8112D;  /* AKIRA 레드 */
-  --color-accent:         #0097A7;  /* Neo-Tokyo 시안 (보조 액센트) */
+  --color-border:         #E5E8EB;  /* 옅은 회색 라인 — 라이트/다크 모두 반전 없음 */
+  --color-text-primary:   #191F28;
+  --color-text-secondary: #4E5968;
+  --color-text-tertiary:  #8B95A1;
+  --color-brand:          #3182F6;  /* Toss Blue */
+  --color-accent:         #0EA5E9;  /* sky, 보조 액센트 */
   --color-success/-warning/-danger/-info: ... /* 각각 -bg 페어 존재 */
-  --font-pixel:  'Orbitron', ...;      /* 브랜드 로고·KPI 숫자 전용(한글 미지원) */
-  --font-serif:  'Black Han Sans', ...; /* 페이지 타이틀 전용(볼드 포스터체) */
-  --shadow-ring: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-border); /* 이중 프레임 */
-  --shadow-glow-red/-cyan: ...; /* CTA·활성 요소 네온 글로우 (신규) */
-  --hazard-stripe: repeating-linear-gradient(-45deg, ...); /* 경고 스트라이프 (신규) */
+  --font-pixel:  var(--font-sans);  /* 하위 호환용 별칭 — 전용 디스플레이 서체 없음 */
+  --font-serif:  var(--font-sans);  /* 동일 */
+  --shadow-ring: 0 1px 2px rgba(25,31,40,.04), 0 8px 20px rgba(25,31,40,.06); /* 소프트 엘리베이션 */
+  --shadow-glow-red/-cyan: ...; /* 토큰명 유지, 값은 소프트 컬러 글로우로 교체 */
 }
 
-/* 다크모드: 보더-배경 명암이 반전된다 (화이트 보더 위 블랙 배경, 네온 채도 강화) */
+/* 다크모드: 반전하지 않는다 — 어둡게 톤만 낮추고 파랑 밝기만 올린다 */
 [data-theme="dark"], @media (prefers-color-scheme: dark) {
-  --color-bg:     #0A0A0C;
-  --color-border: #FFFFFF;  /* 다크 모드는 화이트 라인 */
-  --color-text-primary: #FFFFFF;
-  --color-brand:  #FF2D46;  /* 다크에서 더 밝은 네온 레드 */
-  --color-accent: #00E5FF;  /* 다크에서 풀 네온 시안 */
+  --color-bg:     #14181D;
+  --color-border: #2C333D;  /* 다크에서도 여전히 "옅은" 회색 라인, 화이트 반전 없음 */
+  --color-text-primary: #F2F4F6;
+  --color-brand:  #4C8FFF;  /* 다크 배경에서 시인성 위해 살짝 밝게 */
+  --color-accent: #38BDF8;
 }
 ```
 
-색상 이름·전체 팔레트는 `docs/design/AKIRA_NEOTOKYO_DESIGN_SPEC.md` 참고.
+색상 이름·전체 팔레트는 `docs/design/TOSS_DESIGN_SPEC.md` 참고.
 
 ### Key Component Patterns
 
 | Component | Pattern | Notes |
 |---|---|---|
-| **카드/테이블/모달** | `border: 2px solid var(--color-border)` + `box-shadow: var(--shadow-ring)` | 블러 없는 이중 프레임 |
-| **StatusDot** | `clip-path: polygon(...)` 다이아몬드 | 원형/사각 아님 |
-| **Sidebar active** | `::before { content: '▶' }` | 좌측 바 아님 — 화살표 커서 |
-| **버튼 클릭 피드백** | `translate(2px,2px)` + `box-shadow: none` | `--shadow-sm/md` 하드 오프셋 전용, 패널에는 미사용 |
-| **로그인 화면** | 항상 다크 고정, 로컬 스코프 변수(`--lp-*`)로 테마 독립 | `pages/LoginPage.css` |
-| **Image blur reveal** | `filter: blur(4px) → blur(0)` on `onLoad` | `transition: filter 0.4s ease` |
+| **카드/테이블/모달** | `border: 1px solid var(--color-border)` + `box-shadow: var(--shadow-ring)` | 소프트 엘리베이션, 이중 프레임 아님 |
+| **StatusDot** | `border-radius: var(--radius-full)` 원형 | 다이아몬드/사각 아님 |
+| **Sidebar active** | 브랜드 블루로 채운 둥근 필박스 배경 + 흰 텍스트 | 화살표 커서(`▶`) 없음 |
+| **버튼 클릭 피드백** | `transform: scale(0.97)` 스퀴시 | 하드 오프셋(`translate(2px,2px)`) 아님 |
+| **로그인 화면** | 앱 전체와 동일한 라이트 팔레트, 로컬 스코프 변수(`--lp-*`)는 유지 | `pages/LoginPage.css` — "항상 다크 고정" 원칙은 폐기됨 |
+| **Image blur reveal** | `filter: blur(4px) → blur(0)` on `onLoad` | `transition: filter 0.4s ease` (계승) |
 | **Scroll entrance** | `IntersectionObserver` + `.visible`/`.kpi-visible` 클래스 | `opacity 0→1, translateY→0` — 트리거까지 최대 ~1초 소요될 수 있음(자동화 테스트 시 유의) |
-| **SlideOver** | 우측 패널, 좌측 엣지만 이중선 프레임 | `border-left` + 2겹 `box-shadow` |
+| **SlideOver** | 우측 패널, 테두리 없이 `box-shadow: var(--shadow-xl)`만 | 좌측 이중선 프레임 폐기 |
 | **Masonry grid** | `column-count` CSS (no JS) | 사진 목록 등 일부 페이지에서 유지 |
 
 ### Font
 
 ```html
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Black+Han+Sans&display=swap" rel="stylesheet" />
-<!-- Pretendard는 기존 jsdelivr CDN 유지 -->
+<!-- Pretendard는 jsdelivr CDN 유지, 별도 디스플레이 서체(Google Fonts) 로드 없음 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
 ```
 
 ### Design Files
 
-- `docs/design/AKIRA_NEOTOKYO_DESIGN_SPEC.md` — **현재(5차) 디자인 구현 기록** (팔레트·컴포넌트·적용 범위)
+- `docs/design/TOSS_DESIGN_SPEC.md` — **현재(6차) 디자인 구현 기록** (팔레트·컴포넌트·적용 범위)
 - `docs/planning/APP_TO_ADMIN_SPEC.md` — happiness-app에서 admin으로 이식할 기능 명세
 
 ### Design Rules
@@ -186,13 +185,13 @@ Pixel Arcade → 和ドット/와도트)는 폐기되었다 — 관련 기록 �
 1. **CSS 변수만 사용**: 하드코딩된 색상값 금지. 반드시 실제 존재하는 `var(--color-*)` 사용 —
    작업 전 `frontend/src/styles/tokens.css`에서 토큰명을 확인할 것(이 문서의 표기만 믿지 말 것).
 2. **다크모드 기본 지원**: 새 컴포넌트는 CSS 변수 시스템에 따라 자동으로 양쪽 테마를 지원해야 한다.
-   보더-배경 명암이 테마마다 반전되므로(라이트=화이트 배경/블랙 보더, 다크=블랙 배경/화이트
-   보더) 하드코딩된 보더/배경 조합을 피할 것.
-3. **각진 모서리 유지**: `border-radius`를 새로 하드코딩하지 말 것 — `var(--radius-*)`는 전부 `0`.
+   Toss는 라이트/다크 모두 "옅은 회색 보더" 원칙을 유지한다(반전 없음) — 하드코딩된 보더/배경
+   조합을 피할 것.
+3. **둥근 모서리 사용**: `border-radius`는 항상 `var(--radius-*)` 사용 — `0`으로 하드코딩하지 말 것.
 4. **이미지 blur reveal**: 모든 이미지는 `onLoad`에서 blur → clear 전환 적용.
 5. **IntersectionObserver 입장 애니메이션**: 카드 리스트 페이지에서 스크롤 진입 시 fade+slide up 적용.
-6. **폰트 역할 분리**: 픽셀 폰트(`--font-pixel`, Orbitron)는 숫자·브랜드 로고 전용(한글 미지원),
-   페이지 타이틀은 포스터 디스플레이체(`--font-serif`, Black Han Sans), 본문은 Pretendard.
+6. **하드 오프셋 금지**: 버튼/카드 hover·active에 `translate(Npx,Npx)` 픽셀 오프셋을 새로
+   추가하지 말 것 — hover는 `filter`/소프트 `box-shadow`, active는 `scale(0.97)` 스퀴시.
 7. **패널은 `--shadow-ring`, 버튼은 `--shadow-sm/md`**: 정적 카드/모달과 클릭 가능한 버튼의
    섀도우 체계가 다르다 — 혼용하지 말 것.
 

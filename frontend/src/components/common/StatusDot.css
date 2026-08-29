@@ -10,22 +10,22 @@
 
 .status-dot {
   flex-shrink: 0;
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  border-radius: var(--radius-full);
 }
 
 .status-dot--active {
   background: var(--color-status-active);
-  animation: status-pulse-active 1.2s var(--ease-pixel) infinite;
+  animation: status-pulse-active 1.2s var(--ease-out) infinite;
 }
 
 .status-dot--building {
   background: var(--color-status-building);
-  animation: status-blink 0.8s steps(1) infinite;
+  animation: status-blink 0.8s ease-in-out infinite;
 }
 
 .status-dot--deploy {
   background: var(--color-status-deploy);
-  animation: status-pulse-deploy 1.2s var(--ease-pixel) infinite;
+  animation: status-pulse-deploy 1.2s var(--ease-out) infinite;
 }
 
 .status-dot--error {

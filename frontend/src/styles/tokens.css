@@ -1,71 +1,71 @@
 :root {
-  /* Brand — AKIRA Neo-Tokyo 紅 (electric poster red) */
-  --color-brand:     #E8112D;
-  --color-brand-hover: #B90D22;
-  --color-brand-light: #FCE3E6;
+  /* Brand — Toss Blue */
+  --color-brand:       #3182F6;
+  --color-brand-hover: #1B64DA;
+  --color-brand-light: #E8F3FF;
 
   /* Brand scale — alias to semantic brand tokens */
-  --color-brand-50:  #FCE3E6;
-  --color-brand-100: #F7B8C0;
+  --color-brand-50:  #E8F3FF;
+  --color-brand-100: #C9E2FF;
   --color-brand-400: var(--color-brand);
   --color-brand-500: var(--color-brand);
   --color-brand-600: var(--color-brand-hover);
   --color-brand-700: var(--color-brand-hover);
 
-  /* Secondary accent — Neo-Tokyo 시안 네온 */
-  --color-accent:     #0097A7;
-  --color-accent-bg:  #DFF6F9;
+  /* Secondary accent — Toss sky (보조 정보용) */
+  --color-accent:     #0EA5E9;
+  --color-accent-bg:  #E0F5FC;
 
-  /* Semantic — 블랙/화이트 + 레드·시안 포인트 */
-  --color-success:    #0D9F53;
-  --color-success-bg: #DFF3E7;
-  --color-warning:    #C98A00;
-  --color-warning-bg: #FBEACC;
-  --color-danger:     #B0102A;
-  --color-danger-bg:  #FADCE0;
-  --color-info:       #0097A7;
-  --color-info-bg:    #DFF6F9;
+  /* Semantic */
+  --color-success:    #12B76A;
+  --color-success-bg: #E6F9EF;
+  --color-warning:    #F59E0B;
+  --color-warning-bg: #FEF3E2;
+  --color-danger:     #F04452;
+  --color-danger-bg:  #FDE8EA;
+  --color-info:       #0EA5E9;
+  --color-info-bg:    #E0F5FC;
 
-  /* Neutral — 화이트 베이스 */
-  --color-bg:           #F4F4F4;
+  /* Neutral — 밝은 회색 캔버스 위 화이트 카드 */
+  --color-bg:           #F2F4F6;
   --color-surface:      #FFFFFF;
-  --color-surface-2:    #E8E8E8;
-  --color-border:       #0A0A0A; /* 포스터 블랙 라인 */
-  --color-border-light: #C4C4C4;
+  --color-surface-2:    #F8F9FA;
+  --color-border:       #E5E8EB;
+  --color-border-light: #EEF1F4;
 
   /* Text */
-  --color-text-primary:   #0A0A0A;
-  --color-text-secondary: #3D3D3D;
-  --color-text-tertiary:  #7A7A7A;
+  --color-text-primary:   #191F28;
+  --color-text-secondary: #4E5968;
+  --color-text-tertiary:  #8B95A1;
   --color-text-inverse:   #FFFFFF;
 
-  /* Sidebar — 항상 무광 블랙 유지 */
-  --color-sidebar-bg:          #050505;
-  --color-sidebar-hover:       #161616;
-  --color-sidebar-border:      #FFFFFF;
-  --color-sidebar-text:        #9A9A9A;
-  --color-sidebar-active-text: #FF2D46;
+  /* Sidebar — 항상 다크 네이비(라이트/다크 모드 무관, 내비게이션 대비용) */
+  --color-sidebar-bg:          #191F28;
+  --color-sidebar-hover:       #232A35;
+  --color-sidebar-border:      transparent;
+  --color-sidebar-text:        #8B95A1;
+  --color-sidebar-active-text: #FFFFFF;
 
-  /* Shadow — 버튼용 하드 오프셋 (포스터 컷아웃 DNA 유지) */
-  --shadow-sm: 2px 2px 0 var(--color-border);
-  --shadow-md: 3px 3px 0 var(--color-border);
-  --shadow-lg: 4px 4px 0 var(--color-border);
-  --shadow-xl: 6px 6px 0 var(--color-border);
+  /* Shadow — 소프트 엘리베이션 (하드 오프셋 없음) */
+  --shadow-sm: 0 1px 2px rgba(25, 31, 40, 0.06);
+  --shadow-md: 0 4px 12px rgba(25, 31, 40, 0.08);
+  --shadow-lg: 0 8px 24px rgba(25, 31, 40, 0.10);
+  --shadow-xl: 0 16px 40px rgba(25, 31, 40, 0.14);
 
-  /* Shadow-ring — 패널/카드용 이중 액자 테두리 */
-  --shadow-ring: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-border);
+  /* Shadow-ring — 카드용 소프트 엘리베이션(이중 프레임 대체) */
+  --shadow-ring: 0 1px 2px rgba(25, 31, 40, 0.04), 0 8px 20px rgba(25, 31, 40, 0.06);
 
-  /* Neon glow — CTA/활성 요소 전용 강조 (신규) */
-  --shadow-glow-red:  0 0 0 1px var(--color-brand), 0 0 14px rgba(232, 17, 45, 0.45);
-  --shadow-glow-cyan: 0 0 0 1px var(--color-accent), 0 0 14px rgba(0, 151, 167, 0.45);
+  /* 강조 글로우 — 토큰명은 유지, 소프트 컬러 글로우로 값만 교체 */
+  --shadow-glow-red:  0 8px 20px -6px rgba(240, 68, 82, 0.45);
+  --shadow-glow-cyan: 0 8px 20px -6px rgba(49, 130, 246, 0.45);
 
-  /* Radius — 각진 모서리 유지 */
-  --radius-sm:   0px;
-  --radius-md:   0px;
-  --radius-lg:   0px;
-  --radius-xl:   0px;
-  --radius-2xl:  0px;
-  --radius-full: 0px;
+  /* Radius — 둥근 모서리 */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   20px;
+  --radius-2xl:  24px;
+  --radius-full: 999px;
 
   /* Spacing */
   --space-1:  4px;
@@ -78,11 +78,11 @@
   --space-10: 40px;
   --space-12: 48px;
 
-  /* Font */
-  --font-sans: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
-  --font-pixel: 'Orbitron', 'JetBrains Mono', monospace;
-  --font-serif: 'Black Han Sans', 'Pretendard', sans-serif;
+  /* Font — 단일 산세리프 체계(디스플레이 전용 서체 없음) */
+  --font-sans:  'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:  'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --font-pixel: var(--font-sans);
+  --font-serif: var(--font-sans);
   --text-xs:   11px;
   --text-sm:   13px;
   --text-base: 14px;
@@ -113,33 +113,20 @@
   --z-toast:    500;
   --z-tooltip:  600;
 
-  /* Animation */
-  --dur-fast:   100ms;
+  /* Animation — 부드러운 이징 (스텝 애니메이션 없음) */
+  --dur-fast:   120ms;
   --dur-normal: 200ms;
-  --dur-slow:   350ms;
+  --dur-slow:   320ms;
   --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-out:     cubic-bezier(0, 0, 0.2, 1);
-  --ease-pixel:   steps(4, end);
+  --ease-pixel:   var(--ease-out);
 
   /* Shadow additions */
-  --shadow-focus: 0 0 0 3px rgba(232, 17, 45, 0.35);
-  --shadow-modal: 0 0 0 3px var(--color-bg), 0 0 0 6px var(--color-border);
+  --shadow-focus: 0 0 0 3px rgba(49, 130, 246, 0.35);
+  --shadow-modal: 0 24px 60px -12px rgba(25, 31, 40, 0.24);
 
-  /* 스캔라인 텍스처 — Neo-Tokyo HUD 배경 */
-  --dot-grid:
-    repeating-linear-gradient(0deg,
-      transparent 0, transparent 3px,
-      rgba(10, 10, 10, 0.035) 3px, rgba(10, 10, 10, 0.035) 4px);
-  --dot-grid-size: 100% 4px;
-
-  /* Hazard stripe — 경고 대각선 스트라이프 (신규, 강조 헤더/코너용) */
-  --hazard-stripe:
-    repeating-linear-gradient(-45deg,
-      var(--color-border) 0, var(--color-border) 10px,
-      var(--color-brand) 10px, var(--color-brand) 20px);
-
-  /* Category colors (1차 촬영종류) */
+  /* Category colors (1차 촬영종류) — 브랜드 재도색 범위 밖, 그대로 유지 */
   --color-cat-wedding:  #f9a8d4;
   --color-cat-snap:     #86efac;
   --color-cat-family:   #fbbf24;
@@ -160,27 +147,27 @@
   --color-mood-film:    #d97706;
 
   /* Portfolio / Review status colors */
-  --color-status-draft:    #7A7A7A;
-  --color-status-pending:  #C98A00;
-  --color-status-approved: #0D9F53;
-  --color-status-rejected: #B0102A;
+  --color-status-draft:    #8B95A1;
+  --color-status-pending:  #F59E0B;
+  --color-status-approved: #12B76A;
+  --color-status-rejected: #F04452;
 
-  /* Dark mode surface tokens — 무광 블랙 */
-  --color-bg-dark:              #0A0A0C;
-  --color-surface-dark:         #131316;
-  --color-surface-2-dark:       #1C1C20;
-  --color-border-dark:          #FFFFFF; /* 다크 모드는 화이트 라인으로 반전 */
-  --color-border-light-dark:    #3A3A3E;
-  --color-text-primary-dark:    #FFFFFF;
-  --color-text-secondary-dark:  #B8B8B8;
-  --color-text-tertiary-dark:   #6E6E72;
+  /* Dark mode surface tokens */
+  --color-bg-dark:              #14181D;
+  --color-surface-dark:         #1B2027;
+  --color-surface-2-dark:       #232A33;
+  --color-border-dark:          #2C333D;
+  --color-border-light-dark:    #262C34;
+  --color-text-primary-dark:    #F2F4F6;
+  --color-text-secondary-dark:  #B0B8C1;
+  --color-text-tertiary-dark:   #7A828C;
 
-  /* Status colors (다크 튜닝, 네온) */
-  --color-status-active:   #00C853;
-  --color-status-building: #FFD400;
-  --color-status-deploy:   #00E5FF;
-  --color-status-error:    #FF1744;
-  --color-status-idle:     #8A8A8A;
+  /* Status colors */
+  --color-status-active:   #12B76A;
+  --color-status-building: #F59E0B;
+  --color-status-deploy:   #3182F6;
+  --color-status-error:    #F04452;
+  --color-status-idle:     #8B95A1;
 
   /* Topbar */
   --topbar-height: 56px;
@@ -199,42 +186,34 @@
     --color-text-primary:    var(--color-text-primary-dark);
     --color-text-secondary:  var(--color-text-secondary-dark);
     --color-text-tertiary:   var(--color-text-tertiary-dark);
-    --color-brand:           #FF2D46;
-    --color-brand-hover:     #FF5C70;
-    --color-brand-50:        #3A1216;
-    --color-brand-100:       #4A1A1F;
-    --color-brand-light:     rgba(255, 45, 70, 0.18);
-    --color-accent:          #00E5FF;
-    --color-accent-bg:       #0E2A2E;
-    --color-success:         #00FF7A;
-    --color-success-bg:      #0F2C1B;
-    --color-warning:         #FFD400;
-    --color-warning-bg:      #332A0A;
-    --color-danger:          #FF1744;
-    --color-danger-bg:       #33121A;
-    --color-info:            #00E5FF;
-    --color-info-bg:         #0E2A2E;
-    --shadow-sm: 2px 2px 0 var(--color-border-dark);
-    --shadow-md: 3px 3px 0 var(--color-border-dark);
-    --shadow-lg: 4px 4px 0 var(--color-border-dark);
-    --shadow-xl: 6px 6px 0 var(--color-border-dark);
-    --shadow-ring: 0 0 0 3px var(--color-bg-dark), 0 0 0 5px var(--color-border-dark);
-    --shadow-modal: 0 0 0 3px var(--color-bg-dark), 0 0 0 6px var(--color-border-dark);
-    --shadow-glow-red:  0 0 0 1px var(--color-brand), 0 0 16px rgba(255, 45, 70, 0.6);
-    --shadow-glow-cyan: 0 0 0 1px var(--color-accent), 0 0 16px rgba(0, 229, 255, 0.6);
-    --dot-grid:
-      repeating-linear-gradient(0deg,
-        transparent 0, transparent 3px,
-        rgba(255, 255, 255, 0.045) 3px, rgba(255, 255, 255, 0.045) 4px);
-    --hazard-stripe:
-      repeating-linear-gradient(-45deg,
-        var(--color-border-dark) 0, var(--color-border-dark) 10px,
-        var(--color-brand) 10px, var(--color-brand) 20px);
-    --color-sidebar-bg:          #000000;
-    --color-sidebar-hover:       #161616;
-    --color-sidebar-border:      #FFFFFF;
-    --color-sidebar-text:        #8A8A8A;
-    --color-sidebar-active-text: #FF2D46;
+    --color-brand:           #4C8FFF;
+    --color-brand-hover:     #6FA5FF;
+    --color-brand-50:        #16233A;
+    --color-brand-100:       #1E2E4A;
+    --color-brand-light:     rgba(76, 143, 255, 0.16);
+    --color-accent:          #38BDF8;
+    --color-accent-bg:       #0F2733;
+    --color-success:         #32D583;
+    --color-success-bg:      #0F2A1F;
+    --color-warning:         #FBBF24;
+    --color-warning-bg:      #33280F;
+    --color-danger:          #FF6B78;
+    --color-danger-bg:       #331A1E;
+    --color-info:            #38BDF8;
+    --color-info-bg:         #0F2733;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.30);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.34);
+    --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.40);
+    --shadow-ring: 0 1px 2px rgba(0, 0, 0, 0.20), 0 8px 20px rgba(0, 0, 0, 0.28);
+    --shadow-modal: 0 24px 60px -12px rgba(0, 0, 0, 0.50);
+    --shadow-glow-red:  0 8px 20px -6px rgba(255, 107, 120, 0.5);
+    --shadow-glow-cyan: 0 8px 20px -6px rgba(76, 143, 255, 0.5);
+    --color-sidebar-bg:          #10141A;
+    --color-sidebar-hover:       #1B2027;
+    --color-sidebar-border:      transparent;
+    --color-sidebar-text:        #7A828C;
+    --color-sidebar-active-text: #FFFFFF;
   }
 }
 
@@ -248,40 +227,32 @@
   --color-text-primary:    var(--color-text-primary-dark);
   --color-text-secondary:  var(--color-text-secondary-dark);
   --color-text-tertiary:   var(--color-text-tertiary-dark);
-  --color-brand:           #FF2D46;
-  --color-brand-hover:     #FF5C70;
-  --color-brand-50:        #3A1216;
-  --color-brand-100:       #4A1A1F;
-  --color-brand-light:     rgba(255, 45, 70, 0.18);
-  --color-accent:          #00E5FF;
-  --color-accent-bg:       #0E2A2E;
-  --color-success:         #00FF7A;
-  --color-success-bg:      #0F2C1B;
-  --color-warning:         #FFD400;
-  --color-warning-bg:      #332A0A;
-  --color-danger:          #FF1744;
-  --color-danger-bg:       #33121A;
-  --color-info:            #00E5FF;
-  --color-info-bg:         #0E2A2E;
-  --shadow-sm: 2px 2px 0 var(--color-border-dark);
-  --shadow-md: 3px 3px 0 var(--color-border-dark);
-  --shadow-lg: 4px 4px 0 var(--color-border-dark);
-  --shadow-xl: 6px 6px 0 var(--color-border-dark);
-  --shadow-ring: 0 0 0 3px var(--color-bg-dark), 0 0 0 5px var(--color-border-dark);
-  --shadow-modal: 0 0 0 3px var(--color-bg-dark), 0 0 0 6px var(--color-border-dark);
-  --shadow-glow-red:  0 0 0 1px var(--color-brand), 0 0 16px rgba(255, 45, 70, 0.6);
-  --shadow-glow-cyan: 0 0 0 1px var(--color-accent), 0 0 16px rgba(0, 229, 255, 0.6);
-  --dot-grid:
-    repeating-linear-gradient(0deg,
-      transparent 0, transparent 3px,
-      rgba(255, 255, 255, 0.045) 3px, rgba(255, 255, 255, 0.045) 4px);
-  --hazard-stripe:
-    repeating-linear-gradient(-45deg,
-      var(--color-border-dark) 0, var(--color-border-dark) 10px,
-      var(--color-brand) 10px, var(--color-brand) 20px);
-  --color-sidebar-bg:          #000000;
-  --color-sidebar-hover:       #161616;
-  --color-sidebar-border:      #FFFFFF;
-  --color-sidebar-text:        #8A8A8A;
-  --color-sidebar-active-text: #FF2D46;
+  --color-brand:           #4C8FFF;
+  --color-brand-hover:     #6FA5FF;
+  --color-brand-50:        #16233A;
+  --color-brand-100:       #1E2E4A;
+  --color-brand-light:     rgba(76, 143, 255, 0.16);
+  --color-accent:          #38BDF8;
+  --color-accent-bg:       #0F2733;
+  --color-success:         #32D583;
+  --color-success-bg:      #0F2A1F;
+  --color-warning:         #FBBF24;
+  --color-warning-bg:      #33280F;
+  --color-danger:          #FF6B78;
+  --color-danger-bg:       #331A1E;
+  --color-info:            #38BDF8;
+  --color-info-bg:         #0F2733;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.30);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.34);
+  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.40);
+  --shadow-ring: 0 1px 2px rgba(0, 0, 0, 0.20), 0 8px 20px rgba(0, 0, 0, 0.28);
+  --shadow-modal: 0 24px 60px -12px rgba(0, 0, 0, 0.50);
+  --shadow-glow-red:  0 8px 20px -6px rgba(255, 107, 120, 0.5);
+  --shadow-glow-cyan: 0 8px 20px -6px rgba(76, 143, 255, 0.5);
+  --color-sidebar-bg:          #10141A;
+  --color-sidebar-hover:       #1B2027;
+  --color-sidebar-border:      transparent;
+  --color-sidebar-text:        #7A828C;
+  --color-sidebar-active-text: #FFFFFF;
 }

@@ -158,23 +158,23 @@ PATCH /api/admin/members/:id/status
 
 ## 디자인 시스템 핵심 규칙
 
-현재(5차) 컨셉: **AKIRA Neo-Tokyo** — 블랙/화이트 기반 + 레드·시안 포인트.
-상세: `docs/design/AKIRA_NEOTOKYO_DESIGN_SPEC.md`.
+현재(6차) 컨셉: **Toss** — 흰 캔버스 + 파랑 하나, 둥근 모서리와 소프트 섀도우.
+상세: `docs/design/TOSS_DESIGN_SPEC.md`.
 
 - 색상은 반드시 `var(--color-*)` CSS 변수만 사용 (하드코딩 금지)
-- 다크모드 자동 지원 — CSS 변수 시스템으로 처리 (라이트=화이트bg/블랙보더, 다크=블랙bg/화이트보더 반전)
-- 각진 모서리 유지 — `var(--radius-*)`는 전부 0, 새로 하드코딩 금지
+- 다크모드 자동 지원 — CSS 변수 시스템으로 처리 (라이트/다크 모두 옅은 회색 보더 유지, 반전 없음)
+- 둥근 모서리 사용 — `var(--radius-*)` 사용, `0`으로 하드코딩 금지
 - 이미지는 `onLoad` 시 `filter: blur(4px) → blur(0)` blur reveal 적용
 - 마소니 레이아웃: CSS `column-count` 방식만 사용 (Masonry.js 금지)
 - 카드 진입 애니메이션: `IntersectionObserver` + fade + slide up
-- 폰트: Pretendard(본문) / Orbitron(`--font-pixel`, 숫자·로고) / Black Han Sans(`--font-serif`, 페이지 타이틀)
-- 로고: `frontend/src/assets/logo.png`(투명 배경, 검정 글자) — 다크 배경 위에서는 `filter: invert(1)`로 반전
+- 폰트: Pretendard 단일 체계 (`--font-pixel`/`--font-serif`는 `--font-sans` 별칭, 전용 디스플레이 서체 없음)
+- 로고: `frontend/src/assets/logo.png`(투명 배경, 검정 글자) — 다크 사이드바 위에서는 `filter: invert(1)`로 반전(사이드바는 테마 무관 항상 다크)
 
 ### 브랜드 색상
-| 모드 | brand | accent(시안) | bg | surface |
+| 모드 | brand | accent(sky) | bg | surface |
 |---|---|---|---|---|
-| Light | `#E8112D` | `#0097A7` | `#F4F4F4` | `#FFFFFF` |
-| Dark | `#FF2D46` | `#00E5FF` | `#0A0A0C` | `#131316` |
+| Light | `#3182F6` | `#0EA5E9` | `#F2F4F6` | `#FFFFFF` |
+| Dark | `#4C8FFF` | `#38BDF8` | `#14181D` | `#1B2027` |
 
 ---
 

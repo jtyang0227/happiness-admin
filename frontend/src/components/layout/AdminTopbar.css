@@ -3,21 +3,12 @@
   top: 0; left: 0; right: 0;
   height: var(--topbar-height);
   background: var(--color-surface);
-  border-bottom: 2px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 0 16px;
   z-index: var(--z-sticky);
-}
-
-.admin-topbar::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background-image: var(--hazard-stripe);
-  background-size: 28px 28px;
 }
 
 .topbar-left {
@@ -87,7 +78,7 @@
   height: 34px;
   padding: 0 10px 0 10px;
   background: var(--color-surface-2);
-  border: 2px solid var(--color-border);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
   cursor: pointer;
   transition: border-color var(--dur-fast), background var(--dur-fast);
@@ -149,9 +140,9 @@
 }
 
 .topbar-status-dot {
-  width: 9px;
-  height: 9px;
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
   flex-shrink: 0;
 }
 
@@ -193,7 +184,7 @@
   height: 32px;
   border-radius: var(--radius-md);
   background: var(--color-surface);
-  border: 2px solid var(--color-border);
+  border: 1px solid var(--color-border);
   color: var(--color-text-secondary);
   cursor: pointer;
   transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
@@ -230,8 +221,8 @@
 .topbar-avatar {
   width: 28px;
   height: 28px;
-  border-radius: 0;
-  border: 2px solid var(--color-border);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
   background: var(--color-brand);
   color: #fff;
   font-size: var(--text-xs);
@@ -271,7 +262,7 @@
   right: 0;
   min-width: 200px;
   background: var(--color-surface);
-  border: 2px solid var(--color-border);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xl);
   z-index: calc(var(--z-dropdown) + 1);
@@ -288,8 +279,8 @@
 .topbar-dropdown-avatar {
   width: 36px;
   height: 36px;
-  border-radius: 0;
-  border: 2px solid var(--color-border);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
   background: var(--color-brand);
   color: #fff;
   font-size: var(--text-sm);
@@ -309,8 +300,6 @@
 .topbar-dropdown-role {
   font-size: var(--text-xs);
   color: var(--color-text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   margin-top: 2px;
 }
 

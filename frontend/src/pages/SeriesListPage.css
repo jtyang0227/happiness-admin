@@ -1,2 +1,2 @@
-.series-cover { width: 56px; height: 40px; object-fit: cover; border-radius: 0; background: #f1f5f9; }
+.series-cover { width: 56px; height: 40px; object-fit: cover; border-radius: var(--radius-sm); background: #f1f5f9; }
 .series-title { font-weight: 500; color: #1e293b; }
