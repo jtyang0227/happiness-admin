@@ -13,6 +13,9 @@ const STATUS_LABELS = { PENDING: '대기중', IN_REVIEW: '검토중', ACTION_TAK
 const STATUS_CLASSES = { PENDING: 'badge-red', IN_REVIEW: 'badge-yellow', ACTION_TAKEN: 'badge-green', DISMISSED: 'badge-gray' };
 const TARGET_LABELS = { PHOTO: '사진', MEMBER: '회원', SERIES: '시리즈' };
 
+const SEVERITY_LABELS = { LOW: '낮음', MEDIUM: '보통', HIGH: '높음' };
+const SEVERITY_CLASSES = { LOW: 'badge-gray', MEDIUM: 'badge-yellow', HIGH: 'badge-red' };
+
 const ACTIONS = [
   { value: 'DISMISS', label: '기각 (신고 내용 부적절)' },
   { value: 'HIDE_CONTENT', label: '콘텐츠 숨김 (앱 비노출)' },
@@ -20,6 +23,7 @@ const ACTIONS = [
   { value: 'WARN_AUTHOR', label: '작성자 경고' },
   { value: 'SUSPEND_AUTHOR', label: '작성자 정지' },
 ];
+const ALLOWED_ACTION_VALUES = new Set(ACTIONS.map(a => a.value));
 
 const ReportListPage = () => {
   const { confirm } = useConfirm();
@@ -37,6 +41,7 @@ const ReportListPage = () => {
   const [target, setTarget] = useState(null);
   const [targetLoading, setTargetLoading] = useState(false);
   const [targetError, setTargetError] = useState(false);
+  const [aiRunning, setAiRunning] = useState(false);
 
   const fetchData = useCallback(() => {
     setLoading(true);
@@ -52,9 +57,22 @@ const ReportListPage = () => {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  const handleRunAiTriage = async () => {
+    setAiRunning(true);
+    try {
+      const result = await postApi('/admin/reports/ai-triage/run', {});
+      toast.success(`AI 분석 완료: ${result.succeeded}건 성공, ${result.failed}건 실패`);
+      fetchData();
+    } catch {
+      toast.error('AI 분석 실행에 실패했습니다.');
+    } finally {
+      setAiRunning(false);
+    }
+  };
+
   const openReview = (report) => {
     setSelected(report);
-    setAction('DISMISS');
+    setAction(report.aiSuggestedAction && ALLOWED_ACTION_VALUES.has(report.aiSuggestedAction) ? report.aiSuggestedAction : 'DISMISS');
     setMemo('');
     setTarget(null);
     setTargetError(false);
@@ -119,18 +137,21 @@ const ReportListPage = () => {
           <option value="MEMBER">회원</option>
           <option value="SERIES">시리즈</option>
         </select>
+        <button className="btn-sm btn-outline" onClick={handleRunAiTriage} disabled={aiRunning}>
+          {aiRunning ? 'AI 분석 중...' : 'AI 분석 실행'}
+        </button>
       </div>
 
       <div className="table-card">
         <table className="data-table">
           <thead>
-            <tr><th>신고자</th><th>대상 유형</th><th>신고 사유</th><th>접수일</th><th>상태</th><th>처리</th></tr>
+            <tr><th>신고자</th><th>대상 유형</th><th>신고 사유</th><th>AI 심각도</th><th>접수일</th><th>상태</th><th>처리</th></tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan="6" className="loading-cell">로딩 중...</td></tr>
+              <tr><td colSpan="7" className="loading-cell">로딩 중...</td></tr>
             ) : data.content.length === 0 ? (
-              <tr><td colSpan="6" className="loading-cell">신고 내역이 없습니다.</td></tr>
+              <tr><td colSpan="7" className="loading-cell">신고 내역이 없습니다.</td></tr>
             ) : data.content.map(r => (
               <tr key={r.id} className={r.status === 'PENDING' ? 'row-pending' : ''}>
                 <td>{r.reporterName || '(탈퇴 회원)'}</td>
@@ -140,6 +161,13 @@ const ReportListPage = () => {
                   </button>
                 </td>
                 <td className="name-cell">{r.reason}</td>
+                <td>
+                  {r.aiSeverity ? (
+                    <span className={`badge ${SEVERITY_CLASSES[r.aiSeverity] || 'badge-gray'}`}>{SEVERITY_LABELS[r.aiSeverity] || r.aiSeverity}</span>
+                  ) : (
+                    <span className="ai-not-analyzed">—</span>
+                  )}
+                </td>
                 <td>{r.createdAt?.slice(0, 10)}</td>
                 <td><span className={`badge ${STATUS_CLASSES[r.status] || 'badge-gray'}`}>{STATUS_LABELS[r.status] || r.status}</span></td>
                 <td>
@@ -197,6 +225,17 @@ const ReportListPage = () => {
                 )
               ) : null}
             </div>
+            {selected.aiSummary && (
+              <div className="review-ai-block">
+                <div className="review-ai-header">
+                  <span className={`badge ${SEVERITY_CLASSES[selected.aiSeverity] || 'badge-gray'}`}>
+                    {SEVERITY_LABELS[selected.aiSeverity] || selected.aiSeverity}
+                  </span>
+                  <span className="review-ai-caption">AI 제안 · 참고용, 최종 판단은 관리자가 합니다</span>
+                </div>
+                <p className="review-ai-summary">{selected.aiSummary}</p>
+              </div>
+            )}
             <div className="review-info-grid">
               <div><span className="review-label">신고자</span><span className="review-val">{selected.reporterName} ({selected.reporterEmail})</span></div>
               <div><span className="review-label">신고 유형</span><span className="review-val">{selected.reason}</span></div>

@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
@@ -19,4 +21,8 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
                                Pageable pageable);
 
     long countByStatus(String status);
+
+    @Query("SELECT r FROM Report r WHERE r.status IN ('PENDING', 'IN_REVIEW') " +
+           "AND r.aiAnalyzedAt IS NULL ORDER BY r.createdAt ASC")
+    List<Report> findPendingWithoutAiTriage(Pageable pageable);
 }

@@ -87,3 +87,14 @@
 .review-target-skeleton-thumb { width: 56px; height: 56px; flex-shrink: 0; }
 .review-target-skeleton-lines { flex: 1; display: flex; flex-direction: column; gap: 6px; }
 .review-target-skeleton-line { height: 12px; }
+
+.ai-not-analyzed { color: var(--color-text-tertiary); }
+
+/* ── AI 트리아지 요약 블록 ── */
+.review-ai-block {
+  border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  background: var(--color-surface-2); padding: 12px 14px; margin-bottom: var(--space-4);
+}
+.review-ai-header { display: flex; align-items: center; gap: var(--space-2); margin-bottom: 6px; }
+.review-ai-caption { font-size: var(--text-xs); color: var(--color-text-tertiary); }
+.review-ai-summary { font-size: var(--text-sm); color: var(--color-text-primary); margin: 0; line-height: 1.5; }
