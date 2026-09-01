@@ -18,17 +18,17 @@ const ChangeIndicator = ({ change }) => {
   return <span className="kpi-change kpi-change--neutral"><Minus size={10} />0%</span>;
 };
 
-const KpiCard = ({ icon, label, value, color, to, progress, change }) => (
-  <Link to={to} className="dash-kpi-card" style={{ '--kpi-color': color }}>
+const KpiCard = ({ icon, label, value, tone, to, progress, change }) => (
+  <Link to={to} className={`dash-kpi-card dash-kpi-card--${tone}`}>
     <div className="dash-kpi-card-top">
-      <div className="dash-kpi-icon" style={{ background: color + '1A', color }}>{icon}</div>
+      <div className="dash-kpi-icon">{icon}</div>
       <ChangeIndicator change={change} />
     </div>
     <div className="dash-kpi-value">{value?.toLocaleString() ?? '-'}</div>
     <div className="dash-kpi-label">{label}</div>
     {progress != null && (
       <div className="kpi-progress-track">
-        <div className="kpi-progress-bar" style={{ width: `${Math.min(progress, 100)}%`, background: color }} />
+        <div className="kpi-progress-bar" style={{ width: `${Math.min(progress, 100)}%` }} />
       </div>
     )}
     <ArrowUpRight size={13} className="kpi-arrow" />
@@ -60,13 +60,13 @@ const DashboardPage = () => {
       <h1 className="page-title">대시보드</h1>
 
       <div className="kpi-grid">
-        <KpiCard icon="👥" label="전체 회원"     value={summary?.totalMembers}    color="#C7361B" to="/members" />
-        <KpiCard icon="📷" label="전체 사진"     value={summary?.totalPhotos}     color="#3F8A57" to="/photos" />
-        <KpiCard icon="📬" label="오늘 신규 문의" value={summary?.todayInquiries}  color="#B8791E" to="/inquiries" />
-        <KpiCard icon="🔔" label="미읽음 문의"   value={summary?.unreadInquiries} color="#A82530" to="/inquiries" />
-        <KpiCard icon="📅" label="오늘 예약"     value={summary?.todayBookings}   color="#2F7A8C" to="/bookings" />
-        <KpiCard icon="⏳" label="미확정 예약"   value={summary?.pendingBookings} color="#6A5B8C" to="/bookings" />
-        <KpiCard icon="📋" label="심사 대기 포트폴리오" value={summary?.pendingPortfolios} color="#7A5C1E" to="/portfolios?status=PENDING" />
+        <KpiCard icon="👥" label="전체 회원"     value={summary?.totalMembers}    tone="brand" to="/members" />
+        <KpiCard icon="📷" label="전체 사진"     value={summary?.totalPhotos}     tone="accent" to="/photos" />
+        <KpiCard icon="📬" label="오늘 신규 문의" value={summary?.todayInquiries}  tone="info" to="/inquiries" />
+        <KpiCard icon="🔔" label="미읽음 문의"   value={summary?.unreadInquiries} tone="danger" to="/inquiries" />
+        <KpiCard icon="📅" label="오늘 예약"     value={summary?.todayBookings}   tone="info" to="/bookings" />
+        <KpiCard icon="⏳" label="미확정 예약"   value={summary?.pendingBookings} tone="warning" to="/bookings" />
+        <KpiCard icon="📋" label="심사 대기 포트폴리오" value={summary?.pendingPortfolios} tone="warning" to="/portfolios?status=PENDING" />
       </div>
 
       <div className="dashboard-grid">
