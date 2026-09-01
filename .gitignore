@@ -33,3 +33,6 @@ logs/
 
 # QA
 qa-output/
+
+# Claude Code hook local state
+.claude/.page-change-notify-marker
