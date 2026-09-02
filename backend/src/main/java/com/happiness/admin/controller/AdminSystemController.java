@@ -6,6 +6,7 @@ import com.happiness.admin.dto.PageResponse;
 import com.happiness.admin.dto.SystemStatusDto;
 import com.happiness.admin.entity.AdminActivityLog;
 import com.happiness.admin.repository.AdminActivityLogRepository;
+import com.happiness.admin.service.GeminiClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -28,6 +29,7 @@ public class AdminSystemController {
 
     private final Environment env;
     private final AdminActivityLogRepository activityLogRepository;
+    private final GeminiClientService geminiClientService;
 
     @Value("${spring.mail.host:}")
     private String mailHost;
@@ -50,7 +52,20 @@ public class AdminSystemController {
                 .rateLimitRefillSeconds("1")
                 .dbType(dbType)
                 .activeProfile(activeProfile)
+                .geminiConfigured(geminiClientService.isConfigured())
+                .geminiModel(geminiClientService.getModel())
                 .build());
+    }
+
+    @PostMapping("/gemini-test")
+    public ResponseEntity<?> geminiTest(@RequestBody Map<String, String> body) {
+        String prompt = body.getOrDefault("prompt", "안녕이라고 한국어로만 짧게 답해줘.");
+        try {
+            String text = geminiClientService.generateText(prompt);
+            return ResponseEntity.ok(Map.of("prompt", prompt, "response", text));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(502).body(Map.of("error", e.getMessage()));
+        }
     }
 
     @GetMapping("/activity-logs")
