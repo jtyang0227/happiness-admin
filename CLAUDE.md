@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Happiness Admin is a full-stack admin dashboard with a **Spring Boot backend** (port 8081) and a **React frontend** (port 3001). The backend uses H2 in-memory database for development.
+Happiness Admin is a full-stack admin dashboard with a **Spring Boot backend** (port 8081) and a **React frontend** (port 3000, CRA default — no `PORT` override in `package.json`). The backend uses H2 in-memory database for development.
 
 ## Commands
 
@@ -38,7 +38,7 @@ cd backend
 cd frontend
 
 npm install          # Install dependencies
-npm start            # Dev server (port 3001)
+npm start            # Dev server (port 3000)
 npm run build        # Production build
 npm test             # Run tests
 npx eslint src/      # Lint
@@ -51,7 +51,7 @@ npx eslint src/ --fix  # Auto-fix lint
 
 Standard layered Spring Boot architecture:
 
-- **`controller/`** — REST endpoints. Auth: `AuthController` (`/api/auth/login` → JWT 발급). Admin (모두 `/api/admin/**`):
+- **`controller/`** — REST endpoints. Auth: `AuthController`/`AdminAuthController` (`/api/auth/login` → JWT 발급). Admin (모두 `/api/admin/**`, `ROLE_WM`/`ROLE_SA` 필요):
   - `AdminStatsController` — 대시보드 통계
   - `AdminMemberController` — 회원 목록/상세/역할 변경/상태 변경(정지·해제)/삭제
   - `AdminPhotoController` — 사진 목록/삭제/카테고리코드 수정
@@ -60,10 +60,20 @@ Standard layered Spring Boot architecture:
   - `AdminPortfolioController` — 포트폴리오 목록/승인/반려/비공개/삭제
   - `AdminCategoryController` — 사진 카테고리 트리 조회
   - `AdminSortController` — 정렬 관리 (`GET/PUT /sort/photos`, `/sort/series`, `/sort/series/:id/photos`, `/sort/portfolios/:id/items`)
-  - `AdminSystemController` — 시스템 상태
-- **`service/`** — `AuthService`, `MemberService`, `AdminStatsService`, `AdminMemberService`, `AdminPhotoService`, `AdminInquiryService`, `AdminSeriesService`, `AdminPortfolioService`, `AdminCategoryService`, `AdminSortService`.
-- **`repository/`** — Spring Data JPA: `MemberRepository`, `PhotoRepository`, `InquiryRepository`, `SeriesRepository`, `SeriesPhotoRepository`, `PortfolioRepository`, `PortfolioItemRepository`, `PhotoCategoryRepository`, `BoardRepository`, `ContentRepository`.
-- **`entity/`** — `Member` (suspendReason·suspendUntil·isVerified 포함), `Photo` (displayOrder), `Inquiry`, `Series` (displayOrder), `SeriesPhoto` (displayOrder), `Portfolio`, `PortfolioItem` (displayOrder), `PhotoCategory`, `Authority` (WM/SA/US), `MemberStatus`, `PortfolioStatus`, `PortfolioVisibility`.
+  - `AdminSystemController` — 시스템 상태, 활동 로그/히트맵, Gemini 연동 상태·테스트(`/gemini-test`)
+  - `AdminReportController` — 신고 목록/상세/처리, AI 트리아지 실행(`/ai-triage/run`, §AI 연동 참고)
+  - `AdminNoticeController` — 공지사항 CRUD(임시저장/발행/종료)
+  - `AdminBannerController` — 배너 관리
+  - `AdminPopupController`/`PopupApiController` — 관리자용 팝업 CRUD·정렬 / 앱 노출용 활성 팝업 조회
+  - `AdminFeaturedController` — 피처드 항목 관리
+  - `AdminVerificationController` — 작가 인증 신청 검토
+  - `AdminBookingController` — 촬영 예약 관리
+  - `AdminContentPolicyController` — 정렬 가중치·유지보수 모드 설정
+  - `AdminHelloController` — 헬스체크용 샘플 엔드포인트
+- **`service/`** — `AuthService`, `MemberService`, `AdminStatsService`, `AdminMemberService`, `AdminPhotoService`, `AdminInquiryService`, `AdminSeriesService`, `AdminPortfolioService`, `AdminCategoryService`, `AdminSortService`, `AdminReportService`, `AdminReportAiTriageService`+`ReportAiTriageWriter`(§AI 연동), `AdminNoticeService`, `AdminBannerService`, `AdminPopupService`, `AdminFeaturedService`, `AdminVerificationService`, `AdminBookingService`, `AdminContentPolicyService`, `GeminiClientService`(§AI 연동).
+- **`repository/`** — Spring Data JPA: `MemberRepository`, `PhotoRepository`, `InquiryRepository`, `SeriesRepository`, `SeriesPhotoRepository`, `PortfolioRepository`, `PortfolioItemRepository`, `PhotoCategoryRepository`, `ReportRepository`, `NoticeRepository`, `BannerRepository`, `PopupRepository`, `FeaturedItemRepository`, `VerificationRequestRepository`, `BookingRepository`, `SystemConfigRepository`, `AdminActivityLogRepository`.
+  **주의**: `BoardRepository`/`ContentRepository`(및 `Board`/`Content` 엔티티)는 어떤 컨트롤러·서비스에서도 참조되지 않는 죽은 코드다 — 실제 게시판 기능은 없다(확인 필요 시 grep으로 재검증할 것, 새 기능을 여기 얹지 말 것).
+- **`entity/`** — `Member` (suspendReason·suspendUntil·isVerified 포함), `Photo` (displayOrder), `Inquiry`(+`InquiryProcessStatus`), `Series` (displayOrder), `SeriesPhoto` (displayOrder), `Portfolio`, `PortfolioItem` (displayOrder), `PhotoCategory`, `Report`(aiSummary·aiSeverity·aiSuggestedAction·aiAnalyzedAt 포함, §AI 연동), `Notice`, `Banner`, `Popup`, `FeaturedItem`, `VerificationRequest`, `Booking`(+`BookingStatus`), `SystemConfig`, `AdminActivityLog`, `Authority` (WM/SA/US), `MemberStatus`, `PortfolioStatus`, `PortfolioVisibility`.
 - **`security/`** — `JwtTokenProvider`, `JwtAuthenticationFilter` (Bearer 토큰 검증). 모든 `/api/admin/**`는 `ROLE_WM` 또는 `ROLE_SA` 필요.
 - **`dto/`** — `LoginResponse`, `PageResponse<T>`, `AdminMemberDto` (portfolioCount 포함), `AdminPhotoDto`, `AdminInquiryDto`, `AdminSeriesDto`, `AdminPortfolioDto`, `StatsSummaryDto`, `DailyStatDto`, `TopPhotoDto`, `DistItemDto`, `SystemStatusDto`, `RoleUpdateRequest`, `StatusUpdateRequest`, `CategoryDto`, `ReorderItem`, `SortPhotoDto`, `SortSeriesDto`, `SortSeriesPhotoDto`, `SortPortfolioItemDto`.
 - **`DataInitializer`** — `@Profile("!prod")`: 서버 기동 시 H2에 테스트 데이터 자동 삽입 (관리자 2명, 회원 10명, 사진 30장·displayOrder 1–30, 문의 15건, 시리즈 8개·displayOrder 1–8, 포트폴리오 6개). **개발 계정: `admin@happiness.dev` / `Admin123!`**
@@ -81,12 +91,12 @@ React SPA using React Router v6 + Recharts:
 - **`context/AuthContext.jsx`** — JWT 저장/조회/삭제, `useAuth()` 훅 제공
 - **`context/ConfirmContext.jsx`** — 전역 확인 다이얼로그, `useConfirm()` 훅 제공
 - **`pages/`** —
-  - `LoginPage` — JWT 로그인
-  - `DashboardPage` — 요약 카드 + 바 차트
+  - `LoginPage` — JWT 로그인 (앱 전체 다크모드와 무관하게 항상 라이트 고정)
+  - `DashboardPage` — KPI 카드(brand/accent/info/warning/danger 토큰) + 심사 대기 포트폴리오 + 활동 피드 + 예약 캘린더
   - `MemberListPage` — 회원 목록/검색/상태 필터/역할 변경/정지/삭제
   - `MemberDetailPage` — 회원 상세·KPI·탭(사진·시리즈·문의)·정지 모달
   - `PhotoListPage` — 사진 목록/필터/삭제
-  - `InquiryListPage` — 문의 목록/읽음 처리
+  - `InquiryListPage` — 문의 목록/읽음 처리/처리상태 관리
   - `SeriesListPage` — 시리즈 목록/삭제/사진 정렬 링크
   - `PortfolioListPage` — 포트폴리오 목록/슬라이드오버 심사·승인·반려/아이템 정렬 링크
   - `SortPhotosPage` (`/sort/photos`) — 전체 사진 드래그 정렬
@@ -94,12 +104,44 @@ React SPA using React Router v6 + Recharts:
   - `SortSeriesDetailPage` (`/sort/series/:id`) — 시리즈별 사진 순서 정렬
   - `SortPortfolioPage` (`/sort/portfolios/:id`) — 포트폴리오별 아이템 순서 정렬
   - `StatsPage` — 꺾은선/파이/바 차트
-  - `SystemPage` — 시스템 상태
-- **`components/layout/`** — `Sidebar` (정렬 관리 아코디언 포함), `AdminLayout`, `AdminHeader`
+  - `SystemPage` — 시스템 상태, 활동 히트맵·로그, Gemini 연동 테스트(§AI 연동)
+  - `ReportListPage` — 신고 목록/검토 모달, AI 트리아지 요약·심각도 배지(§AI 연동)
+  - `NoticePage` (`/notices`) — 공지사항 게시판 CRUD(임시저장/발행/종료, 상단 고정)
+  - `BannerPage` (`/banners`) — 배너 관리
+  - `PopupPage` (`/popups`) — 팝업 관리·정렬
+  - `FeaturedPage` (`/featured`) — 피처드 항목 관리
+  - `VerificationListPage` (`/verifications`) — 작가 인증 신청 검토
+  - `BookingListPage` (`/bookings`) — 촬영 예약 관리
+  - `ContentPolicyPage` (`/content-policy`) — 정렬 가중치·유지보수 모드 설정
+- **`components/layout/`** — `Sidebar` (정렬 관리 아코디언 포함), `AdminLayout`, `AdminTopbar` (검색바·다크모드 토글·프로필 드롭다운 — `AdminHeader`는 더 이상 존재하지 않는다, Toss 리뉴얼 때 교체됨)
 - **`components/common/`** — `Pagination`, `ConfirmDialog`, `SlideOver`, `ImgWithFallback`
 - **`hooks/useDragSort.js`** — HTML5 DnD 기반 정렬 훅. `toReorderPayload()` 로 `[{id, displayOrder}]` 생성
-- **`utils/api.js`** — `getApi`, `postApi`, `patchApi`, `putApi`, `deleteApi` (localStorage JWT 자동 첨부, 401 시 `/login` 리다이렉트)
+- **`utils/api.js`** — `getApi`, `postApi`, `patchApi`, `putApi`, `deleteApi`. **토큰이 실려 있던 요청**의 401만 세션 만료로 간주해 `/login` 강제 리다이렉트한다 — 토큰 없이 보낸 요청(로그인 자체 등)의 401은 그 자체가 인증 실패 응답이라 일반 에러로 넘긴다. 이전에는 이 구분이 없어서 로그인 실패 메시지가 아예 안 뜨는 버그가 있었다(수정됨).
 - **`App.jsx`** — `ProtectedRoute` 래퍼: 미인증 시 `/login`으로 리다이렉트
+
+## AI 연동
+
+두 개의 독립된 LLM 연동이 있다 — 서로 대체 관계가 아니라 용도가 다르다.
+
+| | Claude API | Gemini API |
+|---|---|---|
+| **용도** | 신고 트리아지(`AdminReportAiTriageService`) — 신고 요약·심각도·참고용 조치 제안 | 범용 텍스트 생성(`GeminiClientService.generateText(prompt)`) — 특정 기능에 종속 안 됨 |
+| **env var** | `ANTHROPIC_API_KEY` | `GEMINI_API_KEY` (모델은 `GEMINI_MODEL`, 기본 `gemini-3.6-flash`) |
+| **호출 시점** | 관리자가 신고 목록에서 "AI 분석 실행" 클릭 시 온디맨드(최대 20건, 미분석 건만) | 호출하는 기능이 필요할 때마다(현재는 `/system` 페이지 테스트 버튼만 실사용) |
+| **키 없을 때** | 서버 기동 실패 안 함, 호출 시점에만 실패 | 동일 |
+
+**AI-사람 경계선(신고 트리아지)**: AI는 요약·심각도·참고용 조치까지만 하고, 실제 상태 전환(`AdminReportController`의 `/process`)은 항상 관리자가 검토 모달에서 직접 클릭해야만 실행된다 — AI 호출 경로와 실제 조치 실행 경로는 완전히 분리돼 있다. 배경/설계 근거는 `docs/planning/AX_REPORT_TRIAGE_PLAN.md` 참고.
+
+두 클라이언트 모두 새 라이브러리를 추가하지 않았다 — Claude는 공식 Java SDK(`anthropic-java`), Gemini는 JDK 내장 `java.net.http.HttpClient` + 기존 Jackson으로 직접 REST 호출.
+
+## 자동화 · MCP · 스킬
+
+- **`happiness-admin-mcp-server/`** — Node/TypeScript MCP 서버(stdio). 읽기 전용 도구(`happiness_admin_get_dashboard_summary`, `_list_reports`, `_list_members`) + AI 트리아지 트리거(`_run_report_ai_triage`)만 제공한다 — 회원 정지·삭제 같은 조치성 API는 의도적으로 노출하지 않음(실제 조치는 항상 Admin UI에서 사람이). `HAPPINESS_ADMIN_EMAIL`/`_PASSWORD`로 백엔드에 로그인해 JWT를 내부적으로 관리한다. 상세: `happiness-admin-mcp-server/README.md`.
+- **`.claude/hooks/notify-page-change.sh`** (Stop 훅) — `frontend/src/pages/**/*.jsx|css`가 바뀐 채로 턴이 끝나면 멈추지 않고 "agent-browser로 스크린샷 찍고 Gmail로 알려라"는 지시를 다시 넣는다. 같은 미완료 변경은 diff 해시 마커(`.claude/.page-change-notify-marker`, gitignore 처리)로 중복 알림 방지.
+- **`scripts/qa-check.sh`** — agent-browser로 로그인 후 전체 라우트를 순회하며 콘솔 에러·5xx·스크린샷을 점검. 새 라우트를 추가하면 이 스크립트의 `ROUTES` 배열도 수동으로 같이 갱신해야 한다(자동 동기화 안 됨).
+- **`scripts/notion-screens-capture.sh`** — 전체 화면 스크린샷을 찍어 Notion 문서화용으로 캡처(`docs/screens/`에 512px 썸네일 커밋 후 raw.githubusercontent.com URL을 Notion 페이지 커버로 사용 — Notion 파일 업로드 API가 이 샌드박스 네트워크 정책상 막혀 있을 때 쓴 우회로).
+- **`.claude/skills/`** — 프로젝트 전용(`design`, `grill-me`, `qa-admin-routes`) + 외부에서 설치한 것(`agent-browser`, `find-skills`, `mcp-builder`, `design-taste-frontend`, `web-design-guidelines`). `design`은 Working Rule 5에 따라 모든 UI 작업에 필수, `design-taste-frontend`는 랜딩/포트폴리오형 화면에만 선별 적용(대시보드류엔 스킬 자체가 안 맞는다고 명시함).
+- **`claude-md-management` 플러그인**(user scope, `~/.claude/settings.json`) — `claude-md-improver` 스킬로 이 파일을 주기적으로 감사할 수 있다.
 
 ## Design System
 
@@ -178,7 +220,9 @@ AKIRA의 각진 프레임·하드 오프셋 섀도우·네온 포인트·CRT 텍
 ### Design Files
 
 - `docs/design/TOSS_DESIGN_SPEC.md` — **현재(6차) 디자인 구현 기록** (팔레트·컴포넌트·적용 범위)
-- `docs/planning/APP_TO_ADMIN_SPEC.md` — happiness-app에서 admin으로 이식할 기능 명세
+- `docs/planning/APP_TO_ADMIN_SPEC.md` — happiness-app에서 admin으로 이식할 기능 명세. **주의: 이 문서(2026-06-23자)는 이미 낡았다** — "신고/제재 미구현(P2)"라고 적혀 있지만 실제로는 `AdminReportController`/`ReportListPage`가 완전히 구현돼 있고 AI 트리아지까지 붙어 있다(§AI 연동). 이 문서의 구현 여부 표시를 그대로 믿지 말고 코드로 재확인할 것.
+- `docs/planning/AX_REPORT_TRIAGE_PLAN.md` — 신고 트리아지 AI 어시스트 기획(위 AI 연동 섹션의 설계 근거)
+- 그 외 `docs/planning/*.md` — 기능별 기획서 다수(배치 로직, 대시보드/통계 역할 재정의 등). 새 기획 작업 전에 관련 파일이 이미 있는지 먼저 확인할 것.
 
 ### Design Rules
 
@@ -222,6 +266,10 @@ AKIRA의 각진 프레임·하드 오프셋 섀도우·네온 포인트·CRT 텍
 | 트리거 | `push` → main, develop, `claude/**` / `pull_request` → main, develop |
 | Backend 빌드 | Java 21 (Temurin) + Gradle 8.14.4 → `cd backend && ./gradlew build` |
 | Frontend 빌드 | Node.js 20 → `npm ci` + `npm run build` |
+
+### 배포 파이프라인 (`.github/workflows/deploy.yml`)
+
+`master` 브랜치 push/PR에서만 동작 — ci.yml과 별개 워크플로. 백엔드는 Railway(Docker 이미지 빌드+push 후 배포, `RAILWAY_TOKEN` 필수, `RAILWAY_PROJECT_ID` 설정 시 happiness-app과 같은 프로젝트에 묶어 비용 절감), 프론트는 Vercel로 배포한다. `claude/**` 브랜치에서는 배포되지 않는다 — CI(ci.yml)만 돈다.
 
 **환경 변수**
 
