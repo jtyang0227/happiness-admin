@@ -33,6 +33,7 @@ logs/
 
 # QA
 qa-output/
+notion-screens/
 
 # Claude Code hook local state
 .claude/.page-change-notify-marker
