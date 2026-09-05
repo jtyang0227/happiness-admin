@@ -2,7 +2,6 @@ package com.happiness.admin.service;
 
 import com.happiness.admin.dto.AdminPhotoDto;
 import com.happiness.admin.dto.PageResponse;
-import com.happiness.admin.dto.ReorderRequest;
 import com.happiness.admin.entity.Photo;
 import com.happiness.admin.repository.PhotoRepository;
 import com.happiness.admin.repository.SeriesPhotoRepository;
@@ -12,7 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -61,6 +59,12 @@ public class AdminPhotoService {
                         .map(AdminPhotoDto::from));
     }
 
+    public AdminPhotoDto getPhoto(Long id) {
+        Photo photo = photoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("사진을 찾을 수 없습니다."));
+        return AdminPhotoDto.from(photo);
+    }
+
     @Transactional
     public void deletePhoto(Long id) {
         Photo photo = photoRepository.findById(id)
@@ -75,17 +79,6 @@ public class AdminPhotoService {
                 .orElseThrow(() -> new IllegalArgumentException("사진을 찾을 수 없습니다."));
         photo.setCategoryCode(categoryCode);
         return AdminPhotoDto.from(photoRepository.save(photo));
-    }
-
-    @Transactional
-    public int reorderPhotos(List<ReorderRequest> items) {
-        for (ReorderRequest item : items) {
-            Photo photo = photoRepository.findById(item.id())
-                    .orElseThrow(() -> new IllegalArgumentException("사진을 찾을 수 없습니다: " + item.id()));
-            photo.setDisplayOrder(item.displayOrder());
-            photoRepository.save(photo);
-        }
-        return items.size();
     }
 
     private String blank(String s) { return (s != null && !s.isBlank()) ? s.trim() : null; }

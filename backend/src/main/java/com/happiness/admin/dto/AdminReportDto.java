@@ -19,6 +19,10 @@ public class AdminReportDto {
     private String processMemo;
     private LocalDateTime processedAt;
     private LocalDateTime createdAt;
+    private String aiSummary;
+    private String aiSeverity;
+    private String aiSuggestedAction;
+    private LocalDateTime aiAnalyzedAt;
 
     public static AdminReportDto from(Report r) {
         return AdminReportDto.builder()
@@ -34,6 +38,10 @@ public class AdminReportDto {
                 .processMemo(r.getProcessMemo())
                 .processedAt(r.getProcessedAt())
                 .createdAt(r.getCreatedAt())
+                .aiSummary(r.getAiSummary())
+                .aiSeverity(r.getAiSeverity())
+                .aiSuggestedAction(r.getAiSuggestedAction())
+                .aiAnalyzedAt(r.getAiAnalyzedAt())
                 .build();
     }
 }

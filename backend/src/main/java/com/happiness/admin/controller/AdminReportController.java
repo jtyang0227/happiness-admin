@@ -1,6 +1,7 @@
 package com.happiness.admin.controller;
 
 import com.happiness.admin.dto.ReportProcessRequest;
+import com.happiness.admin.service.AdminReportAiTriageService;
 import com.happiness.admin.service.AdminReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class AdminReportController {
 
     private final AdminReportService reportService;
+    private final AdminReportAiTriageService reportAiTriageService;
 
     @GetMapping
     public ResponseEntity<?> list(
@@ -35,5 +37,10 @@ public class AdminReportController {
     @PostMapping("/{id}/process")
     public ResponseEntity<?> process(@PathVariable Long id, @RequestBody ReportProcessRequest req) {
         return ResponseEntity.ok(reportService.process(id, req));
+    }
+
+    @PostMapping("/ai-triage/run")
+    public ResponseEntity<?> runAiTriage(@RequestParam(defaultValue = "20") int limit) {
+        return ResponseEntity.ok(reportAiTriageService.runBatch(limit));
     }
 }

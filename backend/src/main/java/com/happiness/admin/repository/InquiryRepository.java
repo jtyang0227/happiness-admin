@@ -1,6 +1,7 @@
 package com.happiness.admin.repository;
 
 import com.happiness.admin.entity.Inquiry;
+import com.happiness.admin.entity.InquiryProcessStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,11 +19,13 @@ public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
            "(:senderId IS NULL OR i.sender.id = :senderId) AND " +
            "(:receiverId IS NULL OR i.receiver.id = :receiverId) AND " +
            "(:isRead IS NULL OR i.isRead = :isRead) AND " +
-           "(:shootType IS NULL OR i.shootType = :shootType)")
+           "(:shootType IS NULL OR i.shootType = :shootType) AND " +
+           "(:processStatus IS NULL OR i.processStatus = :processStatus)")
     Page<Inquiry> searchInquiries(@Param("senderId") Long senderId,
                                   @Param("receiverId") Long receiverId,
                                   @Param("isRead") Boolean isRead,
                                   @Param("shootType") String shootType,
+                                  @Param("processStatus") InquiryProcessStatus processStatus,
                                   Pageable pageable);
 
     long countByIsReadFalse();

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Sparkles } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { postApi } from '../utils/api';
+import logo from '../assets/logo.png';
 import './LoginPage.css';
 
 const LoginPage = () => {
@@ -32,8 +33,8 @@ const LoginPage = () => {
   return (
     <div className="login-page">
       <div className="login-card">
-        <div className="login-logo"><Sparkles size={28} /></div>
-        <h1 className="login-title">Happiness Admin</h1>
+        <div className="login-logo"><img src={logo} alt="hapis" className="login-logo-img" /></div>
+        <h1 className="sr-only">hapis Admin</h1>
         <p className="login-subtitle">관리자 계정으로 로그인하세요</p>
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">

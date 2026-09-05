@@ -93,29 +93,26 @@ npm start   # http://localhost:3001
 
 ## 디자인 시스템
 
-**Cosmos × Pinterest 퓨전 디자인** — CSS 변수 단일 인터페이스로 라이트/다크 자동 전환.
+**Toss** — 흰 캔버스 위 파랑 하나, CSS 변수 단일 인터페이스로 라이트/다크 자동 전환.
 
-- 라이트: Pin Red (#E60023), 크림 배경 (#FAFAF8), column-count 마소니
-- 다크: Pure Black (#000000), Cosmos DNA, 슬라이딩 언더라인 탭
-- 폰트: Pretendard Variable (CDN)
+- 브랜드: 파랑(#3182F6 라이트 / #4C8FFF 다크), sky 보조 액센트(#0EA5E9 / #38BDF8 다크)
+- 둥근 모서리(`--radius-sm` 8px ~ `--radius-2xl` 24px), 소프트 엘리베이션 섀도우, 라이트/다크 모두 옅은 회색 보더 유지(반전 없음)
+- 폰트: Pretendard 단일 체계(전용 디스플레이 서체 없음)
 
-자세한 내용: `COSMOS_DESIGN_SPEC.md`, `PINTEREST_DESIGN_SPEC.md`, `CLAUDE_DESIGN_PROMPTS.md`
+자세한 내용: `docs/design/TOSS_DESIGN_SPEC.md`
 
 ## 기획 문서 목록
 
 | 파일 | 내용 |
 |------|------|
-| `ADMIN_PLAN.md` | 초기 7개 페이지 구현 기획 (v1.0, 완료) |
-| `PRODUCT_SPEC.md` | 서비스 전체 기획 (앱↔Admin 역할 정의) |
-| `APP_ADMIN_SPEC.md` | 앱 연동 통합 기획 + P0-P3 로드맵 |
-| `APP_TO_ADMIN_SPEC.md` | happiness-app 기능 이식 상세 기획 |
-| `DESIGN_ROADMAP.md` | UI 리팩토링 Phase 0-10 로드맵 |
-| `DESIGN_SPEC.md` | UI/UX 디자인 시스템 명세 |
-| `PINTEREST_DESIGN_SPEC.md` | Pinterest 컨셉 디자인 명세 |
-| `COSMOS_DESIGN_SPEC.md` | Cosmos × Pinterest 퓨전 명세 |
-| `CLAUDE_DESIGN_PROMPTS.md` | Claude Code UI 요청 프롬프트 라이브러리 |
-| `PHOTO_SEARCH_SPEC.md` | 사진 5단계 카테고리 & 검색 기획 |
-| `PORTFOLIO_DESIGN_SPEC.md` | 포트폴리오 디자인 명세 |
+| `docs/planning/ADMIN_PLAN.md` | 초기 7개 페이지 구현 기획 (v1.0, 완료) |
+| `docs/planning/PRODUCT_SPEC.md` | 서비스 전체 기획 (앱↔Admin 역할 정의) |
+| `docs/planning/APP_ADMIN_SPEC.md` | 앱 연동 통합 기획 + P0-P3 로드맵 |
+| `docs/planning/APP_TO_ADMIN_SPEC.md` | happiness-app 기능 이식 상세 기획 |
+| `docs/planning/PHOTO_SEARCH_SPEC.md` | 사진 5단계 카테고리 & 검색 기획 |
+| `docs/planning/UI_IMPROVEMENT_PLAN.md` | UI/UX 개선 기획서 |
+| `docs/planning/UI_IMPROVEMENT_DESIGN.md` | UI/UX 개선 설계서 |
+| `docs/design/TOSS_DESIGN_SPEC.md` | 현재 디자인 시스템 구현 기록 |
 | `CLAUDE_HARNESS_GUIDE.md` | Claude Code 활용 가이드 |
 
 ---

@@ -57,7 +57,7 @@ npm run build                  # 프로덕션 빌드
 |---|---|---|
 | `/` | 대시보드 (요약 카드 + 차트) | ✅ |
 | `/members` | 회원 목록 (SuspendModal·avatar·IntersectionObserver) | ✅ |
-| `/members/:id` | 회원 상세 (KPI·슬라이딩 탭·Cosmos×Pinterest 디자인) | ✅ |
+| `/members/:id` | 회원 상세 (KPI·슬라이딩 탭·포트폴리오 탭) | ✅ |
 | `/photos` | 사진 목록 (5단계 카테고리 필터·마소니 그리드) | ✅ |
 | `/portfolios` | 포트폴리오 (SlideOver 심사·아이템 정렬 링크) | ✅ |
 | `/series` | 시리즈 목록 | ✅ |
@@ -66,8 +66,9 @@ npm run build                  # 프로덕션 빌드
 | `/reports` | 신고 관리 | ✅ |
 | `/notices` | 공지사항 | ✅ |
 | `/banners` | 배너 관리 | ✅ |
+| `/popups` | 팝업 관리 | ✅ |
 | `/verifications` | 작가 인증 | ✅ |
-| `/gallery-order` | 갤러리 순서 | ✅ |
+| `/bookings` | 예약 관리 | ✅ |
 | `/featured` | 피처드 | ✅ |
 | `/content-policy` | 콘텐츠 정책 | ✅ |
 | `/system` | 시스템 상태 | ✅ |
@@ -100,7 +101,6 @@ npm run build                  # 프로덕션 빌드
 | `GET /api/admin/photos` | 사진 목록 (memberId·colorMood·l1~l5·search·sortBy) |
 | `DELETE /api/admin/photos/:id` | 사진 삭제 |
 | `PATCH /api/admin/photos/:id/category-code` | 카테고리 코드 수정 |
-| `PUT /api/admin/photos/reorder` | 사진 순서 저장 |
 
 ### 포트폴리오
 | 경로 | 역할 |
@@ -123,7 +123,7 @@ npm run build                  # 프로덕션 빌드
 ### 정렬
 | 경로 | 역할 |
 |---|---|
-| `GET/PUT /api/admin/sort/photos` | 전체 사진 정렬 |
+| `GET/PUT /api/admin/sort/photos` | 사진 정렬 (전체 또는 `?memberId=`로 작가별 범위) — 사진 순서 저장은 이 엔드포인트로 통일(작가별로 저장해도 전역 displayOrder 값 재사용, 다른 작가 순서 불변) |
 | `GET/PUT /api/admin/sort/series` | 전체 시리즈 정렬 |
 | `GET/PUT /api/admin/sort/series/:id/photos` | 시리즈별 사진 정렬 |
 | `GET/PUT /api/admin/sort/portfolios/:id/items` | 포트폴리오 아이템 정렬 |
@@ -158,18 +158,23 @@ PATCH /api/admin/members/:id/status
 
 ## 디자인 시스템 핵심 규칙
 
+현재(6차) 컨셉: **Toss** — 흰 캔버스 + 파랑 하나, 둥근 모서리와 소프트 섀도우.
+상세: `docs/design/TOSS_DESIGN_SPEC.md`.
+
 - 색상은 반드시 `var(--color-*)` CSS 변수만 사용 (하드코딩 금지)
-- 다크모드 자동 지원 — CSS 변수 시스템으로 처리
+- 다크모드 자동 지원 — CSS 변수 시스템으로 처리 (라이트/다크 모두 옅은 회색 보더 유지, 반전 없음)
+- 둥근 모서리 사용 — `var(--radius-*)` 사용, `0`으로 하드코딩 금지
 - 이미지는 `onLoad` 시 `filter: blur(4px) → blur(0)` blur reveal 적용
 - 마소니 레이아웃: CSS `column-count` 방식만 사용 (Masonry.js 금지)
 - 카드 진입 애니메이션: `IntersectionObserver` + fade + slide up
-- 폰트: Pretendard Variable (CDN)
+- 폰트: Pretendard 단일 체계 (`--font-pixel`/`--font-serif`는 `--font-sans` 별칭, 전용 디스플레이 서체 없음)
+- 로고: `frontend/src/assets/logo.png`(투명 배경, 검정 글자) — 다크 사이드바 위에서는 `filter: invert(1)`로 반전(사이드바는 테마 무관 항상 다크)
 
 ### 브랜드 색상
-| 모드 | brand | bg | surface |
-|---|---|---|---|
-| Light | `#E60023` (Pin Red) | `#FAFAF8` | `#FFFFFF` |
-| Dark | `#FF4455` | `#000000` | `#111111` |
+| 모드 | brand | accent(sky) | bg | surface |
+|---|---|---|---|---|
+| Light | `#3182F6` | `#0EA5E9` | `#F2F4F6` | `#FFFFFF` |
+| Dark | `#4C8FFF` | `#38BDF8` | `#14181D` | `#1B2027` |
 
 ---
 
@@ -196,12 +201,12 @@ PATCH /api/admin/members/:id/status
 
 ---
 
-## MemberDetailPage 디자인 (Cosmos × Pinterest)
+## MemberDetailPage 디자인
 
 - **히어로 카드**: 컬러 아바타 + 상태 링 + 인증 배지 + 정지 배너
 - **KPI 그리드**: 사진·시리즈·문의·포트폴리오 — IntersectionObserver fade+slide
 - **슬라이딩 탭**: `.mdp-tab-indicator` JS로 offsetLeft/offsetWidth 측정
-- **탭 구성**: 활동 요약 / 사진 / 시리즈 / 문의
+- **탭 구성**: 활동 요약 / 사진 / 시리즈 / 포트폴리오 / 문의
 - **CSS prefix**: `.mdp-*` 전용 네임스페이스
 
 ---

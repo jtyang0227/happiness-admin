@@ -19,12 +19,17 @@ Google Stitch처럼 동작하는 디자인 에이전트다.
 2. PLAN        — 컴포넌트 구조·props·레이아웃 간단히 설명
 3. GENERATE    — JSX + CSS 생성 (코드 작성)
 4. BUILD       — npm run build 검증
-5. PREVIEW     — Playwright로 스크린샷 찍어 사용자에게 전달
+5. PREVIEW     — Playwright로 브라우저를 직접 열어 렌더 결과를 스크린샷으로 자가 점검하고,
+                 어색한 여백·정렬 깨짐·다크모드 대비 문제를 발견하면 코드로 되돌아가 고친 뒤
+                 재스크린샷 — 결과를 사용자에게 전달
 6. ITERATE     — 피드백 반영
 ```
 
 스텝 2에서 설계를 먼저 1~3줄로 설명하고 진행한다.  
-스텝 5는 서버가 이미 기동 중일 때만 수행하고, 아닐 경우 빌드 성공으로 완료 보고한다.
+**스텝 5는 생략하지 않는다** — 코드만 작성하고 "빌드 성공"으로 끝내지 않는다. dev 서버가 안
+떠 있으면 백그라운드로 기동한 뒤 진행한다(`npm start`, `/opt/pw-browsers/chromium` 사용).
+스크린샷을 실제로 눈으로 확인해 CSS 변수 미스매치·반응형 깨짐 등을 잡아내는 단계이며, 이것이
+"클로드가 만든 화면이 촌스럽다"는 인상을 막는 핵심 단계다.
 
 ---
 
@@ -57,6 +62,8 @@ components/dashboard/XxxWidget.jsx + .css   ← 대시보드 전용
 
 ## 디자인 시스템 — CSS 변수 (항상 이것만 사용)
 
+작업 전 `frontend/src/styles/tokens.css`를 직접 확인할 것(이 문서보다 코드가 우선).
+
 ```css
 /* 색상 */
 --color-bg            /* 페이지 배경 */
@@ -67,7 +74,8 @@ components/dashboard/XxxWidget.jsx + .css   ← 대시보드 전용
 --color-text-primary  /* 제목, 강조 텍스트 */
 --color-text-secondary /* 본문 텍스트 */
 --color-text-tertiary  /* 힌트, 메타 텍스트 */
---color-brand         /* #E60023 Pin Red — CTA, 강조 */
+--color-brand         /* Toss Blue — CTA, 강조. 라이트 #3182F6 / 다크 #4C8FFF */
+--color-accent        /* sky 보조 액센트. 라이트 #0EA5E9 / 다크 #38BDF8 */
 --color-brand-50      /* brand 배경 (아주 연함) */
 --color-brand-100     /* brand 테두리 (연함) */
 --color-success       --color-success-bg
@@ -82,56 +90,70 @@ components/dashboard/XxxWidget.jsx + .css   ← 대시보드 전용
 --text-lg   /* 16-18px */
 --text-xl   /* 20-24px */
 --fw-normal --fw-medium --fw-semibold --fw-bold
+--font-pixel  /* var(--font-sans) 별칭 — 전용 디스플레이 서체 없음 */
+--font-serif  /* var(--font-sans) 별칭 — 동일 */
 
 /* 여백·반경·그림자 */
---radius-sm  --radius-md  --radius-lg  --radius-xl  --radius-full
---shadow-sm  --shadow-md  --shadow-lg  --shadow-xl  --shadow-modal
+--radius-sm  --radius-md  --radius-lg  --radius-xl  --radius-full  /* 8px ~ 999px, 둥근 모서리 */
+--shadow-sm  --shadow-md  --shadow-lg  --shadow-xl  --shadow-modal  /* 소프트 블러 엘리베이션, 하드 오프셋 없음 */
+--shadow-ring          /* 패널/카드용 이중 프레임 */
+--shadow-glow-red      /* CTA·활성 요소 네온 글로우 */
+--shadow-glow-cyan     /* 보조 강조 네온 글로우 */
+--hazard-stripe        /* 경고 대각선 스트라이프 (포인트로만 사용, 남용 금지) */
 
 /* 애니메이션 */
---dur-fast   /* 120ms */
+--dur-fast   /* 100ms */
 --dur-normal /* 200ms */
---dur-slow   /* 320ms */
+--dur-slow   /* 350ms */
 --ease-default  --ease-spring
 ```
 
-**절대 하드코딩 금지**: `#E60023`, `16px`, `rgba(0,0,0,0.5)` 같은 값을 직접 쓰지 않는다.  
-예외: `box-shadow` 안의 `rgba` (CSS 변수로 표현이 불가능한 경우만).
+**절대 하드코딩 금지**: 색상 hex, `16px`, `rgba(0,0,0,0.5)` 같은 값을 직접 쓰지 않는다.  
+예외: `box-shadow`/배경 텍스처 안의 `rgba` (CSS 변수로 표현이 불가능한 경우만).
 
 ---
 
-## 디자인 언어 — Cosmos × Pinterest 퓨전
+## 디자인 언어 — Toss
 
-### Pinterest DNA (라이트 모드 기반)
-- **Pin Card**: `border-radius: var(--radius-lg)`, hover 시 `translateY(-2px)` + shadow 상승
-- **Masonry Grid**: `column-count: 3~4`, `break-inside: avoid` (JS 라이브러리 금지)
-- **CTA**: `var(--color-brand)` 배경 + 흰색 텍스트
-- **이미지 reveal**: `onLoad` 시 `filter: blur(4px) → 0` 전환
+흰 캔버스 위 파랑 하나, 둥근 모서리와 소프트 섀도우로 신뢰감을 만드는 절제된 문법.
+상세는 `docs/design/TOSS_DESIGN_SPEC.md` 참고.
 
-### Cosmos DNA (다크 모드 기반)
-- **검색바**: pill 모양, placeholder 이탤릭, 포커스 시 border 강화
-- **탭**: 하단 2px underline 슬라이딩 인디케이터
-- **콜라주 히어로**: 2px gap CSS grid, 시네마틱 비율
-- **Board 카드**: 3-preview 이미지 split grid
+### 핵심 원칙
+- **둥근 모서리**: `border-radius`는 항상 `var(--radius-*)` 사용 — `0`으로 하드코딩하지 않는다.
+- **소프트 섀도우, 하드 오프셋 금지**: hover는 `filter: brightness(0.96)` 또는 소프트
+  `box-shadow` 상승, 클릭 시 `transform: scale(0.97)`(스퀴시) 패턴을 쓴다.
+  `translate(Npx,Npx)` 픽셀 오프셋은 쓰지 않는다.
+- **소프트 엘리베이션**: 정적 카드/모달/패널은 `border: 1px solid var(--color-border)` +
+  `box-shadow: var(--shadow-ring)`(블러 기반 소프트 그림자, 이중 프레임 아님).
+- **라이트/다크 모두 옅은 보더 유지**: 반전하지 않는다 — 다크모드도 어둡게 톤만 낮추고
+  보더는 여전히 "옅은 회색"이다. 하드코딩된 보더/배경 조합 금지 — 토큰만 쓰면 자동 대응된다.
+- **액센트는 절제**: 브랜드 블루 하나를 CTA·활성 상태에 집중해서 쓰고, 텍스처·글로우 남용 금지.
+- **이미지 reveal**: `onLoad` 시 `filter: blur(4px) → 0` 전환은 유지.
+- **Masonry Grid**: `column-count: 3~4`, `break-inside: avoid` (JS 라이브러리 금지) — 사진 목록
+  등에서 유지.
 
 ### 공통 패턴
 ```css
-/* 카드 기본 */
+/* 정적 카드(패널) — 소프트 엘리베이션, 하드 오프셋 없음 */
 .some-card {
   background: var(--color-surface);
   border-radius: var(--radius-lg);
-  border: 1.5px solid var(--color-border);
-  box-shadow: var(--shadow-md);
-  transition: box-shadow var(--dur-normal), transform var(--dur-normal);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-ring);
 }
-.some-card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+
+/* 버튼 — 테두리 없는 채움 + 스퀴시 클릭 피드백 */
+.some-btn {
+  border: none;
+  transition: transform var(--dur-fast) var(--ease-out), filter var(--dur-fast);
 }
+.some-btn:hover  { filter: brightness(0.96); }
+.some-btn:active { transform: scale(0.97); }
 
 /* 입력창 기본 */
 .some-input {
   padding: 9px 12px;
-  border: 1.5px solid var(--color-border);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
   color: var(--color-text-primary);
@@ -142,10 +164,10 @@ components/dashboard/XxxWidget.jsx + .css   ← 대시보드 전용
 .some-input:focus { border-color: var(--color-brand); }
 
 /* 뱃지 기본 */
-.badge { padding: 2px 8px; border-radius: var(--radius-full); font-size: var(--text-xs); font-weight: var(--fw-semibold); }
-.badge-green { background: var(--color-success-bg); color: #16a34a; }
+.badge { padding: 2px 8px; border-radius: var(--radius-full); border: none; font-size: var(--text-xs); font-weight: var(--fw-semibold); }
+.badge-green { background: var(--color-success-bg); color: var(--color-success); }
 .badge-red   { background: var(--color-danger-bg);  color: var(--color-danger); }
-.badge-yellow{ background: var(--color-warning-bg); color: #a16207; }
+.badge-blue  { background: var(--color-info-bg);    color: var(--color-info); }
 
 /* 스크롤 입장 애니메이션 */
 .card-list-item {

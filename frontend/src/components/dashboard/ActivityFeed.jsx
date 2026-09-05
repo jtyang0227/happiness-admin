@@ -4,11 +4,11 @@ import { getApi } from '../../utils/api';
 import './ActivityFeed.css';
 
 const ACTIVITY_ICONS = {
-  member:       { Icon: Users,        color: '#7C3AED' },
-  photo:        { Icon: Image,        color: '#10B981' },
-  inquiry:      { Icon: MessageSquare,color: '#F59E0B' },
-  portfolio:    { Icon: FolderOpen,   color: '#3B82F6' },
-  verification: { Icon: ShieldCheck,  color: '#A78BFA' },
+  member:       { Icon: Users,        color: '#C7361B' },
+  photo:        { Icon: Image,        color: '#3F8A57' },
+  inquiry:      { Icon: MessageSquare,color: '#B8791E' },
+  portfolio:    { Icon: FolderOpen,   color: '#2F7A8C' },
+  verification: { Icon: ShieldCheck,  color: '#6A5B8C' },
 };
 
 const timeAgo = (isoStr) => {

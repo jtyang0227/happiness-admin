@@ -98,7 +98,9 @@ public class DataInitializer implements ApplicationRunner {
                     .shootDate(LocalDate.now().plusDays(i * 5L + 10))
                     .budget((i * 10 + 30) + "만원")
                     .message("안녕하세요, " + SHOOT_TYPES[i % SHOOT_TYPES.length] + " 촬영을 문의드립니다. 잘 부탁드립니다.")
-                    .isRead(i % 3 == 0).createdAt(inqTime)
+                    .isRead(i % 3 == 0)
+                    .processStatus(InquiryProcessStatus.values()[i % InquiryProcessStatus.values().length])
+                    .createdAt(inqTime)
                     .build());
         }
 
@@ -109,6 +111,7 @@ public class DataInitializer implements ApplicationRunner {
                     .title(seriesTitles[i]).description(seriesTitles[i] + " 시리즈입니다.")
                     .coverImageUrl("https://picsum.photos/seed/series" + i + "/600/400")
                     .displayOrder(i + 1)
+                    .likesCount(i * 11 + 15).viewCount(i * 23 + 40)
                     .member(author).build();
             series.getSeriesPhotos().add(SeriesPhoto.builder()
                     .series(series).photo(photos.get(i * 3 % photos.size())).displayOrder(0).build());

@@ -1,60 +1,71 @@
 :root {
-  /* Brand — Pinterest Pin Red (primary) */
-  --color-brand:     #E60023;
-  --color-brand-hover: #AD081B;
-  --color-brand-light: #fff0f1;
+  /* Brand — Toss Blue */
+  --color-brand:       #3182F6;
+  --color-brand-hover: #1B64DA;
+  --color-brand-light: #E8F3FF;
 
   /* Brand scale — alias to semantic brand tokens */
-  --color-brand-50:  #eef2ff;
-  --color-brand-100: #e0e7ff;
+  --color-brand-50:  #E8F3FF;
+  --color-brand-100: #C9E2FF;
   --color-brand-400: var(--color-brand);
   --color-brand-500: var(--color-brand);
   --color-brand-600: var(--color-brand-hover);
   --color-brand-700: var(--color-brand-hover);
 
-  /* Semantic */
-  --color-success:    #22c55e;
-  --color-success-bg: #dcfce7;
-  --color-warning:    #f59e0b;
-  --color-warning-bg: #fffbeb;
-  --color-danger:     #ef4444;
-  --color-danger-bg:  #fef2f2;
-  --color-info:       #06b6d4;
-  --color-info-bg:    #ecfeff;
+  /* Secondary accent — Toss sky (보조 정보용) */
+  --color-accent:     #0EA5E9;
+  --color-accent-bg:  #E0F5FC;
 
-  /* Neutral */
-  --color-bg:           #f1f5f9;
-  --color-surface:      #ffffff;
-  --color-surface-2:    #f8fafc;
-  --color-border:       #e2e8f0;
-  --color-border-light: #f1f5f9;
+  /* Semantic */
+  --color-success:    #12B76A;
+  --color-success-bg: #E6F9EF;
+  --color-warning:    #F59E0B;
+  --color-warning-bg: #FEF3E2;
+  --color-danger:     #F04452;
+  --color-danger-bg:  #FDE8EA;
+  --color-info:       #0EA5E9;
+  --color-info-bg:    #E0F5FC;
+
+  /* Neutral — 밝은 회색 캔버스 위 화이트 카드 */
+  --color-bg:           #F2F4F6;
+  --color-surface:      #FFFFFF;
+  --color-surface-2:    #F8F9FA;
+  --color-border:       #E5E8EB;
+  --color-border-light: #EEF1F4;
 
   /* Text */
-  --color-text-primary:   #0f172a;
-  --color-text-secondary: #475569;
-  --color-text-tertiary:  #94a3b8;
-  --color-text-inverse:   #ffffff;
+  --color-text-primary:   #191F28;
+  --color-text-secondary: #4E5968;
+  --color-text-tertiary:  #8B95A1;
+  --color-text-inverse:   #FFFFFF;
 
-  /* Sidebar */
-  --color-sidebar-bg:          #0f172a;
-  --color-sidebar-hover:       #1e293b;
-  --color-sidebar-border:      #1e293b;
-  --color-sidebar-text:        #94a3b8;
-  --color-sidebar-active-text: #818cf8;
+  /* Sidebar — 항상 다크 네이비(라이트/다크 모드 무관, 내비게이션 대비용) */
+  --color-sidebar-bg:          #191F28;
+  --color-sidebar-hover:       #232A35;
+  --color-sidebar-border:      transparent;
+  --color-sidebar-text:        #8B95A1;
+  --color-sidebar-active-text: #FFFFFF;
 
-  /* Shadow */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
-  --shadow-xl: 0 10px 15px rgba(0, 0, 0, 0.10), 0 4px 6px rgba(0, 0, 0, 0.05);
+  /* Shadow — 소프트 엘리베이션 (하드 오프셋 없음) */
+  --shadow-sm: 0 1px 2px rgba(25, 31, 40, 0.06);
+  --shadow-md: 0 4px 12px rgba(25, 31, 40, 0.08);
+  --shadow-lg: 0 8px 24px rgba(25, 31, 40, 0.10);
+  --shadow-xl: 0 16px 40px rgba(25, 31, 40, 0.14);
 
-  /* Radius */
-  --radius-sm:   4px;
-  --radius-md:   8px;
-  --radius-lg:   12px;
-  --radius-xl:   16px;
-  --radius-2xl:  20px;
-  --radius-full: 9999px;
+  /* Shadow-ring — 카드용 소프트 엘리베이션(이중 프레임 대체) */
+  --shadow-ring: 0 1px 2px rgba(25, 31, 40, 0.04), 0 8px 20px rgba(25, 31, 40, 0.06);
+
+  /* 강조 글로우 — 토큰명은 유지, 소프트 컬러 글로우로 값만 교체 */
+  --shadow-glow-red:  0 8px 20px -6px rgba(240, 68, 82, 0.45);
+  --shadow-glow-cyan: 0 8px 20px -6px rgba(49, 130, 246, 0.45);
+
+  /* Radius — 둥근 모서리 */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   20px;
+  --radius-2xl:  24px;
+  --radius-full: 999px;
 
   /* Spacing */
   --space-1:  4px;
@@ -67,9 +78,11 @@
   --space-10: 40px;
   --space-12: 48px;
 
-  /* Font */
-  --font-sans: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  /* Font — 단일 산세리프 체계(디스플레이 전용 서체 없음) */
+  --font-sans:  'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:  'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --font-pixel: var(--font-sans);
+  --font-serif: var(--font-sans);
   --text-xs:   11px;
   --text-sm:   13px;
   --text-base: 14px;
@@ -100,19 +113,20 @@
   --z-toast:    500;
   --z-tooltip:  600;
 
-  /* Animation */
-  --dur-fast:   100ms;
+  /* Animation — 부드러운 이징 (스텝 애니메이션 없음) */
+  --dur-fast:   120ms;
   --dur-normal: 200ms;
-  --dur-slow:   350ms;
+  --dur-slow:   320ms;
   --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-out:     cubic-bezier(0, 0, 0.2, 1);
+  --ease-pixel:   var(--ease-out);
 
   /* Shadow additions */
-  --shadow-focus: 0 0 0 3px rgba(99,102,241,0.25);
-  --shadow-modal: 0 20px 60px rgba(0,0,0,0.3);
+  --shadow-focus: 0 0 0 3px rgba(49, 130, 246, 0.35);
+  --shadow-modal: 0 24px 60px -12px rgba(25, 31, 40, 0.24);
 
-  /* Category colors (1차 촬영종류) */
+  /* Category colors (1차 촬영종류) — 브랜드 재도색 범위 밖, 그대로 유지 */
   --color-cat-wedding:  #f9a8d4;
   --color-cat-snap:     #86efac;
   --color-cat-family:   #fbbf24;
@@ -133,27 +147,27 @@
   --color-mood-film:    #d97706;
 
   /* Portfolio / Review status colors */
-  --color-status-draft:    #94a3b8;
-  --color-status-pending:  #f59e0b;
-  --color-status-approved: #22c55e;
-  --color-status-rejected: #ef4444;
+  --color-status-draft:    #8B95A1;
+  --color-status-pending:  #F59E0B;
+  --color-status-approved: #12B76A;
+  --color-status-rejected: #F04452;
 
-  /* Dark mode surface tokens — Railway DNA */
-  --color-bg-dark:              #0B0D0E;
-  --color-surface-dark:         #161B22;
-  --color-surface-2-dark:       #1F2329;
-  --color-border-dark:          #2D3139;
-  --color-border-light-dark:    #3D4450;
-  --color-text-primary-dark:    #F5F5F5;
-  --color-text-secondary-dark:  #9BA3AF;
-  --color-text-tertiary-dark:   #4B5563;
+  /* Dark mode surface tokens */
+  --color-bg-dark:              #14181D;
+  --color-surface-dark:         #1B2027;
+  --color-surface-2-dark:       #232A33;
+  --color-border-dark:          #2C333D;
+  --color-border-light-dark:    #262C34;
+  --color-text-primary-dark:    #F2F4F6;
+  --color-text-secondary-dark:  #B0B8C1;
+  --color-text-tertiary-dark:   #7A828C;
 
-  /* Status colors (Railway-style) */
-  --color-status-active:   #10B981;
+  /* Status colors */
+  --color-status-active:   #12B76A;
   --color-status-building: #F59E0B;
-  --color-status-deploy:   #A78BFA;
-  --color-status-error:    #EF4444;
-  --color-status-idle:     #4B5563;
+  --color-status-deploy:   #3182F6;
+  --color-status-error:    #F04452;
+  --color-status-idle:     #8B95A1;
 
   /* Topbar */
   --topbar-height: 56px;
@@ -172,22 +186,34 @@
     --color-text-primary:    var(--color-text-primary-dark);
     --color-text-secondary:  var(--color-text-secondary-dark);
     --color-text-tertiary:   var(--color-text-tertiary-dark);
-    --color-brand:           #7C3AED;
-    --color-brand-hover:     #A78BFA;
-    --color-brand-50:        #2D1B69;
-    --color-brand-100:       #3D2B7A;
-    --color-brand-light:     rgba(124, 58, 237, 0.15);
-    --color-success-bg:      #064E3B;
-    --color-warning-bg:      #451A03;
-    --color-danger-bg:       #450A0A;
-    --color-info-bg:         #1E3A5F;
-    --shadow-md: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
-    --shadow-lg: 0 4px 6px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
-    --color-sidebar-bg:          #0B0D0E;
-    --color-sidebar-hover:       #161B22;
-    --color-sidebar-border:      #1F2329;
-    --color-sidebar-text:        #6B7280;
-    --color-sidebar-active-text: #A78BFA;
+    --color-brand:           #4C8FFF;
+    --color-brand-hover:     #6FA5FF;
+    --color-brand-50:        #16233A;
+    --color-brand-100:       #1E2E4A;
+    --color-brand-light:     rgba(76, 143, 255, 0.16);
+    --color-accent:          #38BDF8;
+    --color-accent-bg:       #0F2733;
+    --color-success:         #32D583;
+    --color-success-bg:      #0F2A1F;
+    --color-warning:         #FBBF24;
+    --color-warning-bg:      #33280F;
+    --color-danger:          #FF6B78;
+    --color-danger-bg:       #331A1E;
+    --color-info:            #38BDF8;
+    --color-info-bg:         #0F2733;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.30);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.34);
+    --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.40);
+    --shadow-ring: 0 1px 2px rgba(0, 0, 0, 0.20), 0 8px 20px rgba(0, 0, 0, 0.28);
+    --shadow-modal: 0 24px 60px -12px rgba(0, 0, 0, 0.50);
+    --shadow-glow-red:  0 8px 20px -6px rgba(255, 107, 120, 0.5);
+    --shadow-glow-cyan: 0 8px 20px -6px rgba(76, 143, 255, 0.5);
+    --color-sidebar-bg:          #10141A;
+    --color-sidebar-hover:       #1B2027;
+    --color-sidebar-border:      transparent;
+    --color-sidebar-text:        #7A828C;
+    --color-sidebar-active-text: #FFFFFF;
   }
 }
 
@@ -201,20 +227,32 @@
   --color-text-primary:    var(--color-text-primary-dark);
   --color-text-secondary:  var(--color-text-secondary-dark);
   --color-text-tertiary:   var(--color-text-tertiary-dark);
-  --color-brand:           #7C3AED;
-  --color-brand-hover:     #A78BFA;
-  --color-brand-50:        #2D1B69;
-  --color-brand-100:       #3D2B7A;
-  --color-brand-light:     rgba(124, 58, 237, 0.15);
-  --color-success-bg:      #064E3B;
-  --color-warning-bg:      #451A03;
-  --color-danger-bg:       #450A0A;
-  --color-info-bg:         #1E3A5F;
-  --shadow-md: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
-  --shadow-lg: 0 4px 6px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
-  --color-sidebar-bg:          #0B0D0E;
-  --color-sidebar-hover:       #161B22;
-  --color-sidebar-border:      #1F2329;
-  --color-sidebar-text:        #6B7280;
-  --color-sidebar-active-text: #A78BFA;
+  --color-brand:           #4C8FFF;
+  --color-brand-hover:     #6FA5FF;
+  --color-brand-50:        #16233A;
+  --color-brand-100:       #1E2E4A;
+  --color-brand-light:     rgba(76, 143, 255, 0.16);
+  --color-accent:          #38BDF8;
+  --color-accent-bg:       #0F2733;
+  --color-success:         #32D583;
+  --color-success-bg:      #0F2A1F;
+  --color-warning:         #FBBF24;
+  --color-warning-bg:      #33280F;
+  --color-danger:          #FF6B78;
+  --color-danger-bg:       #331A1E;
+  --color-info:            #38BDF8;
+  --color-info-bg:         #0F2733;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.30);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.34);
+  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.40);
+  --shadow-ring: 0 1px 2px rgba(0, 0, 0, 0.20), 0 8px 20px rgba(0, 0, 0, 0.28);
+  --shadow-modal: 0 24px 60px -12px rgba(0, 0, 0, 0.50);
+  --shadow-glow-red:  0 8px 20px -6px rgba(255, 107, 120, 0.5);
+  --shadow-glow-cyan: 0 8px 20px -6px rgba(76, 143, 255, 0.5);
+  --color-sidebar-bg:          #10141A;
+  --color-sidebar-hover:       #1B2027;
+  --color-sidebar-border:      transparent;
+  --color-sidebar-text:        #7A828C;
+  --color-sidebar-active-text: #FFFFFF;
 }

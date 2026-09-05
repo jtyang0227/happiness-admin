@@ -21,12 +21,28 @@ public class AdminPortfolioService {
 
     private final PortfolioRepository portfolioRepository;
 
-    public PageResponse<AdminPortfolioDto> getPortfolios(String status, String visibility, String search, int page, int size) {
+    public PageResponse<AdminPortfolioDto> getPortfolios(String status, String visibility, Long memberId, String search, String sortBy, int page, int size) {
         PortfolioStatus st = (status != null && !status.isBlank()) ? PortfolioStatus.valueOf(status) : null;
         PortfolioVisibility vis = (visibility != null && !visibility.isBlank()) ? PortfolioVisibility.valueOf(visibility) : null;
         String s = (search != null && !search.isBlank()) ? search.trim() : null;
-        var pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return PageResponse.of(portfolioRepository.searchPortfolios(st, vis, s, pageable).map(AdminPortfolioDto::from));
+        var pageable = PageRequest.of(page, size, resolveSort(sortBy));
+        return PageResponse.of(portfolioRepository.searchPortfolios(st, vis, memberId, s, pageable).map(AdminPortfolioDto::from));
+    }
+
+    private Sort resolveSort(String sortBy) {
+        if (sortBy == null) return Sort.by("createdAt").descending();
+        return switch (sortBy) {
+            case "likes" -> Sort.by("likesCount").descending();
+            case "views" -> Sort.by("viewCount").descending();
+            case "oldest" -> Sort.by("createdAt").ascending();
+            default -> Sort.by("createdAt").descending();
+        };
+    }
+
+    public AdminPortfolioDto getPortfolio(Long id) {
+        Portfolio p = portfolioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("포트폴리오를 찾을 수 없습니다."));
+        return AdminPortfolioDto.from(p);
     }
 
     public Map<String, Long> getStatusCounts() {

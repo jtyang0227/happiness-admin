@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { getApi } from '../utils/api';
+import toast from 'react-hot-toast';
+import { getApi, postApi } from '../utils/api';
 import './SystemPage.css';
 
 const StatusCard = ({ title, items }) => (
@@ -31,6 +32,51 @@ const ACTION_LABELS = {
   VERIFICATION_REJECT: '작가 인증 반려',
 };
 
+const HEATMAP_LEVELS = [
+  { max: 0, opacity: 0 },
+  { max: 2, opacity: 0.35 },
+  { max: 4, opacity: 0.65 },
+  { max: Infinity, opacity: 1 },
+];
+
+const heatmapOpacity = (count) => HEATMAP_LEVELS.find(l => count <= l.max).opacity;
+
+const ActivityHeatmap = ({ days }) => {
+  const weeks = [];
+  for (let i = 0; i < days.length; i += 7) weeks.push(days.slice(i, i + 7));
+
+  return (
+    <div className="heatmap-wrap">
+      <div className="heatmap-grid">
+        {weeks.map((week, wi) => (
+          <div className="heatmap-col" key={wi}>
+            {week.map(d => (
+              <div
+                key={d.day}
+                className="heatmap-cell"
+                style={
+                  d.count === 0
+                    ? { background: 'var(--color-surface-2)' }
+                    : { background: 'var(--color-success)', opacity: heatmapOpacity(d.count) }
+                }
+                title={`${d.day} · ${d.count}건`}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className="heatmap-legend">
+        <span>적음</span>
+        <span className="heatmap-cell" style={{ background: 'var(--color-surface-2)' }} />
+        <span className="heatmap-cell" style={{ background: 'var(--color-success)', opacity: 0.35 }} />
+        <span className="heatmap-cell" style={{ background: 'var(--color-success)', opacity: 0.65 }} />
+        <span className="heatmap-cell" style={{ background: 'var(--color-success)', opacity: 1 }} />
+        <span>많음</span>
+      </div>
+    </div>
+  );
+};
+
 const SystemPage = () => {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -38,9 +84,27 @@ const SystemPage = () => {
   const [logsPage, setLogsPage] = useState(0);
   const [logsTotalPages, setLogsTotalPages] = useState(0);
   const [logsLoading, setLogsLoading] = useState(false);
+  const [heatmap, setHeatmap] = useState([]);
+  const [geminiTesting, setGeminiTesting] = useState(false);
+  const [geminiResult, setGeminiResult] = useState('');
+
+  const runGeminiTest = async () => {
+    setGeminiTesting(true);
+    setGeminiResult('');
+    try {
+      const data = await postApi('/admin/system/gemini-test', {});
+      setGeminiResult(data.response);
+      toast.success('Gemini 응답을 받았습니다.');
+    } catch {
+      toast.error('Gemini 호출에 실패했습니다.');
+    } finally {
+      setGeminiTesting(false);
+    }
+  };
 
   useEffect(() => {
     getApi('/admin/system/status').then(setStatus).finally(() => setLoading(false));
+    getApi('/admin/system/activity-heatmap?weeks=7').then(setHeatmap);
   }, []);
 
   const loadLogs = useCallback(async (page) => {
@@ -77,6 +141,30 @@ const SystemPage = () => {
           { label: 'DB 종류', value: status?.dbType, status: 'ok' },
           { label: '활성 프로필', value: status?.activeProfile, status: 'ok' },
         ]} />
+        <StatusCard title="Gemini 연동" items={[
+          { label: '모델', value: status?.geminiModel, status: 'ok' },
+          { label: '설정 상태', value: status?.geminiConfigured ? '✅ 설정됨' : '⚠️ 미설정', status: status?.geminiConfigured ? 'ok' : 'warn' },
+        ]} />
+      </div>
+
+      <div className="system-card" style={{ marginTop: 20 }}>
+        <h2 className="system-card-title">Gemini 연동 테스트</h2>
+        <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', margin: '0 0 12px' }}>
+          GEMINI_API_KEY가 설정된 상태에서 실제 호출이 정상 동작하는지 확인합니다.
+        </p>
+        <button className="btn-sm btn-outline" onClick={runGeminiTest} disabled={geminiTesting}>
+          {geminiTesting ? '호출 중...' : '테스트 실행'}
+        </button>
+        {geminiResult && (
+          <div style={{ marginTop: 12, padding: 12, background: 'var(--color-surface-2)', borderRadius: 'var(--radius-md)', fontSize: 13 }}>
+            {geminiResult}
+          </div>
+        )}
+      </div>
+
+      <div className="system-card" style={{ marginTop: 20 }}>
+        <h2 className="system-card-title">관리자 활동 히트맵 (최근 7주)</h2>
+        <ActivityHeatmap days={heatmap} />
       </div>
 
       <div className="system-card" style={{ marginTop: 20 }}>
@@ -93,13 +181,13 @@ const SystemPage = () => {
                 <tr><td colSpan="5" className="loading-cell">활동 로그가 없습니다.</td></tr>
               ) : logs.map(log => (
                 <tr key={log.id}>
-                  <td style={{ fontSize: 12, color: 'var(--color-text-2)' }}>{log.createdAt?.replace('T', ' ').slice(0, 16)}</td>
+                  <td style={{ fontSize: 12, color: 'var(--color-text-tertiary)' }}>{log.createdAt?.replace('T', ' ').slice(0, 16)}</td>
                   <td>{log.adminName}</td>
                   <td>
                     <span className="badge badge-blue">{ACTION_LABELS[log.action] || log.action}</span>
                   </td>
                   <td style={{ fontSize: 12 }}>{log.targetType && `${log.targetType} #${log.targetId}`}</td>
-                  <td style={{ fontSize: 12, color: 'var(--color-text-2)' }}>{log.details}</td>
+                  <td style={{ fontSize: 12, color: 'var(--color-text-tertiary)' }}>{log.details}</td>
                 </tr>
               ))}
             </tbody>

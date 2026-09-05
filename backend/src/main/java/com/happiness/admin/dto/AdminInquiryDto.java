@@ -23,6 +23,7 @@ public class AdminInquiryDto {
     private String budget;
     private String message;
     private boolean isRead;
+    private String processStatus;
     private LocalDateTime createdAt;
 
     public static AdminInquiryDto from(Inquiry i) {
@@ -39,6 +40,7 @@ public class AdminInquiryDto {
                 .budget(i.getBudget())
                 .message(i.getMessage())
                 .isRead(i.isRead())
+                .processStatus(i.getProcessStatus().name())
                 .createdAt(i.getCreatedAt())
                 .build();
     }

@@ -69,4 +69,8 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
     @Query("SELECT p FROM Photo p ORDER BY CASE WHEN p.displayOrder = 0 THEN 1 ELSE 0 END ASC, p.displayOrder ASC, p.createdAt DESC, p.id DESC")
     List<Photo> findAllOrderedForSort();
+
+    @Query("SELECT p FROM Photo p WHERE p.member.id = :memberId " +
+           "ORDER BY CASE WHEN p.displayOrder = 0 THEN 1 ELSE 0 END ASC, p.displayOrder ASC, p.createdAt DESC, p.id DESC")
+    List<Photo> findAllOrderedForSort(@Param("memberId") Long memberId);
 }
