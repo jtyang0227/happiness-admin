@@ -163,7 +163,7 @@ const ReportListPage = () => {
                 <td className="name-cell">{r.reason}</td>
                 <td>
                   {r.aiSeverity ? (
-                    <span className={`badge ${SEVERITY_CLASSES[r.aiSeverity] || 'badge-gray'}`}>{SEVERITY_LABELS[r.aiSeverity] || r.aiSeverity}</span>
+                    <span className={`badge badge-ai-in ${SEVERITY_CLASSES[r.aiSeverity] || 'badge-gray'}`}>{SEVERITY_LABELS[r.aiSeverity] || r.aiSeverity}</span>
                   ) : (
                     <span className="ai-not-analyzed">—</span>
                   )}

@@ -19,6 +19,7 @@ const AdminTopbar = ({ onMenuClick, sidebarCollapsed, onSearchClick }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [profileOpen, setProfileOpen] = useState(false);
+  const [profileClosing, setProfileClosing] = useState(false);
   const [theme, setTheme] = useState(getStoredTheme);
   const [systemStatus, setSystemStatus] = useState('checking');
 
@@ -46,6 +47,22 @@ const AdminTopbar = ({ onMenuClick, sidebarCollapsed, onSearchClick }) => {
     logout();
     navigate('/login');
   }, [logout, navigate]);
+
+  const openProfile = useCallback(() => {
+    setProfileClosing(false);
+    setProfileOpen(true);
+  }, []);
+
+  const closeProfile = useCallback(() => {
+    setProfileClosing(true);
+  }, []);
+
+  const handleDropdownAnimationEnd = useCallback(() => {
+    if (profileClosing) {
+      setProfileOpen(false);
+      setProfileClosing(false);
+    }
+  }, [profileClosing]);
 
   const initials = user?.name ? user.name.slice(0, 2) : 'AD';
 
@@ -88,17 +105,20 @@ const AdminTopbar = ({ onMenuClick, sidebarCollapsed, onSearchClick }) => {
         <div className="topbar-profile-wrap">
           <button
             className="topbar-profile-btn"
-            onClick={() => setProfileOpen(v => !v)}
+            onClick={() => (profileOpen && !profileClosing ? closeProfile() : openProfile())}
           >
             <div className="topbar-avatar">{initials}</div>
             <span className="topbar-username">{user?.name}</span>
-            <ChevronDown size={13} className={`topbar-chevron ${profileOpen ? 'open' : ''}`} />
+            <ChevronDown size={13} className={`topbar-chevron ${profileOpen && !profileClosing ? 'open' : ''}`} />
           </button>
 
           {profileOpen && (
             <>
-              <div className="topbar-dropdown-backdrop" onClick={() => setProfileOpen(false)} />
-              <div className="topbar-dropdown">
+              <div className={`topbar-dropdown-backdrop ${profileClosing ? 'closing' : ''}`} onClick={closeProfile} />
+              <div
+                className={`topbar-dropdown ${profileClosing ? 'closing' : ''}`}
+                onAnimationEnd={handleDropdownAnimationEnd}
+              >
                 <div className="topbar-dropdown-header">
                   <div className="topbar-dropdown-avatar">{initials}</div>
                   <div>

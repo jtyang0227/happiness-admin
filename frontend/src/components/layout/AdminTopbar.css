@@ -267,6 +267,27 @@
   box-shadow: var(--shadow-xl);
   z-index: calc(var(--z-dropdown) + 1);
   overflow: hidden;
+  transform-origin: top right;
+  animation: topbar-dropdown-in var(--dur-fast) var(--ease-out);
+}
+
+.topbar-dropdown.closing {
+  animation: topbar-dropdown-out var(--dur-fast) var(--ease-out);
+}
+
+@keyframes topbar-dropdown-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes topbar-dropdown-out {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.95); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .topbar-dropdown { animation-duration: 1ms; }
+  .topbar-dropdown.closing { animation-duration: 1ms; }
 }
 
 .topbar-dropdown-header {

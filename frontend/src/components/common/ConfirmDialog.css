@@ -72,13 +72,15 @@
   font-weight: 600;
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s, transform var(--dur-fast) var(--ease-out);
 }
 
 .confirm-btn-cancel:hover {
   background: var(--color-border);
   border-color: var(--color-border);
 }
+
+.confirm-btn-cancel:active { transform: scale(0.97); }
 
 .confirm-btn-confirm {
   padding: 9px 18px;
@@ -88,9 +90,10 @@
   font-weight: 600;
   color: var(--color-text-inverse);
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, transform var(--dur-fast) var(--ease-out);
 }
 
 .confirm-btn-confirm.danger  { background: var(--color-danger); }
 .confirm-btn-confirm.warning { background: var(--color-warning); }
 .confirm-btn-confirm:hover   { opacity: 0.88; }
+.confirm-btn-confirm:active  { transform: scale(0.97); }

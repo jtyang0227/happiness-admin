@@ -98,3 +98,15 @@
 .review-ai-header { display: flex; align-items: center; gap: var(--space-2); margin-bottom: 6px; }
 .review-ai-caption { font-size: var(--text-xs); color: var(--color-text-tertiary); }
 .review-ai-summary { font-size: var(--text-sm); color: var(--color-text-primary); margin: 0; line-height: 1.5; }
+
+/* ── AI 분석 완료 뱃지 등장 ── */
+.badge-ai-in {
+  animation: badge-ai-in var(--dur-normal) var(--ease-spring);
+}
+@keyframes badge-ai-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .badge-ai-in { animation-duration: 1ms; }
+}
