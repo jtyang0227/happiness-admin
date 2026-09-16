@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
 
@@ -29,4 +31,7 @@ public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
     long countByStatus(PortfolioStatus status);
 
     long countByMemberId(Long memberId);
+
+    @Query("SELECT p.member.id, COUNT(p) FROM Portfolio p WHERE p.member.id IN :memberIds GROUP BY p.member.id")
+    List<Object[]> countByMemberIdIn(@Param("memberIds") List<Long> memberIds);
 }

@@ -22,6 +22,9 @@ public interface SeriesRepository extends JpaRepository<Series, Long> {
 
     long countByMemberId(Long memberId);
 
+    @Query("SELECT s.member.id, COUNT(s) FROM Series s WHERE s.member.id IN :memberIds GROUP BY s.member.id")
+    List<Object[]> countByMemberIdIn(@Param("memberIds") List<Long> memberIds);
+
     List<Series> findByMemberId(Long memberId);
 
     @Query("SELECT s FROM Series s ORDER BY CASE WHEN s.displayOrder = 0 THEN 1 ELSE 0 END ASC, s.displayOrder ASC, s.createdAt DESC, s.id DESC")

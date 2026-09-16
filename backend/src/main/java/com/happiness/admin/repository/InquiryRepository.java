@@ -47,6 +47,9 @@ public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
 
     long countBySenderId(Long senderId);
 
+    @Query("SELECT i.sender.id, COUNT(i) FROM Inquiry i WHERE i.sender.id IN :senderIds GROUP BY i.sender.id")
+    List<Object[]> countBySenderIdIn(@Param("senderIds") List<Long> senderIds);
+
     void deleteBySenderId(Long senderId);
     void deleteByReceiverId(Long receiverId);
 }

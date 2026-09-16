@@ -30,11 +30,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("""
         SELECT b.shootDate, COUNT(b)
         FROM Booking b
-        WHERE YEAR(b.shootDate) = :year AND MONTH(b.shootDate) = :month
+        WHERE b.shootDate BETWEEN :from AND :to
         GROUP BY b.shootDate
         ORDER BY b.shootDate ASC
         """)
-    List<Object[]> countByDay(@Param("year") int year, @Param("month") int month);
+    List<Object[]> countByDayBetween(@Param("from") LocalDate from, @Param("to") LocalDate to);
 
     @Query("""
         SELECT b FROM Booking b

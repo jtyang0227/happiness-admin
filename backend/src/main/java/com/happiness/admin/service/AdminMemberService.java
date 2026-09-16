@@ -18,6 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -37,10 +40,30 @@ public class AdminMemberService {
         MemberStatus status = (statusStr != null && !statusStr.isBlank())
                 ? MemberStatus.valueOf(statusStr) : null;
         var pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return PageResponse.of(memberRepository.searchMembers(
+        var memberPage = memberRepository.searchMembers(
                 (search != null && !search.isBlank()) ? search : null,
                 authority, status, pageable
-        ).map(m -> toDto(m)));
+        );
+
+        List<Long> memberIds = memberPage.getContent().stream().map(Member::getId).toList();
+        Map<Long, Long> photoCounts = memberIds.isEmpty() ? Map.of() : toCountMap(photoRepository.countByMemberIdIn(memberIds));
+        Map<Long, Long> seriesCounts = memberIds.isEmpty() ? Map.of() : toCountMap(seriesRepository.countByMemberIdIn(memberIds));
+        Map<Long, Long> inquiryCounts = memberIds.isEmpty() ? Map.of() : toCountMap(inquiryRepository.countBySenderIdIn(memberIds));
+        Map<Long, Long> portfolioCounts = memberIds.isEmpty() ? Map.of() : toCountMap(portfolioRepository.countByMemberIdIn(memberIds));
+
+        return PageResponse.of(memberPage.map(m -> AdminMemberDto.from(m,
+                photoCounts.getOrDefault(m.getId(), 0L),
+                seriesCounts.getOrDefault(m.getId(), 0L),
+                inquiryCounts.getOrDefault(m.getId(), 0L),
+                portfolioCounts.getOrDefault(m.getId(), 0L))));
+    }
+
+    private static Map<Long, Long> toCountMap(List<Object[]> rows) {
+        Map<Long, Long> map = new HashMap<>();
+        for (Object[] row : rows) {
+            map.put((Long) row[0], (Long) row[1]);
+        }
+        return map;
     }
 
     public AdminMemberDto getMember(Long id) {

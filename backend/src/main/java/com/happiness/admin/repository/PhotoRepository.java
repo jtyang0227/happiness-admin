@@ -65,6 +65,9 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
     long countByMemberId(Long memberId);
 
+    @Query("SELECT p.member.id, COUNT(p) FROM Photo p WHERE p.member.id IN :memberIds GROUP BY p.member.id")
+    List<Object[]> countByMemberIdIn(@Param("memberIds") List<Long> memberIds);
+
     List<Photo> findByMemberId(Long memberId);
 
     @Query("SELECT p FROM Photo p ORDER BY CASE WHEN p.displayOrder = 0 THEN 1 ELSE 0 END ASC, p.displayOrder ASC, p.createdAt DESC, p.id DESC")
