@@ -15,9 +15,9 @@ import java.util.List;
 @Repository
 public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
 
-    @Query("SELECT i FROM Inquiry i WHERE " +
+    @Query("SELECT i FROM Inquiry i LEFT JOIN FETCH i.receiver rcv WHERE " +
            "(:senderId IS NULL OR i.sender.id = :senderId) AND " +
-           "(:receiverId IS NULL OR i.receiver.id = :receiverId) AND " +
+           "(:receiverId IS NULL OR rcv.id = :receiverId) AND " +
            "(:isRead IS NULL OR i.isRead = :isRead) AND " +
            "(:shootType IS NULL OR i.shootType = :shootType) AND " +
            "(:processStatus IS NULL OR i.processStatus = :processStatus)")

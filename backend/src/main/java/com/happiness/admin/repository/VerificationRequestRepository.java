@@ -11,9 +11,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface VerificationRequestRepository extends JpaRepository<VerificationRequest, Long> {
 
-    @Query("SELECT v FROM VerificationRequest v WHERE " +
+    @Query("SELECT v FROM VerificationRequest v LEFT JOIN FETCH v.member m WHERE " +
            "(:status IS NULL OR v.status = :status) AND " +
-           "(:memberId IS NULL OR v.member.id = :memberId)")
+           "(:memberId IS NULL OR m.id = :memberId)")
     Page<VerificationRequest> searchVerifications(
             @Param("status") String status,
             @Param("memberId") Long memberId,

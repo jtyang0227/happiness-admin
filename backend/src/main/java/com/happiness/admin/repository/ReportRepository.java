@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
-    @Query("SELECT r FROM Report r WHERE " +
+    @Query("SELECT r FROM Report r LEFT JOIN FETCH r.reporter WHERE " +
            "(:status IS NULL OR r.status = :status) AND " +
            "(:targetType IS NULL OR r.targetType = :targetType)")
     Page<Report> searchReports(@Param("status") String status,

@@ -12,14 +12,14 @@ public class SortSeriesDto {
     private String memberName;
     private int photoCount;
 
-    public static SortSeriesDto from(Series s) {
+    public static SortSeriesDto from(Series s, long photoCount) {
         SortSeriesDto d = new SortSeriesDto();
         d.id = s.getId();
         d.title = s.getTitle();
         d.coverImageUrl = s.getCoverImageUrl();
         d.displayOrder = s.getDisplayOrder();
         d.memberName = s.getMember() != null ? s.getMember().getName() : null;
-        d.photoCount = s.getSeriesPhotos() != null ? s.getSeriesPhotos().size() : 0;
+        d.photoCount = (int) photoCount;
         return d;
     }
 }

@@ -15,12 +15,12 @@ import java.util.List;
 @Repository
 public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
 
-    @Query("SELECT p FROM Portfolio p WHERE " +
+    @Query("SELECT p FROM Portfolio p LEFT JOIN FETCH p.member m WHERE " +
            "(:status IS NULL OR p.status = :status) AND " +
            "(:visibility IS NULL OR p.visibility = :visibility) AND " +
-           "(:memberId IS NULL OR p.member.id = :memberId) AND " +
+           "(:memberId IS NULL OR m.id = :memberId) AND " +
            "(:search IS NULL OR LOWER(p.title) LIKE LOWER(CONCAT('%',:search,'%')) " +
-           " OR LOWER(p.member.name) LIKE LOWER(CONCAT('%',:search,'%')))")
+           " OR LOWER(m.name) LIKE LOWER(CONCAT('%',:search,'%')))")
     Page<Portfolio> searchPortfolios(
             @Param("status") PortfolioStatus status,
             @Param("visibility") PortfolioVisibility visibility,

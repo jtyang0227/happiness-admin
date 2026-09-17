@@ -15,8 +15,8 @@ import java.util.List;
 @Repository
 public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
-    @Query("SELECT p FROM Photo p WHERE " +
-           "(:memberId IS NULL OR p.member.id = :memberId) AND " +
+    @Query("SELECT p FROM Photo p LEFT JOIN FETCH p.member m WHERE " +
+           "(:memberId IS NULL OR m.id = :memberId) AND " +
            "(:colorMood IS NULL OR p.colorMood = :colorMood) AND " +
            "(:l1 IS NULL OR SUBSTRING(p.categoryCode, 1, 2) = :l1) AND " +
            "(:l2 IS NULL OR SUBSTRING(p.categoryCode, 3, 2) = :l2) AND " +
@@ -25,9 +25,9 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
            "(:l5 IS NULL OR SUBSTRING(p.categoryCode, 9, 2) = :l5) AND " +
            "(:search IS NULL OR " +
            "  LOWER(p.title) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           "  LOWER(p.member.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "  LOWER(m.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "  LOWER(p.description) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           "  LOWER(p.member.profileName) LIKE LOWER(CONCAT('%', :search, '%')))")
+           "  LOWER(m.profileName) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<Photo> searchPhotos(@Param("memberId") Long memberId,
                              @Param("colorMood") String colorMood,
                              @Param("l1") String l1,
@@ -70,10 +70,10 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
     List<Photo> findByMemberId(Long memberId);
 
-    @Query("SELECT p FROM Photo p ORDER BY CASE WHEN p.displayOrder = 0 THEN 1 ELSE 0 END ASC, p.displayOrder ASC, p.createdAt DESC, p.id DESC")
+    @Query("SELECT p FROM Photo p LEFT JOIN FETCH p.member ORDER BY CASE WHEN p.displayOrder = 0 THEN 1 ELSE 0 END ASC, p.displayOrder ASC, p.createdAt DESC, p.id DESC")
     List<Photo> findAllOrderedForSort();
 
-    @Query("SELECT p FROM Photo p WHERE p.member.id = :memberId " +
+    @Query("SELECT p FROM Photo p LEFT JOIN FETCH p.member WHERE p.member.id = :memberId " +
            "ORDER BY CASE WHEN p.displayOrder = 0 THEN 1 ELSE 0 END ASC, p.displayOrder ASC, p.createdAt DESC, p.id DESC")
     List<Photo> findAllOrderedForSort(@Param("memberId") Long memberId);
 }

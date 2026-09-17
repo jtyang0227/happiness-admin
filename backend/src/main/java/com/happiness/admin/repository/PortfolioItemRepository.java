@@ -13,4 +13,8 @@ public interface PortfolioItemRepository extends JpaRepository<PortfolioItem, Lo
 
     @Query("SELECT pi FROM PortfolioItem pi WHERE pi.portfolio.id = :portfolioId ORDER BY pi.displayOrder ASC, pi.id ASC")
     List<PortfolioItem> findByPortfolioIdOrdered(@Param("portfolioId") Long portfolioId);
+
+    @Query("SELECT pi.portfolio.id, pi.itemType, COUNT(pi) FROM PortfolioItem pi " +
+           "WHERE pi.portfolio.id IN :portfolioIds GROUP BY pi.portfolio.id, pi.itemType")
+    List<Object[]> countByPortfolioIdInGroupByType(@Param("portfolioIds") List<Long> portfolioIds);
 }
