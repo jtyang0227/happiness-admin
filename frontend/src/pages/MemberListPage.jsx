@@ -13,7 +13,7 @@ const STATUS_COLORS = { ACTIVE: 'badge-green', INACTIVE: 'badge-yellow', SUSPEND
 const STATUS_LABELS = { ACTIVE: '활성', INACTIVE: '비활성', SUSPENDED: '정지', DELETED: '삭제됨' };
 
 const AVATAR_COLORS = [
-  '#E60023', '#2563eb', '#7c3aed', '#059669', '#d97706', '#0891b2', '#be185d',
+  '#C7361B', '#2F7A8C', '#6A5B8C', '#3F8A57', '#B8791E', '#2C4E6E', '#A82530',
 ];
 const avatarColor = (name = '') => AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length];
 

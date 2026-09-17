@@ -1,12 +1,10 @@
 package com.happiness.admin.controller;
 
-import com.happiness.admin.dto.ReorderRequest;
 import com.happiness.admin.service.AdminPhotoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -32,6 +30,11 @@ public class AdminPhotoController {
         return ResponseEntity.ok(photoService.getPhotos(memberId, colorMood, l1, l2, l3, l4, l5, search, sortBy, page, size));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> detail(@PathVariable Long id) {
+        return ResponseEntity.ok(photoService.getPhoto(id));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         photoService.deletePhoto(id);
@@ -42,11 +45,5 @@ public class AdminPhotoController {
     public ResponseEntity<?> updateCategoryCode(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String code = body.get("categoryCode");
         return ResponseEntity.ok(photoService.updateCategoryCode(id, code));
-    }
-
-    @PutMapping("/reorder")
-    public ResponseEntity<?> reorder(@RequestBody List<ReorderRequest> items) {
-        int updated = photoService.reorderPhotos(items);
-        return ResponseEntity.ok(Map.of("updated", updated, "message", "순서가 저장되었습니다."));
     }
 }

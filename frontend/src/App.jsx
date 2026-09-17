@@ -6,6 +6,7 @@ import { ConfirmProvider } from './context/ConfirmContext';
 import AdminLayout from './components/layout/AdminLayout';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import BookingListPage from './pages/BookingListPage';
 import MemberListPage from './pages/MemberListPage';
 import MemberDetailPage from './pages/MemberDetailPage';
 import PhotoListPage from './pages/PhotoListPage';
@@ -23,7 +24,6 @@ import NoticePage from './pages/NoticePage';
 import BannerPage from './pages/BannerPage';
 import ReportListPage from './pages/ReportListPage';
 import VerificationListPage from './pages/VerificationListPage';
-import GalleryOrderPage from './pages/GalleryOrderPage';
 import FeaturedPage from './pages/FeaturedPage';
 import ContentPolicyPage from './pages/ContentPolicyPage';
 import PopupPage from './pages/PopupPage';
@@ -40,6 +40,7 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
       <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+      <Route path="/bookings" element={<ProtectedRoute><BookingListPage /></ProtectedRoute>} />
       <Route path="/members" element={<ProtectedRoute><MemberListPage /></ProtectedRoute>} />
       <Route path="/members/:id" element={<ProtectedRoute><MemberDetailPage /></ProtectedRoute>} />
       <Route path="/photos" element={<ProtectedRoute><PhotoListPage /></ProtectedRoute>} />
@@ -56,11 +57,10 @@ const AppRoutes = () => {
       <Route path="/banners" element={<ProtectedRoute><BannerPage /></ProtectedRoute>} />
       <Route path="/reports" element={<ProtectedRoute><ReportListPage /></ProtectedRoute>} />
       <Route path="/verifications" element={<ProtectedRoute><VerificationListPage /></ProtectedRoute>} />
-      <Route path="/gallery-order" element={<ProtectedRoute><GalleryOrderPage /></ProtectedRoute>} />
       <Route path="/featured" element={<ProtectedRoute><FeaturedPage /></ProtectedRoute>} />
       <Route path="/content-policy" element={<ProtectedRoute><ContentPolicyPage /></ProtectedRoute>} />
       <Route path="/popups" element={<ProtectedRoute><PopupPage /></ProtectedRoute>} />
-      <Route path="*" element={<NotFoundPage />} />
+      <Route path="*" element={<ProtectedRoute><NotFoundPage /></ProtectedRoute>} />
     </Routes>
   );
 };
@@ -76,17 +76,18 @@ function App() {
             toastOptions={{
               duration: 3000,
               style: {
-                background: '#1e293b',
-                color: '#e2e8f0',
+                background: '#16283B',
+                color: '#F1E9D8',
                 fontSize: '13px',
-                borderRadius: '10px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                borderRadius: '0px',
+                border: '2px solid #F1E9D8',
+                boxShadow: '0 0 0 3px #0F1B2A, 0 0 0 5px #F1E9D8',
               },
-              success: { iconTheme: { primary: '#22c55e', secondary: '#1e293b' } },
+              success: { iconTheme: { primary: '#6BBF82', secondary: '#16283B' } },
               error: {
                 duration: 5000,
-                style: { background: '#1e293b', color: '#ef4444' },
-                iconTheme: { primary: '#ef4444', secondary: '#1e293b' },
+                style: { background: '#16283B', color: '#E0454C' },
+                iconTheme: { primary: '#E0454C', secondary: '#16283B' },
               },
             }}
           />

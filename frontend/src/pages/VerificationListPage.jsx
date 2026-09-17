@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getApi, postApi } from '../utils/api';
 import Pagination from '../components/common/Pagination';
@@ -8,9 +9,11 @@ const STATUS_LABELS = { PENDING: '신청 대기', APPROVED: '승인됨', REJECTE
 const STATUS_CLASSES = { PENDING: 'badge-yellow', APPROVED: 'badge-green', REJECTED: 'badge-red' };
 
 const VerificationListPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const memberId = searchParams.get('memberId') || '';
   const [data, setData] = useState({ content: [], totalPages: 0, totalElements: 0 });
   const [counts, setCounts] = useState({});
-  const [status, setStatus] = useState('PENDING');
+  const [status, setStatus] = useState(memberId ? '' : 'PENDING');
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [rejectModal, setRejectModal] = useState(null);
@@ -21,12 +24,13 @@ const VerificationListPage = () => {
     setLoading(true);
     const params = new URLSearchParams({ page, size: 20 });
     if (status) params.set('status', status);
+    if (memberId) params.set('memberId', memberId);
     Promise.all([
       getApi(`/admin/verifications?${params}`),
       getApi('/admin/verifications/counts'),
     ]).then(([d, c]) => { setData(d); setCounts(c); })
       .finally(() => setLoading(false));
-  }, [page, status]);
+  }, [page, status, memberId]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -65,6 +69,13 @@ const VerificationListPage = () => {
         <h1 className="page-title">작가 인증 관리</h1>
         <span className="total-count">총 {data.totalElements?.toLocaleString()}건</span>
       </div>
+
+      {memberId && (
+        <div className="filter-bar">
+          <span className="badge badge-purple">회원 #{memberId} 필터링 중</span>
+          <button className="btn btn-ghost btn-sm" onClick={() => setSearchParams({})}>초기화</button>
+        </div>
+      )}
 
       <div className="verification-tabs">
         {[

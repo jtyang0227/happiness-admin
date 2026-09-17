@@ -47,6 +47,18 @@ public class Report {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = true, length = 500)
+    private String aiSummary;
+
+    @Column(nullable = true, length = 20)
+    private String aiSeverity; // LOW/MEDIUM/HIGH
+
+    @Column(nullable = true, length = 20)
+    private String aiSuggestedAction; // ReportProcessRequest.action과 동일한 값 집합
+
+    @Column(nullable = true)
+    private LocalDateTime aiAnalyzedAt;
+
     @PrePersist
     protected void onCreate() {
         if (this.createdAt == null) this.createdAt = LocalDateTime.now();

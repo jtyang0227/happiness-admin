@@ -7,7 +7,7 @@ import { getApi } from '../utils/api';
 import ImgWithFallback from '../components/common/ImgWithFallback';
 import './StatsPage.css';
 
-const CHART_COLORS = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#06b6d4', '#a855f7', '#ec4899', '#84cc16'];
+const CHART_COLORS = ['#C7361B', '#3F8A57', '#B8791E', '#A82530', '#2F7A8C', '#6A5B8C', '#7BA23F', '#9C6B4E'];
 
 const StatsPage = () => {
   const [days, setDays] = useState(30);
@@ -83,14 +83,14 @@ const StatsPage = () => {
         ) : (
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={daily}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-light)" />
               <XAxis dataKey="day" tick={{ fontSize: 11 }} tickFormatter={d => d.slice(5)} interval="preserveStartEnd" />
               <YAxis tick={{ fontSize: 11 }} />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="photos" stroke="#6366f1" name="사진 업로드" dot={false} strokeWidth={2} />
-              <Line type="monotone" dataKey="signups" stroke="#22c55e" name="신규 가입" dot={false} strokeWidth={2} />
-              <Line type="monotone" dataKey="inquiries" stroke="#f59e0b" name="문의 접수" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="photos" stroke="#C7361B" name="사진 업로드" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="signups" stroke="#3F8A57" name="신규 가입" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="inquiries" stroke="#B8791E" name="문의 접수" dot={false} strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         )}
@@ -101,12 +101,14 @@ const StatsPage = () => {
           <h2 className="card-title">색채 무드 분포</h2>
           <ResponsiveContainer width="100%" height={240}>
             <PieChart>
-              <Pie data={moodDist} dataKey="count" nameKey="label" cx="50%" cy="50%"
-                outerRadius={90} label={({ label, percent }) => `${label} ${(percent * 100).toFixed(0)}%`}
+              <Pie data={moodDist} dataKey="count" nameKey="label" cx="50%" cy="45%"
+                outerRadius={75} label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
                 labelLine={false} fontSize={11}>
                 {moodDist.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
               </Pie>
               <Tooltip formatter={(v, n) => [v + '개', n]} />
+              <Legend verticalAlign="bottom" height={36}
+                formatter={(value, entry) => `${entry.payload.label} (${entry.payload.count}개)`} />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -115,11 +117,11 @@ const StatsPage = () => {
           <h2 className="card-title">촬영 종류별 문의</h2>
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={shootDist} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-light)" />
               <XAxis type="number" tick={{ fontSize: 11 }} />
               <YAxis dataKey="label" type="category" tick={{ fontSize: 12 }} width={70} />
               <Tooltip />
-              <Bar dataKey="count" fill="#6366f1" radius={[0, 4, 4, 0]} name="문의 수" />
+              <Bar dataKey="count" fill="#C7361B" radius={[0, 0, 0, 0]} name="문의 수" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -169,7 +171,7 @@ const StatsPage = () => {
               <tr key={pg.memberId}>
                 <td className="rank-cell">{i + 1}</td>
                 <td className="name-cell">{pg.name}</td>
-                <td style={{ color: 'var(--color-text-2)', fontSize: 12 }}>{pg.profileName}</td>
+                <td style={{ color: 'var(--color-text-tertiary)', fontSize: 12 }}>{pg.profileName}</td>
                 <td>{pg.photoCount.toLocaleString()}</td>
                 <td>❤️ {pg.totalLikes.toLocaleString()}</td>
                 <td>🔖 {pg.totalSaves.toLocaleString()}</td>

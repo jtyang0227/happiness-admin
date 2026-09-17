@@ -43,6 +43,11 @@ public class Inquiry {
     @Builder.Default
     private boolean isRead = false;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "process_status", nullable = false)
+    @Builder.Default
+    private InquiryProcessStatus processStatus = InquiryProcessStatus.NEW;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

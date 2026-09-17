@@ -40,6 +40,16 @@
   position: absolute; top: 8px; right: 8px;
   font-size: 14px; line-height: 1;
 }
+.pf-pending-age {
+  position: absolute; bottom: 8px; left: 8px;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: var(--radius-full);
+  font-size: var(--text-xs); font-weight: 600;
+  background: var(--color-warning-bg); color: var(--color-warning);
+}
+.pf-pending-age--overdue {
+  background: var(--color-danger-bg); color: var(--color-danger);
+}
 
 .pf-body { padding: 12px; }
 .pf-title { font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

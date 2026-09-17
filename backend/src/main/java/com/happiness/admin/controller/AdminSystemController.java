@@ -1,10 +1,12 @@
 package com.happiness.admin.controller;
 
+import com.happiness.admin.dto.ActivityHeatmapDayDto;
 import com.happiness.admin.dto.AdminActivityLogDto;
 import com.happiness.admin.dto.PageResponse;
 import com.happiness.admin.dto.SystemStatusDto;
 import com.happiness.admin.entity.AdminActivityLog;
 import com.happiness.admin.repository.AdminActivityLogRepository;
+import com.happiness.admin.service.GeminiClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -12,7 +14,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/system")
@@ -21,6 +29,7 @@ public class AdminSystemController {
 
     private final Environment env;
     private final AdminActivityLogRepository activityLogRepository;
+    private final GeminiClientService geminiClientService;
 
     @Value("${spring.mail.host:}")
     private String mailHost;
@@ -43,7 +52,20 @@ public class AdminSystemController {
                 .rateLimitRefillSeconds("1")
                 .dbType(dbType)
                 .activeProfile(activeProfile)
+                .geminiConfigured(geminiClientService.isConfigured())
+                .geminiModel(geminiClientService.getModel())
                 .build());
+    }
+
+    @PostMapping("/gemini-test")
+    public ResponseEntity<?> geminiTest(@RequestBody Map<String, String> body) {
+        String prompt = body.getOrDefault("prompt", "안녕이라고 한국어로만 짧게 답해줘.");
+        try {
+            String text = geminiClientService.generateText(prompt);
+            return ResponseEntity.ok(Map.of("prompt", prompt, "response", text));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(502).body(Map.of("error", e.getMessage()));
+        }
     }
 
     @GetMapping("/activity-logs")
@@ -61,5 +83,29 @@ public class AdminSystemController {
     @PostMapping("/activity-logs")
     public ResponseEntity<?> logActivity(@RequestBody AdminActivityLog log) {
         return ResponseEntity.ok(activityLogRepository.save(log));
+    }
+
+    @GetMapping("/activity-heatmap")
+    public ResponseEntity<List<ActivityHeatmapDayDto>> activityHeatmap(
+            @RequestParam(defaultValue = "7") int weeks) {
+        int days = weeks * 7;
+        LocalDate today = LocalDate.now();
+        LocalDate since = today.minusDays(days - 1L);
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        Map<String, Long> countByDay = new HashMap<>();
+        for (Object[] row : activityLogRepository.dailyActivity(since.atStartOfDay())) {
+            countByDay.put(((LocalDate) row[0]).format(fmt), (Long) row[1]);
+        }
+
+        List<ActivityHeatmapDayDto> result = new ArrayList<>();
+        for (int i = days - 1; i >= 0; i--) {
+            String day = today.minusDays(i).format(fmt);
+            result.add(ActivityHeatmapDayDto.builder()
+                    .day(day)
+                    .count(countByDay.getOrDefault(day, 0L))
+                    .build());
+        }
+        return ResponseEntity.ok(result);
     }
 }

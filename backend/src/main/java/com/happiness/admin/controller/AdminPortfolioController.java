@@ -18,15 +18,22 @@ public class AdminPortfolioController {
     public ResponseEntity<?> list(
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String visibility,
+            @RequestParam(required = false) Long memberId,
             @RequestParam(required = false) String search,
+            @RequestParam(required = false) String sortBy,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(portfolioService.getPortfolios(status, visibility, search, page, size));
+        return ResponseEntity.ok(portfolioService.getPortfolios(status, visibility, memberId, search, sortBy, page, size));
     }
 
     @GetMapping("/stats")
     public ResponseEntity<?> stats() {
         return ResponseEntity.ok(portfolioService.getStatusCounts());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> detail(@PathVariable Long id) {
+        return ResponseEntity.ok(portfolioService.getPortfolio(id));
     }
 
     @PatchMapping("/{id}/approve")

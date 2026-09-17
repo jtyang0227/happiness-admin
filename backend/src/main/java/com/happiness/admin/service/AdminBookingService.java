@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 @Service
@@ -29,7 +30,8 @@ public class AdminBookingService {
     }
 
     public List<BookingCalendarDotDto> getCalendarDots(int year, int month) {
-        return bookingRepository.countByDay(year, month).stream()
+        YearMonth ym = YearMonth.of(year, month);
+        return bookingRepository.countByDayBetween(ym.atDay(1), ym.atEndOfMonth()).stream()
                 .map(r -> new BookingCalendarDotDto((LocalDate) r[0], (Long) r[1]))
                 .toList();
     }

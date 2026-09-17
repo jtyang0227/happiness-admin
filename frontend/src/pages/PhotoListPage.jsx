@@ -135,10 +135,14 @@ const PhotoListPage = () => {
   const catValues = { l1, l2, l3, l4, l5 };
 
   const decodeCat = (photo) => {
-    return [
-      { lv: 'l1', label: photo.l1Name },
-      { lv: 'l2', label: photo.l2Name },
-    ].filter(c => c.label && c.label !== '00');
+    if (!cats || !photo.categoryCode) return [];
+    return [1, 2]
+      .map(lv => {
+        const code = photo.categoryCode.slice((lv - 1) * 2, lv * 2);
+        const match = (cats[lv] || []).find(c => c.code === code);
+        return match && code !== '00' ? { lv: `l${lv}`, label: match.nameKo } : null;
+      })
+      .filter(Boolean);
   };
 
   return (
@@ -210,9 +214,6 @@ const PhotoListPage = () => {
               <div className="photo-body">
                 <div className="photo-title"><Highlight text={p.title} keyword={search} /></div>
                 <div className="photo-author"><Highlight text={p.authorName} keyword={search} /></div>
-                {p.categoryCode && p.categoryCode !== '0000000000' && (
-                  <div className="photo-code code-badge">{p.categoryCode}</div>
-                )}
                 <div className="photo-stats">❤️ {p.likesCount} · 🔖 {p.savesCount} · 🔄 {p.sharesCount}</div>
                 <div className="photo-date">{p.createdAt?.slice(0, 10)}</div>
                 <button

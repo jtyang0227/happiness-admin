@@ -3,54 +3,60 @@
 /* ── KPI Cards ── */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
 
-@media (max-width: 1280px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 768px)  { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 480px)  { .kpi-grid { gap: 10px; } }
 
-.kpi-card {
+.dash-kpi-card {
   background: var(--color-surface);
   border-radius: var(--radius-lg);
   padding: 18px 16px 14px;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-ring);
   border: 1px solid var(--color-border);
   text-decoration: none;
   color: inherit;
   position: relative;
-  transition: box-shadow var(--dur-normal), transform var(--dur-normal), border-color var(--dur-normal);
+  transition: transform var(--dur-fast), border-color var(--dur-normal);
   overflow: hidden;
 }
 
-.kpi-card::before {
+.dash-kpi-card::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 2px;
+  height: 4px;
   background: var(--kpi-color, var(--color-brand));
 }
 
-.kpi-card:hover {
-  box-shadow: var(--shadow-md);
+.dash-kpi-card:hover {
   transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
   border-color: var(--kpi-color, var(--color-brand));
   text-decoration: none;
 }
 
-.kpi-card-top {
+/* 카드마다 임의의 hex를 인라인으로 넘기던 방식을 없애고, 의미(정보/주의/긴급)별로
+   실제 토큰 5종만 쓰도록 고정했다 — 다크모드에서도 자동으로 대비가 맞는다. */
+.dash-kpi-card--brand   { --kpi-color: var(--color-brand);   --kpi-bg: var(--color-brand-light); }
+.dash-kpi-card--accent  { --kpi-color: var(--color-accent);  --kpi-bg: var(--color-accent-bg); }
+.dash-kpi-card--info    { --kpi-color: var(--color-info);    --kpi-bg: var(--color-info-bg); }
+.dash-kpi-card--warning { --kpi-color: var(--color-warning); --kpi-bg: var(--color-warning-bg); }
+.dash-kpi-card--danger  { --kpi-color: var(--color-danger);  --kpi-bg: var(--color-danger-bg); }
+
+.dash-kpi-card-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 4px;
 }
 
-.kpi-icon {
+.dash-kpi-icon {
   width: 36px;
   height: 36px;
   border-radius: var(--radius-md);
@@ -59,16 +65,19 @@
   justify-content: center;
   font-size: 16px;
   flex-shrink: 0;
+  background: var(--kpi-bg);
+  color: var(--kpi-color);
 }
 
-.kpi-value {
-  font-size: var(--text-xl);
-  font-weight: var(--fw-bold);
+.dash-kpi-value {
+  font-family: var(--font-pixel);
+  font-size: var(--text-lg);
+  font-weight: 400;
   color: var(--color-text-primary);
-  line-height: 1;
+  line-height: 1.4;
 }
 
-.kpi-label {
+.dash-kpi-label {
   font-size: var(--text-xs);
   color: var(--color-text-secondary);
 }
@@ -88,8 +97,9 @@
 .kpi-change--neutral { background: var(--color-surface-2);  color: var(--color-text-tertiary); }
 
 .kpi-progress-track {
-  height: 3px;
-  background: var(--color-border);
+  height: 6px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
   margin-top: 6px;
   overflow: hidden;
@@ -98,6 +108,7 @@
 .kpi-progress-bar {
   height: 100%;
   border-radius: var(--radius-full);
+  background: var(--kpi-color, var(--color-brand));
   transition: width 0.6s var(--ease-default);
 }
 
@@ -110,7 +121,7 @@
   transition: opacity var(--dur-fast);
 }
 
-.kpi-card:hover .kpi-arrow { opacity: 1; }
+.dash-kpi-card:hover .kpi-arrow { opacity: 1; }
 
 /* ── Dashboard Grid ── */
 .dashboard-grid {
@@ -132,11 +143,12 @@
   background: var(--color-surface);
   border-radius: var(--radius-lg);
   padding: 20px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-ring);
   border: 1px solid var(--color-border);
 }
 
 .dashboard-card.full-width { grid-column: 1 / -1; }
+.dashboard-card.span-2 { grid-column: span 2; }
 
 .card-header {
   display: flex;
@@ -166,9 +178,13 @@
 
 .top-photos-list { display: flex; flex-direction: column; gap: 10px; }
 
-.top-photo-item { display: flex; align-items: center; gap: 12px; }
-
-.rank { width: 24px; font-size: var(--text-sm); font-weight: var(--fw-bold); color: var(--color-brand); }
+.top-photo-item {
+  display: flex; align-items: center; gap: 12px;
+  text-decoration: none; color: inherit;
+  padding: 4px; margin: -4px;
+  transition: background var(--dur-fast);
+}
+.top-photo-item:hover { background: var(--color-surface-2); text-decoration: none; }
 
 .photo-thumb {
   width: 44px;

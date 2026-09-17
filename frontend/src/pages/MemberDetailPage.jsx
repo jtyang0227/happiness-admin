@@ -7,14 +7,20 @@ import {
 } from 'lucide-react';
 import { getApi, patchApi } from '../utils/api';
 import { useConfirm } from '../context/ConfirmContext';
+import SlideOver from '../components/common/SlideOver';
 import './MemberDetailPage.css';
 
 const TABS = [
   { key: 'summary', label: '활동 요약' },
   { key: 'photos',  label: '사진' },
   { key: 'series',  label: '시리즈' },
+  { key: 'portfolios', label: '포트폴리오' },
   { key: 'inquiries', label: '문의' },
 ];
+
+const AUTHORITY_LABELS = { WM: '웹관리자', SA: '운영자', US: '일반' };
+const PF_STATUS_LABELS = { DRAFT: '임시저장', PENDING: '심사 중', APPROVED: '승인', REJECTED: '반려' };
+const PF_STATUS_BADGE = { DRAFT: 'badge-draft', PENDING: 'badge-pending', APPROVED: 'badge-approved', REJECTED: 'badge-rejected' };
 
 const STATUS_MAP = {
   ACTIVE:    { label: '활성',   cls: 'sc-active' },
@@ -23,7 +29,7 @@ const STATUS_MAP = {
   DELETED:   { label: '삭제됨', cls: 'sc-deleted' },
 };
 
-const AVATAR_COLORS = ['#E60023','#2563eb','#7c3aed','#059669','#d97706','#0891b2','#be185d'];
+const AVATAR_COLORS = ['#C7361B','#2F7A8C','#6A5B8C','#3F8A57','#B8791E','#2C4E6E','#A82530'];
 const avatarColor = (name = '') => AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length];
 
 /* ── 정지 모달 ── */
@@ -117,6 +123,30 @@ const PhotoThumb = ({ photo }) => {
   );
 };
 
+/* ── 포트폴리오 썸네일 (blur reveal) ── */
+const PortfolioThumb = ({ portfolio, onClick }) => {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div className="mdp-photo-card" style={{ cursor: 'pointer' }} onClick={onClick}>
+      <div className="mdp-photo-img-wrap">
+        {portfolio.coverImageUrl
+          ? <img
+              src={portfolio.coverImageUrl}
+              alt={portfolio.title}
+              className={`mdp-photo-img${loaded ? ' loaded' : ''}`}
+              onLoad={() => setLoaded(true)}
+            />
+          : <div className="mdp-photo-placeholder"><FolderOpen size={24} /></div>
+        }
+      </div>
+      <div className="mdp-photo-title">{portfolio.title}</div>
+      <span className={`badge ${PF_STATUS_BADGE[portfolio.status] || ''}`} style={{ marginTop: 4 }}>
+        {PF_STATUS_LABELS[portfolio.status] || portfolio.status}
+      </span>
+    </div>
+  );
+};
+
 /* ── 메인 컴포넌트 ── */
 const MemberDetailPage = () => {
   const { id } = useParams();
@@ -127,9 +157,14 @@ const MemberDetailPage = () => {
   const [activeTab, setActiveTab] = useState('summary');
   const [tabPhotos, setTabPhotos] = useState([]);
   const [tabSeries, setTabSeries] = useState([]);
+  const [tabPortfolios, setTabPortfolios] = useState([]);
   const [tabInquiries, setTabInquiries] = useState([]);
   const [showSuspend, setShowSuspend] = useState(false);
   const [indicator, setIndicator] = useState({ left: 0, width: 0 });
+  const [hasPendingVerification, setHasPendingVerification] = useState(false);
+  const [slidePortfolio, setSlidePortfolio] = useState(null);
+  const [noteInput, setNoteInput] = useState('');
+  const [actionLoading, setActionLoading] = useState(false);
   const tabBarRef = useRef(null);
 
   const fetchMember = useCallback(() => {
@@ -147,10 +182,69 @@ const MemberDetailPage = () => {
       getApi(`/admin/photos?memberId=${id}&size=6`).then(r => setTabPhotos(r.content || [])).catch(() => {});
     } else if (activeTab === 'series') {
       getApi(`/admin/series?memberId=${id}&size=6`).then(r => setTabSeries(r.content || [])).catch(() => {});
+    } else if (activeTab === 'portfolios') {
+      getApi(`/admin/portfolios?memberId=${id}&size=6`).then(r => setTabPortfolios(r.content || [])).catch(() => {});
     } else if (activeTab === 'inquiries') {
       getApi(`/admin/inquiries?senderId=${id}&size=10`).then(r => setTabInquiries(r.content || [])).catch(() => {});
     }
   }, [activeTab, member, id]);
+
+  useEffect(() => {
+    if (!member || member.isVerified) return;
+    getApi(`/admin/verifications?memberId=${id}&status=PENDING&size=1`)
+      .then(r => setHasPendingVerification((r.content || []).length > 0))
+      .catch(() => {});
+  }, [member, id]);
+
+  const refreshPortfolios = useCallback(() => {
+    getApi(`/admin/portfolios?memberId=${id}&size=6`).then(r => setTabPortfolios(r.content || [])).catch(() => {});
+  }, [id]);
+
+  const openPortfolioSlide = (p) => {
+    setSlidePortfolio(p);
+    setNoteInput(p.adminNote || '');
+  };
+
+  const handlePortfolioApprove = async () => {
+    if (!slidePortfolio) return;
+    setActionLoading(true);
+    try {
+      await patchApi(`/admin/portfolios/${slidePortfolio.id}/approve`, { adminNote: noteInput });
+      toast.success('포트폴리오가 승인되었습니다.');
+      setSlidePortfolio(null);
+      refreshPortfolios();
+      fetchMember();
+    } catch { toast.error('처리에 실패했습니다.'); }
+    finally { setActionLoading(false); }
+  };
+
+  const handlePortfolioReject = async () => {
+    if (!slidePortfolio) return;
+    if (!noteInput.trim()) { toast.error('반려 사유를 입력해 주세요.'); return; }
+    setActionLoading(true);
+    try {
+      await patchApi(`/admin/portfolios/${slidePortfolio.id}/reject`, { adminNote: noteInput });
+      toast.success('포트폴리오가 반려되었습니다.');
+      setSlidePortfolio(null);
+      refreshPortfolios();
+      fetchMember();
+    } catch { toast.error('처리에 실패했습니다.'); }
+    finally { setActionLoading(false); }
+  };
+
+  const handleRoleChange = async (newAuthority) => {
+    const ok = await confirm({
+      title: '역할 변경',
+      description: `"${member.name}"의 역할을 ${AUTHORITY_LABELS[newAuthority]}(${newAuthority})로 변경하시겠습니까?`,
+      variant: 'warning',
+    });
+    if (!ok) return;
+    try {
+      await patchApi(`/admin/members/${id}/role`, { authority: newAuthority });
+      toast.success('역할이 변경되었습니다.');
+      fetchMember();
+    } catch { toast.error('역할 변경에 실패했습니다.'); }
+  };
 
   useEffect(() => {
     if (!tabBarRef.current) return;
@@ -249,10 +343,10 @@ const MemberDetailPage = () => {
 
       {/* ── KPI ── */}
       <div className="mdp-kpi-grid">
-        <KpiCard icon={Camera}        label="사진"       value={member.photoCount}     color="#E60023" delay={0} />
-        <KpiCard icon={BookOpen}      label="시리즈"     value={member.seriesCount}    color="#2563eb" delay={60} />
-        <KpiCard icon={MessageSquare} label="문의"       value={member.inquiryCount}   color="#7c3aed" delay={120} />
-        <KpiCard icon={FolderOpen}    label="포트폴리오" value={member.portfolioCount} color="#059669" delay={180} />
+        <KpiCard icon={Camera}        label="사진"       value={member.photoCount}     color="#C7361B" delay={0} />
+        <KpiCard icon={BookOpen}      label="시리즈"     value={member.seriesCount}    color="#2F7A8C" delay={60} />
+        <KpiCard icon={MessageSquare} label="문의"       value={member.inquiryCount}   color="#6A5B8C" delay={120} />
+        <KpiCard icon={FolderOpen}    label="포트폴리오" value={member.portfolioCount} color="#3F8A57" delay={180} />
       </div>
 
       {/* ── 탭 ── */}
@@ -276,12 +370,31 @@ const MemberDetailPage = () => {
               <div className="mdp-card-title">기본 정보</div>
               <div className="mdp-info-list">
                 <div className="mdp-info-row"><span>가입일</span><span>{member.createdAt?.slice(0, 10)}</span></div>
-                <div className="mdp-info-row"><span>권한</span><span>{member.authority}</span></div>
+                <div className="mdp-info-row">
+                  <span>권한</span>
+                  <select
+                    className="role-select badge badge-purple"
+                    value={member.authority}
+                    onChange={e => handleRoleChange(e.target.value)}
+                  >
+                    {Object.entries(AUTHORITY_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                  </select>
+                </div>
                 <div className="mdp-info-row">
                   <span>작가 인증</span>
-                  <span className={member.isVerified ? 'mdp-verified-text' : 'mdp-unverified-text'}>
-                    {member.isVerified ? `인증됨 (${member.verifiedAt?.slice(0, 10)})` : '미인증'}
-                  </span>
+                  {member.isVerified ? (
+                    <span className="mdp-verified-text">
+                      인증됨 ({member.verifiedAt?.slice(0, 10)}) ·{' '}
+                      <button className="mdp-inline-link" onClick={() => navigate(`/verifications?memberId=${id}`)}>인증 내역 보기 ↗</button>
+                    </span>
+                  ) : hasPendingVerification ? (
+                    <span className="mdp-unverified-text">
+                      미인증 ·{' '}
+                      <button className="mdp-inline-link" onClick={() => navigate(`/verifications?memberId=${id}`)}>심사 대기 중 — 인증 관리에서 보기 ↗</button>
+                    </span>
+                  ) : (
+                    <span className="mdp-unverified-text">미인증</span>
+                  )}
                 </div>
               </div>
             </div>
@@ -323,6 +436,17 @@ const MemberDetailPage = () => {
           </div>
         )}
 
+        {activeTab === 'portfolios' && (
+          <div className="mdp-photos-grid">
+            {tabPortfolios.length === 0
+              ? <div className="mdp-empty"><FolderOpen size={32} /><span>등록된 포트폴리오가 없습니다.</span></div>
+              : tabPortfolios.map(p => (
+                <PortfolioThumb key={p.id} portfolio={p} onClick={() => openPortfolioSlide(p)} />
+              ))
+            }
+          </div>
+        )}
+
         {activeTab === 'inquiries' && (
           <div className="mdp-list-stack">
             {tabInquiries.length === 0
@@ -342,6 +466,64 @@ const MemberDetailPage = () => {
       {showSuspend && (
         <SuspendModal member={member} onClose={() => setShowSuspend(false)} onConfirm={handleSuspendConfirm} />
       )}
+
+      <SlideOver
+        open={!!slidePortfolio}
+        onClose={() => setSlidePortfolio(null)}
+        title="포트폴리오 상세 / 심사"
+        width={520}
+        footer={
+          slidePortfolio && (
+            <>
+              <button className="btn btn-ghost btn-md" onClick={() => setSlidePortfolio(null)}>닫기</button>
+              {slidePortfolio.status === 'PENDING' && (
+                <>
+                  <button className="btn btn-danger-full btn-md" onClick={handlePortfolioReject} disabled={actionLoading}>반려</button>
+                  <button className="btn btn-success btn-md" onClick={handlePortfolioApprove} disabled={actionLoading}>승인</button>
+                </>
+              )}
+            </>
+          )
+        }
+      >
+        {slidePortfolio && (
+          <>
+            <div className="so-field">
+              <span className="so-label">제목</span>
+              <span className="so-value">{slidePortfolio.title}</span>
+            </div>
+            <div className="so-field">
+              <span className="so-label">상태</span>
+              <span className="so-value">
+                <span className={`badge ${PF_STATUS_BADGE[slidePortfolio.status] || ''}`}>{PF_STATUS_LABELS[slidePortfolio.status]}</span>
+              </span>
+            </div>
+            <div className="so-field">
+              <span className="so-label">구성</span>
+              <span className="so-value">사진 {slidePortfolio.photoCount}장 · 시리즈 {slidePortfolio.seriesCount}개</span>
+            </div>
+            <div className="so-field">
+              <span className="so-label">통계</span>
+              <span className="so-value">❤️ {slidePortfolio.likesCount} · 👁 {slidePortfolio.viewCount}</span>
+            </div>
+            <div className="so-field">
+              <span className="so-label">등록일</span>
+              <span className="so-value">{slidePortfolio.createdAt?.slice(0, 10)}</span>
+            </div>
+            <hr className="so-divider" />
+            <div className="so-field">
+              <span className="so-label">관리자 메모 {slidePortfolio.status === 'PENDING' && <span style={{ color: 'var(--color-danger)', fontWeight: 400 }}>(반려 시 필수)</span>}</span>
+              <textarea
+                className="so-textarea"
+                rows={3}
+                value={noteInput}
+                onChange={e => setNoteInput(e.target.value)}
+                placeholder="관리자 메모 또는 반려 사유를 입력하세요."
+              />
+            </div>
+          </>
+        )}
+      </SlideOver>
     </div>
   );
 };

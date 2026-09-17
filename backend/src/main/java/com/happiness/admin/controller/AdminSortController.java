@@ -18,8 +18,8 @@ public class AdminSortController {
     private final AdminSortService sortService;
 
     @GetMapping("/photos")
-    public ResponseEntity<List<SortPhotoDto>> getPhotos() {
-        return ResponseEntity.ok(sortService.getPhotosForSort());
+    public ResponseEntity<List<SortPhotoDto>> getPhotos(@RequestParam(required = false) Long memberId) {
+        return ResponseEntity.ok(sortService.getPhotosForSort(memberId));
     }
 
     @PutMapping("/photos")

@@ -6,10 +6,12 @@ import com.happiness.admin.dto.PhotographerStatDto;
 import com.happiness.admin.dto.StatsSummaryDto;
 import com.happiness.admin.dto.TopPhotoDto;
 import com.happiness.admin.entity.BookingStatus;
+import com.happiness.admin.entity.PortfolioStatus;
 import com.happiness.admin.repository.BookingRepository;
 import com.happiness.admin.repository.InquiryRepository;
 import com.happiness.admin.repository.MemberRepository;
 import com.happiness.admin.repository.PhotoRepository;
+import com.happiness.admin.repository.PortfolioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ public class AdminStatsService {
     private final PhotoRepository photoRepository;
     private final InquiryRepository inquiryRepository;
     private final BookingRepository bookingRepository;
+    private final PortfolioRepository portfolioRepository;
 
     public StatsSummaryDto getSummary() {
         LocalDateTime todayStart = LocalDate.now().atStartOfDay();
@@ -41,6 +44,7 @@ public class AdminStatsService {
                 .unreadInquiries(inquiryRepository.countByIsReadFalse())
                 .todayBookings(bookingRepository.countTodayConfirmed(LocalDate.now()))
                 .pendingBookings(bookingRepository.countByStatus(BookingStatus.REQUESTED))
+                .pendingPortfolios(portfolioRepository.countByStatus(PortfolioStatus.PENDING))
                 .build();
     }
 

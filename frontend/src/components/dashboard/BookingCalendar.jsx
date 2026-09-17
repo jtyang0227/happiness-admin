@@ -13,8 +13,8 @@ const STATUS_MAP = {
 
 const getDotColor = (count) => {
   if (count >= 6) return 'var(--color-brand)';
-  if (count >= 3) return 'var(--color-warning, #f59e0b)';
-  return 'var(--color-info, #0ea5e9)';
+  if (count >= 3) return 'var(--color-warning)';
+  return 'var(--color-info)';
 };
 
 const pad = (n) => String(n).padStart(2, '0');

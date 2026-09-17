@@ -136,7 +136,6 @@ const SortSeriesDetailPage = () => {
               <BlurImg src={sp.thumbnailUrl} alt={sp.title} />
               <div className="ssd-info">
                 <span className="ssd-name">{sp.title}</span>
-                <span className="ssd-meta">Photo ID: {sp.photoId}</span>
               </div>
             </li>
           ))}

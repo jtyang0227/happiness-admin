@@ -1,34 +1,54 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import './SlideOver.css';
 
 const SlideOver = ({ open, onClose, title, children, footer, width = 480 }) => {
+  const [rendered, setRendered] = useState(open);
+  const [closing, setClosing] = useState(false);
+
   useEffect(() => {
     if (open) {
+      setRendered(true);
+      setClosing(false);
+    } else {
+      setClosing(true);
+    }
+  }, [open]);
+
+  const handleAnimationEnd = () => {
+    if (closing) {
+      setRendered(false);
+      setClosing(false);
+    }
+  };
+
+  useEffect(() => {
+    if (rendered) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
     return () => { document.body.style.overflow = ''; };
-  }, [open]);
+  }, [rendered]);
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose?.(); };
-    if (open) document.addEventListener('keydown', onKey);
+    if (rendered) document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+  }, [rendered, onClose]);
 
-  if (!open) return null;
+  if (!rendered) return null;
 
   return (
     <>
-      <div className="slideover-backdrop" onClick={onClose} aria-hidden="true" />
+      <div className={`slideover-backdrop ${closing ? 'closing' : ''}`} onClick={onClose} aria-hidden="true" />
       <aside
-        className="slideover"
+        className={`slideover ${closing ? 'closing' : ''}`}
         style={{ width: Math.min(width, window.innerWidth) }}
         role="dialog"
         aria-modal="true"
         aria-label={title}
+        onAnimationEnd={handleAnimationEnd}
       >
         <div className="slideover-header">
           <h2 className="slideover-title">{title}</h2>
