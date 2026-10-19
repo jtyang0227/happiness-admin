@@ -7,7 +7,7 @@ import { getApi } from '../utils/api';
 import ImgWithFallback from '../components/common/ImgWithFallback';
 import './StatsPage.css';
 
-const CHART_COLORS = ['#C7361B', '#3F8A57', '#B8791E', '#A82530', '#2F7A8C', '#6A5B8C', '#7BA23F', '#9C6B4E'];
+const CHART_COLORS = ['#EC572D', '#3F8A57', '#B8791E', '#A82530', '#2F7A8C', '#6A5B8C', '#7BA23F', '#9C6B4E'];
 
 const StatsPage = () => {
   const [days, setDays] = useState(30);
@@ -88,7 +88,7 @@ const StatsPage = () => {
               <YAxis tick={{ fontSize: 11 }} />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="photos" stroke="#C7361B" name="사진 업로드" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="photos" stroke="#EC572D" name="사진 업로드" dot={false} strokeWidth={2} />
               <Line type="monotone" dataKey="signups" stroke="#3F8A57" name="신규 가입" dot={false} strokeWidth={2} />
               <Line type="monotone" dataKey="inquiries" stroke="#B8791E" name="문의 접수" dot={false} strokeWidth={2} />
             </LineChart>
@@ -121,7 +121,7 @@ const StatsPage = () => {
               <XAxis type="number" tick={{ fontSize: 11 }} />
               <YAxis dataKey="label" type="category" tick={{ fontSize: 12 }} width={70} />
               <Tooltip />
-              <Bar dataKey="count" fill="#C7361B" radius={[0, 0, 0, 0]} name="문의 수" />
+              <Bar dataKey="count" fill="#EC572D" radius={[0, 0, 0, 0]} name="문의 수" />
             </BarChart>
           </ResponsiveContainer>
         </div>

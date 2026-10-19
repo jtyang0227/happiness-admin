@@ -29,7 +29,7 @@ const STATUS_MAP = {
   DELETED:   { label: '삭제됨', cls: 'sc-deleted' },
 };
 
-const AVATAR_COLORS = ['#C7361B','#2F7A8C','#6A5B8C','#3F8A57','#B8791E','#2C4E6E','#A82530'];
+const AVATAR_COLORS = ['#EC572D','#2F7A8C','#6A5B8C','#3F8A57','#B8791E','#2C4E6E','#A82530'];
 const avatarColor = (name = '') => AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length];
 
 /* ── 정지 모달 ── */
@@ -343,7 +343,7 @@ const MemberDetailPage = () => {
 
       {/* ── KPI ── */}
       <div className="mdp-kpi-grid">
-        <KpiCard icon={Camera}        label="사진"       value={member.photoCount}     color="#C7361B" delay={0} />
+        <KpiCard icon={Camera}        label="사진"       value={member.photoCount}     color="#EC572D" delay={0} />
         <KpiCard icon={BookOpen}      label="시리즈"     value={member.seriesCount}    color="#2F7A8C" delay={60} />
         <KpiCard icon={MessageSquare} label="문의"       value={member.inquiryCount}   color="#6A5B8C" delay={120} />
         <KpiCard icon={FolderOpen}    label="포트폴리오" value={member.portfolioCount} color="#3F8A57" delay={180} />

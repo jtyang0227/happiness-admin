@@ -113,7 +113,7 @@ React SPA using React Router v6 + Recharts:
   - `VerificationListPage` (`/verifications`) — 작가 인증 신청 검토
   - `BookingListPage` (`/bookings`) — 촬영 예약 관리
   - `ContentPolicyPage` (`/content-policy`) — 정렬 가중치·유지보수 모드 설정
-- **`components/layout/`** — `Sidebar` (정렬 관리 아코디언 포함), `AdminLayout`, `AdminTopbar` (검색바·다크모드 토글·프로필 드롭다운 — `AdminHeader`는 더 이상 존재하지 않는다, Toss 리뉴얼 때 교체됨)
+- **`components/layout/`** — `navConfig.js`(그룹↔라우트 단일 소스, `findActiveGroup`), `AdminTopbar`(상단 pill 탭 5그룹·검색·상태·다크모드 토글·프로필), `IconRail`(활성 그룹 페이지용 플로팅 아이콘 레일, 모바일 ≤767px에서는 하단 바, 정렬 관리는 팝오버), `AdminLayout`. `Sidebar`는 V14에서 삭제됨
 - **`components/common/`** — `Pagination`, `ConfirmDialog`, `SlideOver`, `ImgWithFallback`
 - **`hooks/useDragSort.js`** — HTML5 DnD 기반 정렬 훅. `toReorderPayload()` 로 `[{id, displayOrder}]` 생성
 - **`utils/api.js`** — `getApi`, `postApi`, `patchApi`, `putApi`, `deleteApi`. **토큰이 실려 있던 요청**의 401만 세션 만료로 간주해 `/login` 강제 리다이렉트한다 — 토큰 없이 보낸 요청(로그인 자체 등)의 401은 그 자체가 인증 실패 응답이라 일반 에러로 넘긴다. 이전에는 이 구분이 없어서 로그인 실패 메시지가 아예 안 뜨는 버그가 있었다(수정됨).
@@ -147,8 +147,7 @@ React SPA using React Router v6 + Recharts:
 
 ### Design References
 
-현재(6차) 디자인 컨셉은 **Toss** — 흰 캔버스 위 파랑 하나, 둥근 모서리와 소프트 섀도우로
-신뢰감을 만드는 절제된 금융 UI 문법이다. 1~5차(Cosmos × Pinterest → Railway DNA →
+현재(7차) 디자인 컨셉은 **V14 Minimal Premium** — 라이트 캔버스(#F5F3F6) 위 오렌지(#EC572D) 하나, 블랙 pill CTA·탭, 테두리 없는 둥근 카드와 약한 섀도우로 만드는 미니멀 UI 문법이다. 6차 Toss(파랑)도 폐기되었다 — 구조(상단 pill 탭 + 플로팅 아이콘 레일)와 팔레트가 모두 바뀌었다. 1~5차(Cosmos × Pinterest → Railway DNA →
 Pixel Arcade → 和ドット → AKIRA Neo-Tokyo)는 전부 폐기되었다 — 관련 기록 문서는 더 이상
 리포지토리에 없다(과거 세대의 팔레트·컴포넌트 디테일이 필요하면 git 히스토리 참고). 5차
 AKIRA의 각진 프레임·하드 오프셋 섀도우·네온 포인트·CRT 텍스처는 전부 폐기했다 — 6차는
@@ -157,7 +156,7 @@ AKIRA의 각진 프레임·하드 오프셋 섀도우·네온 포인트·CRT 텍
 | DNA | Key Elements |
 |---|---|
 | **둥근 카드** | 둥근 모서리(`--radius-sm` 8px ~ `--radius-2xl` 24px), 소프트 엘리베이션 섀도우(`--shadow-ring`), 하드 오프셋 없음 |
-| **Toss 팔레트** | 파랑(#3182F6) 브랜드, sky(#0EA5E9) 보조 액센트, 라이트/다크 모두 옅은 회색 보더 유지(반전 없음) |
+| **V14 팔레트** | 오렌지(#EC572D) 브랜드(강조·선택·히어로 그라디언트 전용), 잉크(#151316) pill CTA/활성 탭(`--color-ink`), sky 보조 액센트, 다크는 구조 동일·오렌지만 한 단계 밝게 |
 | **인터랙션** | 클릭 시 `scale(0.97)` 스퀴시, hover 시 `filter: brightness(0.96)` 또는 소프트 리프트 — 하드 오프셋/픽셀 블링크 없음 |
 
 ### CSS Variable System
@@ -202,7 +201,7 @@ AKIRA의 각진 프레임·하드 오프셋 섀도우·네온 포인트·CRT 텍
 |---|---|---|
 | **카드/테이블/모달** | `border: 1px solid var(--color-border)` + `box-shadow: var(--shadow-ring)` | 소프트 엘리베이션, 이중 프레임 아님 |
 | **StatusDot** | `border-radius: var(--radius-full)` 원형 | 다이아몬드/사각 아님 |
-| **Sidebar active** | 브랜드 블루로 채운 둥근 필박스 배경 + 흰 텍스트 | 화살표 커서(`▶`) 없음 |
+| **TopNav/IconRail active** | `--color-ink` 블랙 pill 배경 + `--color-ink-text` | 대시보드는 레일 없음, 아이콘에 `aria-label`+툴팁 |
 | **버튼 클릭 피드백** | `transform: scale(0.97)` 스퀴시 | 하드 오프셋(`translate(2px,2px)`) 아님 |
 | **로그인 화면** | 앱 전체와 동일한 라이트 팔레트, 로컬 스코프 변수(`--lp-*`)는 유지 | `pages/LoginPage.css` — "항상 다크 고정" 원칙은 폐기됨 |
 | **Image blur reveal** | `filter: blur(4px) → blur(0)` on `onLoad` | `transition: filter 0.4s ease` (계승) |

@@ -4,7 +4,7 @@ import { getApi } from '../../utils/api';
 import './ActivityFeed.css';
 
 const ACTIVITY_ICONS = {
-  member:       { Icon: Users,        color: '#C7361B' },
+  member:       { Icon: Users,        color: '#EC572D' },
   photo:        { Icon: Image,        color: '#3F8A57' },
   inquiry:      { Icon: MessageSquare,color: '#B8791E' },
   portfolio:    { Icon: FolderOpen,   color: '#2F7A8C' },

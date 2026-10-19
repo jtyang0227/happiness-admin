@@ -7,23 +7,20 @@
 
 .admin-main {
   flex: 1;
-  padding: 24px;
+  padding: 24px 32px;
   min-height: 100vh;
   overflow: auto;
   margin-top: var(--topbar-height);
-  transition: margin-left var(--dur-normal) var(--ease-default);
 }
 
-.sidebar-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: calc(var(--z-raised) - 1);
+.admin-main--rail {
+  margin-left: calc(var(--rail-width) + 32px);
 }
 
 @media (max-width: 767px) {
-  .admin-main {
-    margin-left: 0 !important;
-    padding: 16px;
+  .admin-main,
+  .admin-main--rail {
+    margin-left: 0;
+    padding: 16px 16px 96px;
   }
 }

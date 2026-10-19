@@ -1,12 +1,12 @@
 .login-page {
-  --lp-bg:      #F2F4F6;
+  --lp-bg:      #F5F3F6;
   --lp-surface: #FFFFFF;
   --lp-border:  #E5E8EB;
   --lp-line:    #E5E8EB;
-  --lp-text:    #191F28;
+  --lp-text:    #151316;
   --lp-text-2:  #8B95A1;
-  --lp-brand:   #3182F6;
-  --lp-brand-hover: #1B64DA;
+  --lp-brand:   #EC572D;
+  --lp-brand-hover: #D94A20;
   --lp-danger:      #F04452;
   --lp-danger-bg:   #FDE8EA;
 
