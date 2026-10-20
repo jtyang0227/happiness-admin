@@ -88,9 +88,11 @@
     flex-direction: row;
     justify-content: flex-start;
     overflow-x: auto;
+    scrollbar-width: none;
     border-radius: var(--radius-xl);
     z-index: var(--z-sticky);
   }
+  .icon-rail::-webkit-scrollbar { display: none; }
   .icon-rail-item { flex-shrink: 0; }
   .icon-rail-tip { display: none; }
   .icon-rail-popover { position: fixed; left: 12px; top: auto; bottom: 84px; }

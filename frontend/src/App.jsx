@@ -19,6 +19,9 @@ import SortSeriesDetailPage from './pages/SortSeriesDetailPage';
 import SortPortfolioPage from './pages/SortPortfolioPage';
 import StatsPage from './pages/StatsPage';
 import SystemPage from './pages/SystemPage';
+import CurationPage from './pages/CurationPage';
+import CommentListPage from './pages/CommentListPage';
+import GatheringListPage from './pages/GatheringListPage';
 import NotFoundPage from './pages/NotFoundPage';
 import NoticePage from './pages/NoticePage';
 import BannerPage from './pages/BannerPage';
@@ -59,6 +62,9 @@ const AppRoutes = () => {
       <Route path="/verifications" element={<ProtectedRoute><VerificationListPage /></ProtectedRoute>} />
       <Route path="/featured" element={<ProtectedRoute><FeaturedPage /></ProtectedRoute>} />
       <Route path="/content-policy" element={<ProtectedRoute><ContentPolicyPage /></ProtectedRoute>} />
+      <Route path="/curation" element={<ProtectedRoute><CurationPage /></ProtectedRoute>} />
+      <Route path="/comments" element={<ProtectedRoute><CommentListPage /></ProtectedRoute>} />
+      <Route path="/gatherings" element={<ProtectedRoute><GatheringListPage /></ProtectedRoute>} />
       <Route path="/popups" element={<ProtectedRoute><PopupPage /></ProtectedRoute>} />
       <Route path="*" element={<ProtectedRoute><NotFoundPage /></ProtectedRoute>} />
     </Routes>

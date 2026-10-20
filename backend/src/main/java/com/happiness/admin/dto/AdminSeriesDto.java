@@ -18,6 +18,10 @@ public class AdminSeriesDto {
     private int photoCount;
     private int likesCount;
     private int viewCount;
+    private String shootType;
+    private boolean draft;
+    private boolean featured;
+    private LocalDateTime featuredAt;
     private LocalDateTime createdAt;
 
     public static AdminSeriesDto from(Series s, long photoCount) {
@@ -30,6 +34,10 @@ public class AdminSeriesDto {
                 .photoCount((int) photoCount)
                 .likesCount(s.getLikesCount())
                 .viewCount(s.getViewCount())
+                .shootType(s.getShootType())
+                .draft(Boolean.TRUE.equals(s.getDraft()))
+                .featured(s.getFeaturedAt() != null)
+                .featuredAt(s.getFeaturedAt())
                 .createdAt(s.getCreatedAt())
                 .build();
     }

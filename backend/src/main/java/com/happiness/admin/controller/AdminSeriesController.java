@@ -24,6 +24,23 @@ public class AdminSeriesController {
         return ResponseEntity.ok(seriesService.getSeries(memberId, search, sortBy, page, size));
     }
 
+    @GetMapping("/curation")
+    public ResponseEntity<?> curation(
+            @RequestParam(required = false) Boolean featured,
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "24") int size) {
+        return ResponseEntity.ok(seriesService.getCurationCandidates(featured, search, page, size));
+    }
+
+    @PutMapping("/{id}/featured")
+    public ResponseEntity<?> setFeatured(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        if (!(body.get("featured") instanceof Boolean featured)) {
+            throw new IllegalArgumentException("featured(true/false)가 필요합니다.");
+        }
+        return ResponseEntity.ok(seriesService.setFeatured(id, featured));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> detail(@PathVariable Long id) {
         return ResponseEntity.ok(seriesService.getSeriesDetail(id));

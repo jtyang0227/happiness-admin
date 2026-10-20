@@ -27,7 +27,7 @@ const apiCall = async (endpoint, options = {}) => {
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
-    throw new Error(err.message || `요청 실패 (${response.status})`);
+    throw new Error(err.message || err.error || `요청 실패 (${response.status})`);
   }
 
   const text = await response.text();

@@ -3,7 +3,7 @@ import {
   BookOpen, BarChart2, Settings,
   FolderOpen, Bell, Flag, ShieldCheck, LayoutPanelTop,
   Star, SlidersHorizontal, ArrowUpDown, AppWindow,
-  CalendarDays,
+  CalendarDays, Sparkles, MessagesSquare, Tent,
 } from 'lucide-react';
 
 export const SORT_ITEMS = [
@@ -22,6 +22,8 @@ export const NAV_GROUPS = [
       { path: '/photos',         label: '사진 관리',   Icon: Image },
       { path: '/portfolios',     label: '포트폴리오',  Icon: FolderOpen },
       { path: '/series',         label: '시리즈',      Icon: BookOpen },
+      { path: '/curation',       label: '작업 큐레이션', Icon: Sparkles },
+      { path: '/comments',       label: '댓글 관리',   Icon: MessagesSquare },
       { type: 'sort', label: '정렬 관리', Icon: ArrowUpDown, subItems: SORT_ITEMS },
       { path: '/reports',        label: '신고 관리',   Icon: Flag },
       { path: '/featured',       label: '피처드',      Icon: Star },
@@ -40,6 +42,7 @@ export const NAV_GROUPS = [
     items: [
       { path: '/inquiries', label: '문의 관리', Icon: MessageSquare },
       { path: '/bookings',  label: '예약 관리', Icon: CalendarDays },
+      { path: '/gatherings', label: '모임 관리', Icon: Tent },
       { path: '/stats',     label: '통계',      Icon: BarChart2 },
       { path: '/notices',   label: '공지사항',  Icon: Bell },
       { path: '/banners',   label: '배너 관리', Icon: LayoutPanelTop },

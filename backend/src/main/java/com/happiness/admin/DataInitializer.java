@@ -38,6 +38,13 @@ public class DataInitializer implements ApplicationRunner {
     private final AdminActivityLogRepository activityLogRepository;
     private final PopupRepository popupRepository;
     private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
+    private final GatheringRepository gatheringRepository;
+    private final GatheringParticipantRepository gatheringParticipantRepository;
+    private final GatheringPostRepository gatheringPostRepository;
+    private final GatheringPhotoRepository gatheringPhotoRepository;
+    private final GatheringPostLikeRepository gatheringPostLikeRepository;
+    private final GatheringPostCommentRepository gatheringPostCommentRepository;
 
     private static final String[] MOODS = {"WARM", "COOL", "NEUTRAL", "VIVID", "DARK", "SOFT"};
     private static final String[] SHOOT_TYPES = {"웨딩", "가족", "프로필", "스냅", "바디프로필", "커플"};
@@ -112,6 +119,9 @@ public class DataInitializer implements ApplicationRunner {
                     .coverImageUrl("https://picsum.photos/seed/series" + i + "/600/400")
                     .displayOrder(i + 1)
                     .likesCount(i * 11 + 15).viewCount(i * 23 + 40)
+                    .shootType(SHOOT_TYPES[i % SHOOT_TYPES.length])
+                    .draft(i == 7)
+                    .featuredAt(i == 1 || i == 4 ? LocalDateTime.now().minusDays(i) : null)
                     .member(author).build();
             series.getSeriesPhotos().add(SeriesPhoto.builder()
                     .series(series).photo(photos.get(i * 3 % photos.size())).displayOrder(0).build());
@@ -312,6 +322,86 @@ public class DataInitializer implements ApplicationRunner {
                     .targetId((long) (i + 1))
                     .details(logData[i][2])
                     .build());
+        }
+
+        seedComments(photos, users);
+        seedGatherings(users, wm);
+    }
+
+    private void seedComments(List<Photo> photos, List<Member> users) {
+        String[] bodies = {"색감이 정말 따뜻하네요!", "구도가 인상적이에요.", "어떤 렌즈로 찍으셨나요?", "이런 분위기 너무 좋아요",
+                "빛 표현이 예술입니다", "광고 문의는 DM 주세요 www.spam-example.com", "다음 작업도 기대할게요", "보정 팁 공유해주실 수 있나요?"};
+        for (int i = 0; i < 16; i++) {
+            Member writer = users.get(i % users.size());
+            Comment parent = commentRepository.save(Comment.builder()
+                    .photoId(photos.get(i % 8).getId()).memberId(writer.getId()).memberName(writer.getName())
+                    .content(bodies[i % bodies.length])
+                    .createdAt(LocalDateTime.now().minusHours(i * 5L))
+                    .build());
+            if (i % 3 == 0) {
+                Member replier = users.get((i + 3) % users.size());
+                commentRepository.save(Comment.builder()
+                        .photoId(parent.getPhotoId()).memberId(replier.getId()).memberName(replier.getName())
+                        .content("저도 같은 생각이에요 :)").parentId(parent.getId())
+                        .createdAt(parent.getCreatedAt().plusMinutes(30))
+                        .build());
+            }
+        }
+    }
+
+    private void seedGatherings(List<Member> users, Member wm) {
+        Object[][] data = {
+            {"한강 노을 출사", "여의도 한강공원", "골든아워 실루엣", "RECRUITING", 10},
+            {"성수동 스트리트 스냅", "성수역 3번 출구", "스트리트 · 흑백", "RECRUITMENT_CLOSED", 8},
+            {"북촌 한옥 인물 촬영", "북촌한옥마을", "자연광 인물", "SCHEDULED", 6},
+            {"서울숲 가을 출사", "서울숲 정문", "단풍 · 역광", "ONGOING", 12},
+            {"을지로 야경 출사", "을지로3가역", "네온 · 장노출", "ENDED", 8},
+            {"제주 오름 일출 출사", "용눈이오름", "일출 · 풍경", "ENDED", 15},
+        };
+        int[] dayOffsets = {10, 5, 3, 0, -7, -20};
+        String[] postBodies = {"오늘 모임 덕분에 좋은 사진 많이 건졌어요!", "다음에도 꼭 참여할게요 📸",
+                "보정 전후 비교 올려봅니다", "단톡방 링크 여기 있어요 bit.ly/xxxx (홍보 아님)"};
+        for (int i = 0; i < data.length; i++) {
+            LocalDateTime start = LocalDateTime.now().plusDays(dayOffsets[i]).withHour(17).withMinute(0).withSecond(0).withNano(0);
+            Member host = i == 0 ? wm : users.get(i);
+            Gathering g = gatheringRepository.save(Gathering.builder()
+                    .title((String) data[i][0]).location((String) data[i][1]).shootTheme((String) data[i][2])
+                    .status((String) data[i][3]).maxParticipants((Integer) data[i][4])
+                    .description(data[i][0] + " — 함께 찍고 서로 피드백해요.")
+                    .thumbnailUrl("https://picsum.photos/seed/gathering" + i + "/600/400")
+                    .startDateTime(start).endDateTime(start.plusHours(3))
+                    .recruitmentEndDateTime(start.minusDays(2))
+                    .createdBy(host.getId())
+                    .createdAt(start.minusDays(14))
+                    .build());
+            int joined = Math.min((Integer) data[i][4], 3 + i);
+            for (int j = 0; j < joined; j++) {
+                gatheringParticipantRepository.save(GatheringParticipant.builder()
+                        .gatheringId(g.getId()).memberId(users.get((i + j) % users.size()).getId())
+                        .status(j == joined - 1 && i % 2 == 0 ? "WAITING" : "PARTICIPATING").build());
+            }
+            if (!"ENDED".equals(data[i][3]) && !"ONGOING".equals(data[i][3])) continue;
+            for (int k = 0; k < postBodies.length; k++) {
+                Member writer = users.get((i + k) % users.size());
+                GatheringPost post = gatheringPostRepository.save(GatheringPost.builder()
+                        .gatheringId(g.getId()).memberId(writer.getId()).memberName(writer.getName())
+                        .content(postBodies[k]).hashtags(k == 0 ? "#출사 #모임" : null)
+                        .createdAt(start.plusHours(4 + k))
+                        .build());
+                for (int n = 0; n < (k % 3); n++) {
+                    gatheringPhotoRepository.save(GatheringPhoto.builder()
+                            .gatheringPostId(post.getId()).sortOrder(n)
+                            .imageUrl("https://picsum.photos/seed/gpost" + post.getId() + "_" + n + "/400/400").build());
+                }
+                for (int n = 0; n < k + 1; n++) {
+                    gatheringPostLikeRepository.save(GatheringPostLike.builder()
+                            .gatheringPostId(post.getId()).memberId(users.get(n).getId()).build());
+                }
+                if (k % 2 == 0) {
+                    gatheringPostCommentRepository.save(GatheringPostComment.builder()
+                            .gatheringPostId(post.getId()).memberId(users.get(k).getId()).build());
+                }
+            }
         }
     }
 

@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, Image, MessageSquare, BookOpen,
   BarChart2, Settings, FolderOpen, Bell, Flag, ShieldCheck,
   LayoutPanelTop, AppWindow, Star, SlidersHorizontal, CalendarDays,
-  ArrowUpDown, Search, X, User,
+  ArrowUpDown, Search, X, User, Sparkles, MessagesSquare, Tent,
 } from 'lucide-react';
 import { getApi } from '../../utils/api';
 import './CommandPalette.css';
@@ -16,6 +16,9 @@ const COMMANDS = [
   { path: '/bookings',       label: '예약 관리',   Icon: CalendarDays,      group: '페이지' },
   { path: '/portfolios',     label: '포트폴리오',  Icon: FolderOpen,        group: '페이지' },
   { path: '/series',         label: '시리즈',      Icon: BookOpen,          group: '페이지' },
+  { path: '/curation',       label: '작업 큐레이션', Icon: Sparkles,        group: '페이지' },
+  { path: '/comments',       label: '댓글 관리',   Icon: MessagesSquare,    group: '페이지' },
+  { path: '/gatherings',     label: '모임 관리',   Icon: Tent,              group: '페이지' },
   { path: '/inquiries',      label: '문의 관리',   Icon: MessageSquare,     group: '페이지' },
   { path: '/stats',          label: '통계',        Icon: BarChart2,         group: '페이지' },
   { path: '/reports',        label: '신고 관리',   Icon: Flag,              group: '페이지' },
