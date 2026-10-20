@@ -53,6 +53,7 @@
 }
 .icon-rail-item:hover .icon-rail-tip,
 .icon-rail-item:focus-visible .icon-rail-tip { opacity: 1; }
+.icon-rail-item[aria-expanded="true"] .icon-rail-tip { opacity: 0; }
 
 .icon-rail-popover {
   position: absolute;
