@@ -35,7 +35,12 @@ public class AdminMemberController {
     @PostMapping("/export")
     public ResponseEntity<?> export(@RequestBody(required = false) Map<String, String> filter) {
         Map<String, String> f = filter != null ? filter : Map.of();
-        return ResponseEntity.ok(memberService.exportMembers(f.get("search"), f.get("authority"), f.get("status")));
+        return ResponseEntity.ok(memberService.exportMembers(f.get("search"), f.get("authority"), f.get("status"), f.get("reason")));
+    }
+
+    @PostMapping("/{id}/reveal")
+    public ResponseEntity<?> reveal(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        return ResponseEntity.ok(memberService.revealContact(id, body.get("reason")));
     }
 
     @GetMapping("/{id}/history")

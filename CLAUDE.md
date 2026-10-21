@@ -51,7 +51,7 @@ npx eslint src/ --fix  # Auto-fix lint
 
 Standard layered Spring Boot architecture:
 
-- **`controller/`** — REST endpoints. Auth: `AuthController`/`AdminAuthController` (`/api/auth/login` → JWT 발급). Admin (모두 `/api/admin/**`, `ROLE_WM`/`ROLE_SA` 필요):
+- **`controller/`** — REST endpoints. Auth: `AuthController` — **`POST /api/auth/login`만** 공개(회원가입·이메일 확인·회원 조회·OAuth·`/api/auth/admin/login`은 삭제됨 — 과거 비로그인 `GET /api/auth/member/{id}`가 회원 이메일·전화번호를 반환하던 치명 결함, `docs/planning/PRIVACY_PROTECTION_PLAN.md` F1). 로그인 실패 메시지는 단일화, 같은 이메일 5회 실패 시 15분 잠금(429). Admin (모두 `/api/admin/**`, `ROLE_WM`/`ROLE_SA` 필요):
   - `AdminStatsController` — 대시보드 통계
   - `AdminMemberController` — 회원 목록/상세/역할 변경/상태 변경(정지·해제·탈퇴 처리·복구), `/summary`, `POST /export`, `/{id}/history`, `/{id}/notes`. 영구 삭제(`DELETE`)는 **WM 전용 + 이미 `DELETED`인 회원만**, 연관 데이터(예약·포트폴리오·인증·피처드·댓글·프로필 콘텐츠 등)를 FK 순서대로 정리. 본인 계정 조치 금지, 관리자 계정 정지·탈퇴는 WM만
   - `AdminPhotoController` — 사진 목록/삭제/카테고리코드 수정
@@ -75,13 +75,16 @@ Standard layered Spring Boot architecture:
   - `AdminProfileContentController` — 작가 프로필 콘텐츠 5종(`type=testimonials|pricing|press|achievements|brands`) 목록/삭제
   - `AdminNewsletterController` — 뉴스레터 구독자 목록·집계, `POST /export`(활성 구독자, 활동 로그 기록)
   - `AdminTransactionController` — 미팅·납품 메타데이터 집계/정체 건/목록, 읽기 전용
+  - `AdminPrivacyLogController` — 개인정보 접속기록 조회·`/summary`·`/verify`(해시 체인 무결성)·`POST /inspections`(점검 기록). **WM 전용**, 수정·삭제 API 없음
   - `AdminHelloController` — 헬스체크용 샘플 엔드포인트
-- **`service/`** — `AuthService`, `MemberService`, `AdminStatsService`, `AdminMemberService`, `AdminPhotoService`, `AdminInquiryService`, `AdminSeriesService`, `AdminPortfolioService`, `AdminCategoryService`, `AdminSortService`, `AdminReportService`, `AdminReportAiTriageService`+`ReportAiTriageWriter`(§AI 연동), `AdminNoticeService`, `AdminBannerService`, `AdminPopupService`, `AdminFeaturedService`, `AdminVerificationService`, `AdminBookingService`, `AdminContentPolicyService`, `AdminCommentService`, `AdminGatheringService`, `AdminSecurityAuditService`, `AdminProfileContentService`, `AdminNewsletterService`, `AdminTransactionService`, `AdminActivityRecorder`(현재 관리자로 `admin_activity_logs` 기록, 스케줄러용 `recordSystem` — 회원 조치·큐레이션·댓글/게시글 삭제·내보내기가 사용), `MemberSuspensionScheduler`(10분마다 기간 만료 정지 자동 해제 — App은 `SUSPENDED`면 로그인을 막으므로 해제하지 않으면 영구 정지가 됨, `admin.member.suspension-check-ms`로 주기 조정), `GeminiClientService`(§AI 연동).
-- **`repository/`** — Spring Data JPA: `MemberRepository`, `PhotoRepository`, `InquiryRepository`, `SeriesRepository`, `SeriesPhotoRepository`, `PortfolioRepository`, `PortfolioItemRepository`, `PhotoCategoryRepository`, `ReportRepository`, `NoticeRepository`, `BannerRepository`, `PopupRepository`, `FeaturedItemRepository`, `VerificationRequestRepository`, `BookingRepository`, `SystemConfigRepository`, `AdminActivityLogRepository`, `CommentRepository`, `Gathering*Repository`(모임·참여자·게시글·사진·좋아요·댓글), `SecurityAuditLogRepository`, `TestimonialRepository`·`PricingPackageRepository`·`PressFeatureRepository`·`AchievementRepository`·`ClientBrandRepository`, `NewsletterSubscriberRepository`, `MeetRepository`, `DeliverySetRepository`, `AdminMemberNoteRepository`.
+- **`service/`** — `AuthService`, `MemberService`, `AdminStatsService`, `AdminMemberService`, `AdminPhotoService`, `AdminInquiryService`, `AdminSeriesService`, `AdminPortfolioService`, `AdminCategoryService`, `AdminSortService`, `AdminReportService`, `AdminReportAiTriageService`+`ReportAiTriageWriter`(§AI 연동), `AdminNoticeService`, `AdminBannerService`, `AdminPopupService`, `AdminFeaturedService`, `AdminVerificationService`, `AdminBookingService`, `AdminContentPolicyService`, `AdminCommentService`, `AdminGatheringService`, `AdminSecurityAuditService`, `AdminProfileContentService`, `AdminNewsletterService`, `AdminTransactionService`, `AdminActivityRecorder`(현재 관리자로 `admin_activity_logs` 기록, 스케줄러용 `recordSystem` — 회원 조치·큐레이션·댓글/게시글 삭제·내보내기가 사용), `MemberSuspensionScheduler`(10분마다 기간 만료 정지 자동 해제 — App은 `SUSPENDED`면 로그인을 막으므로 해제하지 않으면 영구 정지가 됨, `admin.member.suspension-check-ms`로 주기 조정), `AdminPrivacyLogService`, `GeminiClientService`(§AI 연동).
+- **`privacy/`** — `FieldEncryptor`(AES-256-GCM, `enc:v1:` 접두어, 접두어 없는 기존 평문은 그대로 읽음, 키 `PRIVACY_ENCRYPTION_KEY` — prod에서 없으면 기동 실패), `EncryptedStringConverter`(JPA 투명 암호화 — `admin_member_notes.content`, `members.suspend_reason`에 적용, 정지 사유는 암호문이 varchar(500)에 들어가도록 평문 100자 상한), `PrivacyMasker`(이메일·전화 마스킹 — 회원·문의·신고·인증·뉴스레터 DTO가 항상 마스킹해 응답), `PrivacyAccessRecorder`(개인정보 접속기록 LIST/VIEW/REVEAL/EXPORT/INSPECTION, SHA-256 해시 체인, 열람·다운로드는 사유 5자 이상 필수).
+- **`repository/`** — Spring Data JPA: `MemberRepository`, `PhotoRepository`, `InquiryRepository`, `SeriesRepository`, `SeriesPhotoRepository`, `PortfolioRepository`, `PortfolioItemRepository`, `PhotoCategoryRepository`, `ReportRepository`, `NoticeRepository`, `BannerRepository`, `PopupRepository`, `FeaturedItemRepository`, `VerificationRequestRepository`, `BookingRepository`, `SystemConfigRepository`, `AdminActivityLogRepository`, `CommentRepository`, `Gathering*Repository`(모임·참여자·게시글·사진·좋아요·댓글), `SecurityAuditLogRepository`, `TestimonialRepository`·`PricingPackageRepository`·`PressFeatureRepository`·`AchievementRepository`·`ClientBrandRepository`, `NewsletterSubscriberRepository`, `MeetRepository`, `DeliverySetRepository`, `AdminMemberNoteRepository`, `PrivacyAccessLogRepository`.
   **주의**: `BoardRepository`/`ContentRepository`(및 `Board`/`Content` 엔티티)는 어떤 컨트롤러·서비스에서도 참조되지 않는 죽은 코드다 — 실제 게시판 기능은 없다(확인 필요 시 grep으로 재검증할 것, 새 기능을 여기 얹지 말 것).
-- **`entity/`** — `Member` (suspendReason·suspendUntil·isVerified 포함), `Photo` (displayOrder), `Inquiry`(+`InquiryProcessStatus`), `Series` (displayOrder), `SeriesPhoto` (displayOrder), `Portfolio`, `PortfolioItem` (displayOrder), `PhotoCategory`, `Report`(aiSummary·aiSeverity·aiSuggestedAction·aiAnalyzedAt 포함, §AI 연동), `Notice`, `Banner`, `Popup`, `FeaturedItem`, `VerificationRequest`, `Booking`(+`BookingStatus`), `SystemConfig`, `AdminActivityLog`, `Authority` (WM/SA/US), `MemberStatus`, `PortfolioStatus`, `PortfolioVisibility`, `Comment`, `Gathering`/`GatheringParticipant`/`GatheringPost`/`GatheringPhoto`/`GatheringPostLike`/`GatheringPostComment`, `SecurityAuditLog`, `Testimonial`/`PricingPackage`/`PressFeature`/`Achievement`/`ClientBrand`, `NewsletterSubscriber`(token은 응답 제외), `Meet`/`DeliverySet`(메타데이터만 — 메시지·주소·토큰·비밀번호·피드백은 의도적으로 미매핑), `AdminMemberNote`(Admin 전용 신규 테이블 `admin_member_notes` — 운영자 내부 메모).
+- **`entity/`** — `Member` (suspendReason·suspendUntil·isVerified 포함), `Photo` (displayOrder), `Inquiry`(+`InquiryProcessStatus`), `Series` (displayOrder), `SeriesPhoto` (displayOrder), `Portfolio`, `PortfolioItem` (displayOrder), `PhotoCategory`, `Report`(aiSummary·aiSeverity·aiSuggestedAction·aiAnalyzedAt 포함, §AI 연동), `Notice`, `Banner`, `Popup`, `FeaturedItem`, `VerificationRequest`, `Booking`(+`BookingStatus`), `SystemConfig`, `AdminActivityLog`, `Authority` (WM/SA/US), `MemberStatus`, `PortfolioStatus`, `PortfolioVisibility`, `Comment`, `Gathering`/`GatheringParticipant`/`GatheringPost`/`GatheringPhoto`/`GatheringPostLike`/`GatheringPostComment`, `SecurityAuditLog`, `Testimonial`/`PricingPackage`/`PressFeature`/`Achievement`/`ClientBrand`, `NewsletterSubscriber`(token은 응답 제외), `Meet`/`DeliverySet`(메타데이터만 — 메시지·주소·토큰·비밀번호·피드백은 의도적으로 미매핑), `AdminMemberNote`(Admin 전용 신규 테이블 `admin_member_notes` — 운영자 내부 메모, 내용 암호화 저장), `PrivacyAccessLog`(Admin 전용 `admin_privacy_access_logs` — 개인정보 접속기록, 해시 체인).
+  **개인정보 규칙**: 회원 이메일·전화를 응답에 원문으로 넣지 말 것(항상 `PrivacyMasker`). 원문이 꼭 필요하면 사유를 받고 `PrivacyAccessRecorder.record("REVEAL"…)`. 새 CSV/다운로드는 사유 필수 + `EXPORT` 기록. 주민번호·카드·계좌 등 고시 제7조 암호화 대상을 저장하게 되면 반드시 `EncryptedStringConverter`. App 공유 컬럼(email/tel/name)은 App이 평문으로 읽으므로 Admin 단독으로 암호화하지 말 것.
   **App 테이블 미러링 규칙**: prod에서 Admin은 App과 같은 Postgres(`ddl-auto=update`)를 쓴다 — `Comment`·`Gathering*`·`SecurityAuditLog`·프로필 콘텐츠 5종·`NewsletterSubscriber`·`Meet`·`DeliverySet`·`Series.draft/featuredAt/shootType`은 App 엔티티의 테이블·컬럼명을 그대로 부분 매핑한 것이다. 새로 매핑하는 컬럼은 App과 이름을 맞추고, App에 없는 NOT NULL 컬럼을 추가하지 말 것(배경: `docs/planning/APP_FEATURE_SYNC_PLAN.md` §6).
-- **`security/`** — `JwtTokenProvider`, `JwtAuthenticationFilter` (Bearer 토큰 검증, principal = 이메일), `CurrentAdminProvider`(요청 중인 관리자 `Member` 조회 — 권한 가드·이력 기록용). `@PreAuthorize` 거부는 `GlobalExceptionHandler`에서 403으로 변환. 모든 `/api/admin/**`는 `ROLE_WM` 또는 `ROLE_SA` 필요.
+- **`security/`** — `JwtTokenProvider`, `JwtAuthenticationFilter` (Bearer 토큰 검증, principal = 이메일), `CurrentAdminProvider`(요청 중인 관리자 `Member` 조회 — 권한 가드·이력 기록용), `LoginAttemptLimiter`(인메모리 로그인 잠금 — 다중 인스턴스 시 공유 저장소 필요). 공개 경로는 `POST /api/auth/login`, `GET /api/popups/active`, `GET /actuator/health`뿐(H2 콘솔은 `spring.h2.console.enabled`일 때만). JWT 기본 만료 8시간. `@PreAuthorize` 거부는 `GlobalExceptionHandler`에서 403으로 변환. 모든 `/api/admin/**`는 `ROLE_WM` 또는 `ROLE_SA` 필요.
 - **`dto/`** — `LoginResponse`, `PageResponse<T>`, `AdminMemberDto` (portfolioCount 포함), `AdminPhotoDto`, `AdminInquiryDto`, `AdminSeriesDto`, `AdminPortfolioDto`, `StatsSummaryDto`, `DailyStatDto`, `TopPhotoDto`, `DistItemDto`, `SystemStatusDto`, `RoleUpdateRequest`, `StatusUpdateRequest`, `CategoryDto`, `ReorderItem`, `SortPhotoDto`, `SortSeriesDto`, `SortSeriesPhotoDto`, `SortPortfolioItemDto`.
 - **`DataInitializer`** — `@Profile("!prod")`: 서버 기동 시 H2에 테스트 데이터 자동 삽입 (관리자 2명, 회원 10명, 사진 30장·displayOrder 1–30, 문의 15건, 시리즈 8개·displayOrder 1–8, 포트폴리오 6개). **개발 계정: `admin@happiness.dev` / `Admin123!`**
 
@@ -95,7 +98,7 @@ Key settings (`application.properties`):
 
 React SPA using React Router v6 + Recharts:
 
-- **`context/AuthContext.jsx`** — JWT 저장/조회/삭제, `useAuth()` 훅 제공
+- **`context/AuthContext.jsx`** — JWT 저장/조회/삭제, `useAuth()` 훅 제공. **30분 무조작 시 자동 로그아웃**(`/login?reason=idle`, 탭 간 공유되는 `admin_last_activity` 기준 — 고시 제6조 자동 접속차단)
 - **`context/ConfirmContext.jsx`** — 전역 확인 다이얼로그, `useConfirm()` 훅 제공
 - **`pages/`** —
   - `LoginPage` — JWT 로그인 (앱 전체 다크모드와 무관하게 항상 라이트 고정). `admin_user`에 `memberId`도 저장(본인 판별용)
@@ -127,8 +130,9 @@ React SPA using React Router v6 + Recharts:
   - `ProfileContentPage` (`/profile-content`, 회원) — 작가 후기·가격·언론·수상·브랜드 점검/삭제(`?memberId=` 필터)
   - `NewsletterPage` (`/newsletter`, 운영·마케팅) — 구독자 목록·KPI·CSV 내보내기(클라이언트에서 BOM 포함 CSV 생성)
   - `TransactionsPage` (`/transactions`, 운영·마케팅) — 미팅·납품 상태 집계와 정체/만료 알림, 읽기 전용
+  - `PrivacyLogPage` (`/privacy-logs`, 설정, WM 전용) — 개인정보 접속기록 필터·무결성 검증·점검 완료 기록
 - **`components/layout/`** — `navConfig.js`(그룹↔라우트 단일 소스, `findActiveGroup`), `AdminTopbar`(상단 pill 탭 5그룹·검색·상태·다크모드 토글·프로필), `IconRail`(활성 그룹 페이지용 플로팅 아이콘 레일, 모바일 ≤767px에서는 하단 바, 정렬 관리는 팝오버), `AdminLayout`. `Sidebar`는 V14에서 삭제됨
-- **`components/common/`** — `Pagination`, `ConfirmDialog`, `SlideOver`, `ImgWithFallback`, `SegmentedControl`(pill 세그먼트 필터, 카운트 배지)
+- **`components/common/`** — `Pagination`, `ConfirmDialog`, `SlideOver`, `ImgWithFallback`, `SegmentedControl`(pill 세그먼트 필터, 카운트 배지), `ReasonDialog`(개인정보 열람·다운로드 사유 입력 — 회원 상세 "개인정보 보기", 회원·뉴스레터 CSV)
 - **`hooks/useDragSort.js`** — HTML5 DnD 기반 정렬 훅. `toReorderPayload()` 로 `[{id, displayOrder}]` 생성
 - **`utils/api.js`** — `getApi`, `postApi`, `patchApi`, `putApi`, `deleteApi`. **토큰이 실려 있던 요청**의 401만 세션 만료로 간주해 `/login` 강제 리다이렉트한다 — 토큰 없이 보낸 요청(로그인 자체 등)의 401은 그 자체가 인증 실패 응답이라 일반 에러로 넘긴다. 이전에는 이 구분이 없어서 로그인 실패 메시지가 아예 안 뜨는 버그가 있었다(수정됨).
 - **`App.jsx`** — `ProtectedRoute` 래퍼: 미인증 시 `/login`으로 리다이렉트
@@ -241,6 +245,7 @@ AKIRA의 각진 프레임·하드 오프셋 섀도우·네온 포인트·CRT 텍
 - `docs/planning/V14_MINIMAL_DESIGN_PLAN.md` — **현재(7차) V14 디자인 기획·토큰·구조**
 - `docs/design/TOSS_DESIGN_SPEC.md` — 디자인 세대 계보 + 6차 Toss 구현 기록(레거시 참고용)
 - `docs/planning/APP_TO_ADMIN_SPEC.md` — happiness-app에서 admin으로 이식할 기능 명세. **주의: 이 문서(2026-06-23자)는 이미 낡았다** — "신고/제재 미구현(P2)"라고 적혀 있지만 실제로는 `AdminReportController`/`ReportListPage`가 완전히 구현돼 있고 AI 트리아지까지 붙어 있다(§AI 연동). 이 문서의 구현 여부 표시를 그대로 믿지 말고 코드로 재확인할 것.
+- `docs/planning/PRIVACY_PROTECTION_PLAN.md` — 개인정보 보호 강화(법령 근거표, 결함 F1~F7, 암호화·마스킹·접속기록 설계, App 공유 컬럼 후속 과제)
 - `docs/planning/MEMBER_MGMT_V2_PLAN.md` — 회원 관리 2차(운영 결함 D1~D6: 삭제 500·정지 미해제·본인 조치·이력 부재 등) 기획·구현 기록. 1차 `MEMBER_MGMT_SPEC.md`는 구현 현황 표가 낡음
 - `docs/planning/APP_FEATURE_SYNC_PLAN.md` — App(2026-10-20) 기능 분석 → Admin 반영 2차 기획(큐레이션·댓글·모임 구현, 태그·미팅·납품은 보류 사유 포함)
 - `docs/planning/AX_REPORT_TRIAGE_PLAN.md` — 신고 트리아지 AI 어시스트 기획(위 AI 연동 섹션의 설계 근거)
@@ -299,6 +304,7 @@ AKIRA의 각진 프레임·하드 오프셋 섀도우·네온 포인트·CRT 텍
 |---|---|---|
 | `JWT_SECRET` | `ci-test-secret-key-at-least-256-bits-long-for-hs256-algorithm` | 백엔드 테스트용 JWT 시크릿 |
 | `CI` | `false` | CRA ESLint 경고를 에러로 처리하지 않도록 설정 |
+| `PRIVACY_ENCRYPTION_KEY` | Base64 32바이트 (`openssl rand -base64 32`) | **운영(Railway) 필수** — 없으면 prod 프로필 기동 실패. 개인정보 필드 암호화 키, 분실 시 암호화된 메모·정지 사유 복호화 불가 |
 
 **주의사항**
 

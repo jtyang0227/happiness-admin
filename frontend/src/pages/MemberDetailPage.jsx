@@ -9,6 +9,7 @@ import { getApi, patchApi, postApi, deleteApi } from '../utils/api';
 import { useConfirm } from '../context/ConfirmContext';
 import { useAuth } from '../context/AuthContext';
 import SlideOver from '../components/common/SlideOver';
+import ReasonDialog from '../components/common/ReasonDialog';
 import './MemberDetailPage.css';
 
 const TABS = [
@@ -66,7 +67,8 @@ const SuspendModal = ({ member, onClose, onConfirm }) => {
           <textarea
             className="modal-textarea"
             rows={3}
-            placeholder="운영 정책 위반 내용을 입력하세요"
+            placeholder="운영 정책 위반 내용을 입력하세요 (100자 이내)"
+            maxLength={100}
             value={reason}
             onChange={e => setReason(e.target.value)}
           />
@@ -179,6 +181,9 @@ const MemberDetailPage = () => {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState('');
   const [savingNote, setSavingNote] = useState(false);
+  const [revealOpen, setRevealOpen] = useState(false);
+  const [revealing, setRevealing] = useState(false);
+  const [contact, setContact] = useState(null);
   const [showSuspend, setShowSuspend] = useState(false);
   const [indicator, setIndicator] = useState({ left: 0, width: 0 });
   const [hasPendingVerification, setHasPendingVerification] = useState(false);
@@ -195,6 +200,26 @@ const MemberDetailPage = () => {
   }, [id, navigate]);
 
   useEffect(() => { fetchMember(); }, [fetchMember]);
+
+  useEffect(() => {
+    if (!contact) return undefined;
+    const t = setTimeout(() => setContact(null), 60000);
+    return () => clearTimeout(t);
+  }, [contact]);
+
+  useEffect(() => { setContact(null); }, [id]);
+
+  const handleReveal = async (reason) => {
+    setRevealing(true);
+    try {
+      setContact(await postApi(`/admin/members/${id}/reveal`, { reason }));
+      setRevealOpen(false);
+    } catch (e) {
+      toast.error(e.message || '열람에 실패했습니다.');
+    } finally {
+      setRevealing(false);
+    }
+  };
 
   const loadManage = useCallback(() => {
     getApi(`/admin/members/${id}/history`).then(setHistory).catch(() => {});
@@ -417,9 +442,12 @@ const MemberDetailPage = () => {
           </div>
 
           <div className="mdp-meta-row">
-            <span className="mdp-meta-item"><Mail size={13} />{member.email}</span>
-            {member.profileName && <span className="mdp-meta-item">@{member.profileName}</span>}
-            {member.tel && <span className="mdp-meta-item"><Phone size={13} />{member.tel}</span>}
+            <span className="mdp-meta-item"><Mail size={13} />{contact ? contact.email : member.email}</span>
+            {member.profileName && <span className="mdp-meta-item">@{member.profileName.replace(/^@/, "")}</span>}
+            {member.tel && <span className="mdp-meta-item"><Phone size={13} />{contact ? contact.tel : member.tel}</span>}
+            {contact
+              ? <span className="mdp-reveal-state">원문 표시 중 · 1분 뒤 다시 가려집니다</span>
+              : <button type="button" className="mdp-reveal-btn" onClick={() => setRevealOpen(true)}>개인정보 보기</button>}
             <span className="mdp-meta-item"><Calendar size={13} />{member.createdAt?.slice(0, 10)} 가입</span>
           </div>
 
@@ -654,6 +682,16 @@ const MemberDetailPage = () => {
           </div>
         )}
       </div>
+
+      <ReasonDialog
+        open={revealOpen}
+        title="개인정보 원문 보기"
+        description={`${member.name} 님의 이메일·전화번호 원문을 표시합니다. 업무상 꼭 필요한 경우에만 열람하세요.`}
+        confirmLabel="열람"
+        busy={revealing}
+        onSubmit={handleReveal}
+        onClose={() => setRevealOpen(false)}
+      />
 
       {showSuspend && (
         <SuspendModal member={member} onClose={() => setShowSuspend(false)} onConfirm={handleSuspendConfirm} />

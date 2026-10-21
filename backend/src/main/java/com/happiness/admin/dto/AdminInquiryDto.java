@@ -32,7 +32,7 @@ public class AdminInquiryDto {
                 .senderId(i.getSender() != null ? i.getSender().getId() : null)
                 .receiverId(i.getReceiver() != null ? i.getReceiver().getId() : null)
                 .senderName(i.getSenderName())
-                .senderEmail(i.getSenderEmail())
+                .senderEmail(com.happiness.admin.privacy.PrivacyMasker.email(i.getSenderEmail()))
                 .receiverName(i.getReceiver() != null ? i.getReceiver().getName() : null)
                 .receiverProfileName(i.getReceiver() != null ? i.getReceiver().getProfileName() : null)
                 .shootType(i.getShootType())

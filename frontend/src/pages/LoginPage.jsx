@@ -11,6 +11,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [idleNotice] = useState(() => new URLSearchParams(window.location.search).get('reason') === 'idle');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -62,6 +63,7 @@ const LoginPage = () => {
               </button>
             </div>
           </div>
+          {idleNotice && !error && <div className="login-notice" role="status">30분 동안 사용하지 않아 안전을 위해 로그아웃되었습니다.</div>}
           {error && <div className="login-error" role="alert" aria-live="polite">{error}</div>}
           <button type="submit" className="login-btn" disabled={loading}>
             {loading ? '로그인 중...' : '로그인'}

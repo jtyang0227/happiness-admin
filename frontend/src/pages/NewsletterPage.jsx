@@ -3,16 +3,15 @@ import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Download } from 'lucide-react';
 import { getApi, postApi } from '../utils/api';
-import { useConfirm } from '../context/ConfirmContext';
 import Pagination from '../components/common/Pagination';
 import SegmentedControl from '../components/common/SegmentedControl';
+import ReasonDialog from '../components/common/ReasonDialog';
 import './NewsletterPage.css';
 
 const formatDate = (v) => (v ? v.slice(0, 10) : '-');
 const csvCell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
 
 const NewsletterPage = () => {
-  const { confirm } = useConfirm();
   const [status, setStatus] = useState('active');
   const [search, setSearch] = useState('');
   const [query, setQuery] = useState('');
@@ -21,6 +20,7 @@ const NewsletterPage = () => {
   const [counts, setCounts] = useState({});
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
 
   const fetchData = useCallback(() => {
     setLoading(true);
@@ -42,16 +42,10 @@ const NewsletterPage = () => {
     return () => clearTimeout(t);
   }, [search]);
 
-  const handleExport = async () => {
-    const ok = await confirm({
-      title: '구독자 CSV 내보내기',
-      description: `활성 구독자 ${counts.active ?? 0}명의 이메일을 내려받습니다. 개인정보이므로 발송 목적 외 사용을 금하며, 내보내기 기록은 활동 로그에 남습니다.`,
-      variant: 'warning',
-    });
-    if (!ok) return;
+  const handleExport = async (reason) => {
     setExporting(true);
     try {
-      const rows = await postApi('/admin/newsletter/export', {});
+      const rows = await postApi('/admin/newsletter/export', { reason });
       const csv = ['email,name,subscribed_at', ...rows.map(r => [r.email, r.memberName, r.subscribedAt].map(csvCell).join(','))].join('\n');
       const url = URL.createObjectURL(new Blob([`﻿${csv}`], { type: 'text/csv;charset=utf-8' }));
       const a = document.createElement('a');
@@ -60,6 +54,7 @@ const NewsletterPage = () => {
       a.click();
       URL.revokeObjectURL(url);
       toast.success(`${rows.length}명을 내보냈습니다.`);
+      setExportOpen(false);
     } catch (e) {
       toast.error(e.message || '내보내기에 실패했습니다.');
     } finally {
@@ -72,7 +67,7 @@ const NewsletterPage = () => {
       <div className="page-header">
         <h1 className="page-title">뉴스레터 구독자</h1>
         <span className="total-count">App 작가 소식 구독 현황</span>
-        <button type="button" className="btn btn-md btn-primary nl-export" onClick={handleExport} disabled={exporting || !counts.active}>
+        <button type="button" className="btn btn-md btn-primary nl-export" onClick={() => setExportOpen(true)} disabled={exporting || !counts.active}>
           <Download size={14} /> {exporting ? '내보내는 중...' : 'CSV 내보내기'}
         </button>
       </div>
@@ -125,6 +120,15 @@ const NewsletterPage = () => {
         </table>
       </div>
       <Pagination page={page} totalPages={data.totalPages} onPageChange={setPage} />
+      <ReasonDialog
+        open={exportOpen}
+        title="구독자 CSV 내보내기"
+        description={`활성 구독자 ${counts.active ?? 0}명의 이메일을 내려받습니다. 발송 목적 외 사용을 금합니다.`}
+        confirmLabel="내려받기"
+        busy={exporting}
+        onSubmit={handleExport}
+        onClose={() => setExportOpen(false)}
+      />
     </div>
   );
 };

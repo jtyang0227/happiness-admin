@@ -52,3 +52,8 @@
 .login-btn:active:not(:disabled) { transform: scale(0.98); }
 .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .login-hint { font-size: 12px; color: var(--lp-text-2); margin-top: 20px; }
+
+.login-notice {
+  background: var(--lp-bg); color: var(--lp-text-2); border-radius: 12px;
+  padding: 10px 14px; font-size: 13px; margin-bottom: 12px;
+}

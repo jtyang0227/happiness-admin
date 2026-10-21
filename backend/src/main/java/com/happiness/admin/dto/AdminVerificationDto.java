@@ -24,7 +24,7 @@ public class AdminVerificationDto {
                 .id(v.getId())
                 .memberId(v.getMember().getId())
                 .memberName(v.getMember().getName())
-                .memberEmail(v.getMember().getEmail())
+                .memberEmail(com.happiness.admin.privacy.PrivacyMasker.email(v.getMember().getEmail()))
                 .memberProfileName(v.getMember().getProfileName())
                 .portfolioUrl(v.getPortfolioUrl())
                 .bio(v.getBio())

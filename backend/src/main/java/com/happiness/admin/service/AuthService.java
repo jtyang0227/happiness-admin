@@ -7,10 +7,14 @@ import com.happiness.admin.entity.Member;
 import com.happiness.admin.entity.MemberStatus;
 import com.happiness.admin.repository.MemberRepository;
 import com.happiness.admin.security.JwtTokenProvider;
+import com.happiness.admin.security.LoginAttemptLimiter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Duration;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -20,22 +24,39 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final LoginAttemptLimiter loginAttemptLimiter;
+
+    /** 실패 사유를 구분하지 않는 단일 메시지 — 계정 존재 여부를 응답으로 알 수 없게 한다. */
+    static final String LOGIN_FAILED = "이메일 또는 비밀번호가 올바르지 않습니다.";
+
+    /** 존재하지 않는 계정에도 BCrypt 비교를 수행해 응답 시간으로 계정 유무를 추측하지 못하게 하는 더미 해시. */
+    private volatile String dummyHash;
+
+    private String dummyHash() {
+        if (dummyHash == null) dummyHash = passwordEncoder.encode(UUID.randomUUID().toString());
+        return dummyHash;
+    }
+
+    public static class LoginLockedException extends RuntimeException {
+        public LoginLockedException(String message) { super(message); }
+    }
 
     public LoginResponse adminLogin(LoginRequest request) {
-        Member member = memberRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 이메일입니다."));
-
-        if (!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        Duration lock = loginAttemptLimiter.remainingLock(request.getEmail());
+        if (!lock.isZero()) {
+            throw new LoginLockedException("로그인 시도가 너무 많습니다. " + Math.max(1, lock.toMinutes() + 1) + "분 후 다시 시도해 주세요.");
         }
-
-        if (member.getStatus() != MemberStatus.ACTIVE) {
-            throw new IllegalArgumentException("비활성화된 계정입니다.");
+        Member member = memberRepository.findByEmail(request.getEmail()).orElse(null);
+        boolean passwordOk = passwordEncoder.matches(
+                request.getPassword() == null ? "" : request.getPassword(),
+                member != null && member.getPassword() != null ? member.getPassword() : dummyHash());
+        boolean isAdmin = member != null
+                && (member.getAuthority() == Authority.WM || member.getAuthority() == Authority.SA);
+        if (member == null || !passwordOk || !isAdmin || member.getStatus() != MemberStatus.ACTIVE) {
+            loginAttemptLimiter.recordFailure(request.getEmail());
+            throw new IllegalArgumentException(LOGIN_FAILED);
         }
-
-        if (member.getAuthority() != Authority.WM && member.getAuthority() != Authority.SA) {
-            throw new IllegalArgumentException("관리자 권한이 없습니다.");
-        }
+        loginAttemptLimiter.recordSuccess(request.getEmail());
 
         String token = jwtTokenProvider.createToken(member.getEmail(), member.getAuthority());
 

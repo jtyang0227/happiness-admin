@@ -9,6 +9,8 @@ import com.happiness.admin.entity.MemberStatus;
 import com.happiness.admin.entity.Photo;
 import com.happiness.admin.entity.Series;
 import com.happiness.admin.repository.*;
+import com.happiness.admin.privacy.PrivacyAccessRecorder;
+import com.happiness.admin.privacy.PrivacyMasker;
 import com.happiness.admin.security.CurrentAdminProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -49,8 +51,11 @@ public class AdminMemberService {
     private final AdminActivityLogRepository activityLogRepository;
     private final AdminActivityRecorder activityRecorder;
     private final CurrentAdminProvider currentAdmin;
+    private final PrivacyAccessRecorder privacyAccessRecorder;
 
     static final int EXPORT_LIMIT = 5000;
+    /** 암호문이 suspend_reason varchar(500)에 들어가도록 하는 평문 상한(한글 3바이트 기준). */
+    static final int SUSPEND_REASON_MAX = 100;
 
     public PageResponse<AdminMemberDto> getMembers(String search, String authorityStr, String statusStr, int page, int size) {
         Authority authority = (authorityStr != null && !authorityStr.isBlank())
@@ -69,6 +74,9 @@ public class AdminMemberService {
         Map<Long, Long> inquiryCounts = memberIds.isEmpty() ? Map.of() : toCountMap(inquiryRepository.countBySenderIdIn(memberIds));
         Map<Long, Long> portfolioCounts = memberIds.isEmpty() ? Map.of() : toCountMap(portfolioRepository.countByMemberIdIn(memberIds));
 
+        privacyAccessRecorder.record("LIST", null, memberPage.getNumberOfElements(), null,
+                "회원 목록 p" + page + (status != null ? " 상태=" + status : "") + (authority != null ? " 역할=" + authority : "")
+                        + (search != null && !search.isBlank() ? " 검색=" + maskSearch(search) : ""));
         return PageResponse.of(memberPage.map(m -> AdminMemberDto.from(m,
                 photoCounts.getOrDefault(m.getId(), 0L),
                 seriesCounts.getOrDefault(m.getId(), 0L),
@@ -85,9 +93,24 @@ public class AdminMemberService {
     }
 
     public AdminMemberDto getMember(Long id) {
-        Member m = memberRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
+        Member m = findMember(id);
+        privacyAccessRecorder.record("VIEW", id, 1, null, "회원 상세(마스킹)");
         return toDto(m);
+    }
+
+    /** 마스킹되지 않은 연락처 열람 — 사유 필수, 접속기록(REVEAL)을 남긴다. */
+    public Map<String, String> revealContact(Long id, String reason) {
+        String why = PrivacyAccessRecorder.requireReason(reason);
+        Member m = findMember(id);
+        privacyAccessRecorder.record("REVEAL", id, 1, why, "이메일·전화번호 원문 열람");
+        Map<String, String> contact = new LinkedHashMap<>();
+        contact.put("email", m.getEmail());
+        contact.put("tel", m.getTel());
+        return contact;
+    }
+
+    private static String maskSearch(String search) {
+        return search.contains("@") ? PrivacyMasker.email(search.trim()) : search.trim();
     }
 
     @Transactional
@@ -129,6 +152,9 @@ public class AdminMemberService {
         }
         if (newStatus == MemberStatus.SUSPENDED && (reason == null || reason.isBlank())) {
             throw new IllegalArgumentException("정지 사유를 입력해 주세요.");
+        }
+        if (reason != null && reason.length() > SUSPEND_REASON_MAX) {
+            throw new IllegalArgumentException("정지 사유는 " + SUSPEND_REASON_MAX + "자까지 쓸 수 있습니다.");
         }
 
         MemberStatus before = m.getStatus();
@@ -230,7 +256,7 @@ public class AdminMemberService {
         noteRepository.deleteByMemberId(id);
         memberRepository.delete(m);
         activityRecorder.record("MEMBER_DELETE", "MEMBER", id,
-                m.getName() + " (" + m.getEmail() + ") 영구 삭제 · 사진 " + photoIds.size() + " · 시리즈 " + seriesIds.size());
+                m.getName() + " (#" + id + ") 영구 삭제 · 사진 " + photoIds.size() + " · 시리즈 " + seriesIds.size());
     }
 
     public Map<String, Long> getSummary() {
@@ -247,14 +273,16 @@ public class AdminMemberService {
 
     /** 현재 필터 결과를 내보낸다(최대 EXPORT_LIMIT명). 연락처는 제외 — 최소한의 개인정보만 반출. */
     @Transactional
-    public List<Map<String, Object>> exportMembers(String search, String authorityStr, String statusStr) {
+    public List<Map<String, Object>> exportMembers(String search, String authorityStr, String statusStr, String reason) {
+        String why = PrivacyAccessRecorder.requireReason(reason);
         Authority authority = (authorityStr != null && !authorityStr.isBlank()) ? Authority.valueOf(authorityStr) : null;
         MemberStatus status = (statusStr != null && !statusStr.isBlank()) ? MemberStatus.valueOf(statusStr) : null;
         var members = memberRepository.searchMembers((search != null && !search.isBlank()) ? search : null,
                 authority, status, PageRequest.of(0, EXPORT_LIMIT, Sort.by("createdAt").descending())).getContent();
         activityRecorder.record("MEMBER_EXPORT", "MEMBER", null,
                 "회원 " + members.size() + "명 CSV 내보내기 (상태=" + (status != null ? status : "전체")
-                        + ", 역할=" + (authority != null ? authority : "전체") + (search != null && !search.isBlank() ? ", 검색=" + search : "") + ")");
+                        + ", 역할=" + (authority != null ? authority : "전체") + (search != null && !search.isBlank() ? ", 검색=" + maskSearch(search) : "") + ")");
+        privacyAccessRecorder.record("EXPORT", null, members.size(), why, "회원 CSV (이메일 포함, 연락처 제외)");
         return members.stream().map(m -> {
             Map<String, Object> row = new LinkedHashMap<>();
             row.put("id", m.getId());

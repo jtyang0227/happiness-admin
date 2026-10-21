@@ -1,6 +1,7 @@
 package com.happiness.admin.entity;
 
 import jakarta.persistence.*;
+import com.happiness.admin.privacy.EncryptedStringConverter;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ public class AdminMemberNote {
     private String adminName;
 
     @Column(nullable = false, columnDefinition = "TEXT")
+    @Convert(converter = EncryptedStringConverter.class)
     private String content;
 
     @Column(name = "created_at", nullable = false, updatable = false)

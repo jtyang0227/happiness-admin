@@ -27,7 +27,7 @@ public class AdminNewsletterController {
     }
 
     @PostMapping("/export")
-    public ResponseEntity<?> export() {
-        return ResponseEntity.ok(newsletterService.exportActive());
+    public ResponseEntity<?> export(@RequestBody(required = false) java.util.Map<String, String> body) {
+        return ResponseEntity.ok(newsletterService.exportActive(body != null ? body.get("reason") : null));
     }
 }

@@ -7,6 +7,7 @@ import { useConfirm } from '../context/ConfirmContext';
 import { useAuth } from '../context/AuthContext';
 import Pagination from '../components/common/Pagination';
 import SegmentedControl from '../components/common/SegmentedControl';
+import ReasonDialog from '../components/common/ReasonDialog';
 import './MemberListPage.css';
 
 const AUTHORITY_COLORS = { WM: 'badge-purple', SA: 'badge-blue', US: 'badge-green' };
@@ -53,7 +54,8 @@ const SuspendModal = ({ member, onClose, onConfirm }) => {
           <textarea
             className="modal-textarea"
             rows={3}
-            placeholder="운영 정책 위반 내용을 입력하세요"
+            placeholder="운영 정책 위반 내용을 입력하세요 (100자 이내)"
+            maxLength={100}
             value={reason}
             onChange={e => setReason(e.target.value)}
           />
@@ -102,7 +104,7 @@ const TableRow = ({ m, me, onNavigate, onRoleChange, onSuspend, onActivate, onWi
         </button>
       </td>
       <td className="email-cell">{m.email}</td>
-      <td className="profile-cell">{m.profileName ? `@${m.profileName}` : <span className="text-muted">—</span>}</td>
+      <td className="profile-cell">{m.profileName ? `@${m.profileName.replace(/^@/, "")}` : <span className="text-muted">—</span>}</td>
       <td>
         <select
           className={`role-select badge ${AUTHORITY_COLORS[m.authority]}`}
@@ -154,6 +156,7 @@ const MemberListPage = () => {
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
   const [suspendTarget, setSuspendTarget] = useState(null);
 
   const fetchData = useCallback(() => {
@@ -224,16 +227,10 @@ const MemberListPage = () => {
     if (ok) run(() => deleteApi(`/admin/members/${m.id}`), '영구 삭제되었습니다.');
   };
 
-  const handleExport = async () => {
-    const ok = await confirm({
-      title: '회원 CSV 내보내기',
-      description: `현재 필터 결과 ${data.totalElements.toLocaleString()}명(최대 5,000명)을 내려받습니다. 연락처는 포함되지 않으며, 내보내기 기록은 활동 로그에 남습니다.`,
-      variant: 'warning',
-    });
-    if (!ok) return;
+  const handleExport = async (reason) => {
     setExporting(true);
     try {
-      const rows = await postApi('/admin/members/export', { search, authority, status });
+      const rows = await postApi('/admin/members/export', { search, authority, status, reason });
       const header = 'id,name,email,profile_name,authority,status,verified,created_at';
       const lines = rows.map(r => [r.id, r.name, r.email, r.profileName, r.authority, r.status, r.verified, r.createdAt].map(csvCell).join(','));
       const url = URL.createObjectURL(new Blob([`\uFEFF${[header, ...lines].join('\n')}`], { type: 'text/csv;charset=utf-8' }));
@@ -243,6 +240,7 @@ const MemberListPage = () => {
       a.click();
       URL.revokeObjectURL(url);
       toast.success(`${rows.length}명을 내보냈습니다.`);
+      setExportOpen(false);
     } catch (e) {
       toast.error(e.message || '내보내기에 실패했습니다.');
     } finally {
@@ -268,7 +266,7 @@ const MemberListPage = () => {
           <div className="ml-title-icon"><Users size={20} /></div>
           <h1 className="ml-title">회원 관리</h1>
           <span className="ml-total">{data.totalElements?.toLocaleString()}명</span>
-          <button type="button" className="btn btn-md btn-primary ml-export" onClick={handleExport} disabled={exporting || !data.totalElements}>
+          <button type="button" className="btn btn-md btn-primary ml-export" onClick={() => setExportOpen(true)} disabled={exporting || !data.totalElements}>
             <Download size={14} /> {exporting ? '내보내는 중...' : 'CSV 내보내기'}
           </button>
         </div>
@@ -367,6 +365,16 @@ const MemberListPage = () => {
       </div>
 
       <Pagination page={page} totalPages={data.totalPages} onPageChange={setPage} />
+
+      <ReasonDialog
+        open={exportOpen}
+        title="회원 CSV 내보내기"
+        description={`현재 필터 결과 ${data.totalElements.toLocaleString()}명(최대 5,000명)의 이름·이메일을 내려받습니다. 연락처는 포함되지 않습니다.`}
+        confirmLabel="내려받기"
+        busy={exporting}
+        onSubmit={handleExport}
+        onClose={() => setExportOpen(false)}
+      />
 
       {suspendTarget && (
         <SuspendModal member={suspendTarget} onClose={() => setSuspendTarget(null)} onConfirm={handleSuspendConfirm} />

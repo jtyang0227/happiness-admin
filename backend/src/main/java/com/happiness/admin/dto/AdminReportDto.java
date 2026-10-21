@@ -29,7 +29,7 @@ public class AdminReportDto {
                 .id(r.getId())
                 .reporterId(r.getReporter() != null ? r.getReporter().getId() : null)
                 .reporterName(r.getReporter() != null ? r.getReporter().getName() : null)
-                .reporterEmail(r.getReporter() != null ? r.getReporter().getEmail() : null)
+                .reporterEmail(r.getReporter() != null ? com.happiness.admin.privacy.PrivacyMasker.email(r.getReporter().getEmail()) : null)
                 .targetType(r.getTargetType())
                 .targetId(r.getTargetId())
                 .reason(r.getReason())

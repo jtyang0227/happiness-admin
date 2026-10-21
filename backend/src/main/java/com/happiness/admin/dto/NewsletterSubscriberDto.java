@@ -20,7 +20,7 @@ public class NewsletterSubscriberDto {
                 .id(s.getId())
                 .memberId(s.getMemberId())
                 .memberName(memberName)
-                .email(s.getEmail())
+                .email(com.happiness.admin.privacy.PrivacyMasker.email(s.getEmail()))
                 .active(s.getUnsubscribedAt() == null)
                 .subscribedAt(s.getSubscribedAt())
                 .unsubscribedAt(s.getUnsubscribedAt())

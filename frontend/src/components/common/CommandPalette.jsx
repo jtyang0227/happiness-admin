@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, Image, MessageSquare, BookOpen,
   BarChart2, Settings, FolderOpen, Bell, Flag, ShieldCheck,
   LayoutPanelTop, AppWindow, Star, SlidersHorizontal, CalendarDays,
-  ArrowUpDown, Search, X, User, Sparkles, MessagesSquare, Tent, ShieldAlert, IdCard, Mail, Handshake,
+  ArrowUpDown, Search, X, User, Sparkles, MessagesSquare, Tent, ShieldAlert, IdCard, Mail, Handshake, ScrollText,
 } from 'lucide-react';
 import { getApi } from '../../utils/api';
 import './CommandPalette.css';
@@ -33,6 +33,7 @@ const COMMANDS = [
   { path: '/content-policy', label: '콘텐츠 정책', Icon: SlidersHorizontal, group: '페이지' },
   { path: '/system',         label: '시스템 설정', Icon: Settings,          group: '페이지' },
   { path: '/security-audit', label: '보안 감사 로그', Icon: ShieldAlert,     group: '페이지' },
+  { path: '/privacy-logs',   label: '개인정보 접속기록', Icon: ScrollText,  group: '페이지' },
   { path: '/sort/photos',    label: '사진 정렬',   Icon: ArrowUpDown,       group: '정렬' },
   { path: '/sort/series',    label: '시리즈 정렬', Icon: ArrowUpDown,       group: '정렬' },
 ];
