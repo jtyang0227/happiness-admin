@@ -270,3 +270,61 @@
   .mdp-hero-actions { width: 100%; flex-direction: row; }
   .mdp-tab { padding: 10px 14px; font-size: var(--text-sm); }
 }
+
+/* ── 2차: 관리 이력·메모 / 댓글 / 보안 기록 ── */
+.mdp-self-note { font-size: var(--text-xs); color: var(--color-text-tertiary); max-width: 160px; }
+.mdp-side-link {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: var(--text-xs); font-weight: var(--fw-semibold);
+  color: var(--color-text-secondary); text-decoration: none;
+}
+.mdp-side-link:hover { color: var(--color-brand); }
+.mdp-more-link { align-self: flex-end; margin-top: 4px; }
+.mdp-comment-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.mdp-audit-error { color: var(--color-danger); font-weight: var(--fw-regular); }
+
+.mdp-manage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.mdp-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  box-shadow: var(--shadow-ring);
+}
+.mdp-card .mdp-card-title { display: flex; align-items: center; gap: 6px; }
+.mdp-card-hint { margin-left: auto; font-size: var(--text-xs); font-weight: var(--fw-regular); color: var(--color-text-tertiary); }
+
+.mdp-note-form { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-bottom: 16px; }
+.mdp-note-form .modal-textarea { width: 100%; }
+.mdp-note-empty { font-size: var(--text-sm); color: var(--color-text-tertiary); padding: 8px 0; }
+.mdp-notes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.mdp-note { background: var(--color-surface-2); border-radius: var(--radius-lg); padding: 12px 14px; }
+.mdp-note-head { display: flex; align-items: center; gap: 8px; font-size: var(--text-xs); color: var(--color-text-tertiary); }
+.mdp-note-head strong { color: var(--color-text-primary); font-size: var(--text-sm); }
+.mdp-note-del {
+  margin-left: auto; border: none; background: none; padding: 4px;
+  color: var(--color-text-tertiary); cursor: pointer; border-radius: var(--radius-sm);
+}
+.mdp-note-del:hover { color: var(--color-danger); background: var(--color-danger-bg); }
+.mdp-note p { margin: 6px 0 0; font-size: var(--text-sm); color: var(--color-text-primary); line-height: var(--line-normal); white-space: pre-wrap; }
+
+.mdp-timeline { list-style: none; margin: 0; padding: 0; position: relative; }
+.mdp-timeline li { display: flex; gap: 12px; padding-bottom: 14px; position: relative; }
+.mdp-timeline li:not(:last-child)::after {
+  content: ''; position: absolute; left: 5px; top: 14px; bottom: 0;
+  width: 2px; background: var(--color-border);
+}
+.mdp-tl-dot {
+  width: 12px; height: 12px; margin-top: 3px; flex-shrink: 0;
+  border-radius: var(--radius-full); background: var(--color-text-tertiary);
+}
+.mdp-tl-MEMBER_SUSPEND, .mdp-tl-MEMBER_WITHDRAW { background: var(--color-danger); }
+.mdp-tl-MEMBER_UNSUSPEND, .mdp-tl-MEMBER_RESTORE, .mdp-tl-MEMBER_SUSPEND_EXPIRED { background: var(--color-success); }
+.mdp-tl-MEMBER_ROLE_CHANGE { background: var(--color-brand); }
+.mdp-tl-body { min-width: 0; flex: 1; }
+.mdp-tl-head { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: var(--text-sm); }
+.mdp-tl-head span { font-size: var(--text-xs); color: var(--color-text-tertiary); }
+.mdp-tl-detail { font-size: var(--text-xs); color: var(--color-text-secondary); margin-top: 2px; word-break: break-all; }
+
+@media (max-width: 900px) {
+  .mdp-manage { grid-template-columns: 1fr; }
+}

@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
   ArrowLeft, ShieldCheck, Camera, BookOpen,
-  MessageSquare, FolderOpen, Calendar, Phone, Mail,
+  MessageSquare, FolderOpen, Calendar, Phone, Mail, StickyNote, History, ShieldAlert, Trash2, IdCard,
 } from 'lucide-react';
-import { getApi, patchApi } from '../utils/api';
+import { getApi, patchApi, postApi, deleteApi } from '../utils/api';
 import { useConfirm } from '../context/ConfirmContext';
+import { useAuth } from '../context/AuthContext';
 import SlideOver from '../components/common/SlideOver';
 import './MemberDetailPage.css';
 
@@ -16,6 +17,9 @@ const TABS = [
   { key: 'series',  label: '시리즈' },
   { key: 'portfolios', label: '포트폴리오' },
   { key: 'inquiries', label: '문의' },
+  { key: 'comments', label: '댓글' },
+  { key: 'security', label: '보안 기록' },
+  { key: 'manage', label: '관리 이력·메모' },
 ];
 
 const AUTHORITY_LABELS = { WM: '웹관리자', SA: '운영자', US: '일반' };
@@ -26,7 +30,7 @@ const STATUS_MAP = {
   ACTIVE:    { label: '활성',   cls: 'sc-active' },
   INACTIVE:  { label: '비활성', cls: 'sc-inactive' },
   SUSPENDED: { label: '정지',   cls: 'sc-suspended' },
-  DELETED:   { label: '삭제됨', cls: 'sc-deleted' },
+  DELETED:   { label: '탈퇴', cls: 'sc-deleted' },
 };
 
 const AVATAR_COLORS = ['#EC572D','#2F7A8C','#6A5B8C','#3F8A57','#B8791E','#2C4E6E','#A82530'];
@@ -148,10 +152,20 @@ const PortfolioThumb = ({ portfolio, onClick }) => {
 };
 
 /* ── 메인 컴포넌트 ── */
+const HISTORY_LABELS = {
+  MEMBER_ROLE_CHANGE: '역할 변경', MEMBER_SUSPEND: '정지', MEMBER_UNSUSPEND: '정지 해제',
+  MEMBER_SUSPEND_EXPIRED: '자동 해제', MEMBER_WITHDRAW: '탈퇴 처리', MEMBER_RESTORE: '복구',
+  MEMBER_STATUS_CHANGE: '상태 변경',
+};
+const AUDIT_LABELS = { LOGIN_FAILURE: '로그인 실패', LOGIN_SUCCESS: '로그인', ADMIN_API: '관리자 API', SERVICE: '서비스 동작' };
+const fmt = (v) => (v ? v.slice(0, 16).replace('T', ' ') : '-');
+const daysLeft = (iso) => Math.max(0, Math.ceil((new Date(iso).getTime() - Date.now()) / 86400000));
+
 const MemberDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { confirm } = useConfirm();
+  const { user } = useAuth();
 
   const [member, setMember] = useState(null);
   const [activeTab, setActiveTab] = useState('summary');
@@ -159,6 +173,12 @@ const MemberDetailPage = () => {
   const [tabSeries, setTabSeries] = useState([]);
   const [tabPortfolios, setTabPortfolios] = useState([]);
   const [tabInquiries, setTabInquiries] = useState([]);
+  const [tabComments, setTabComments] = useState([]);
+  const [tabSecurity, setTabSecurity] = useState([]);
+  const [history, setHistory] = useState([]);
+  const [notes, setNotes] = useState([]);
+  const [newNote, setNewNote] = useState('');
+  const [savingNote, setSavingNote] = useState(false);
   const [showSuspend, setShowSuspend] = useState(false);
   const [indicator, setIndicator] = useState({ left: 0, width: 0 });
   const [hasPendingVerification, setHasPendingVerification] = useState(false);
@@ -176,6 +196,78 @@ const MemberDetailPage = () => {
 
   useEffect(() => { fetchMember(); }, [fetchMember]);
 
+  const loadManage = useCallback(() => {
+    getApi(`/admin/members/${id}/history`).then(setHistory).catch(() => {});
+    getApi(`/admin/members/${id}/notes`).then(setNotes).catch(() => {});
+  }, [id]);
+
+  const afterAction = (msg) => {
+    toast.success(msg);
+    fetchMember();
+    if (activeTab === 'manage') loadManage();
+  };
+
+  const handleAddNote = async () => {
+    if (!newNote.trim()) return;
+    setSavingNote(true);
+    try {
+      await postApi(`/admin/members/${id}/notes`, { content: newNote });
+      setNewNote('');
+      loadManage();
+    } catch (e) {
+      toast.error(e.message || '메모 저장에 실패했습니다.');
+    } finally {
+      setSavingNote(false);
+    }
+  };
+
+  const handleDeleteNote = async (note) => {
+    const ok = await confirm({ title: '메모 삭제', description: '이 내부 메모를 삭제합니다.', variant: 'danger' });
+    if (!ok) return;
+    try {
+      await deleteApi(`/admin/members/${id}/notes/${note.id}`);
+      loadManage();
+    } catch (e) {
+      toast.error(e.message || '삭제에 실패했습니다.');
+    }
+  };
+
+  const handleWithdraw = async () => {
+    const ok = await confirm({
+      title: '탈퇴 처리',
+      description: `"${member.name}" 회원을 탈퇴 처리합니다. 데이터는 보존되며 언제든 복구할 수 있습니다.`,
+      variant: 'danger',
+    });
+    if (!ok) return;
+    try {
+      await patchApi(`/admin/members/${id}/status`, { status: 'DELETED' });
+      afterAction('탈퇴 처리되었습니다.');
+    } catch (e) { toast.error(e.message || '처리에 실패했습니다.'); }
+  };
+
+  const handleRestore = async () => {
+    const ok = await confirm({ title: '회원 복구', description: `"${member.name}" 회원을 활성 상태로 복구합니다.`, variant: 'warning' });
+    if (!ok) return;
+    try {
+      await patchApi(`/admin/members/${id}/status`, { status: 'ACTIVE' });
+      afterAction('복구되었습니다.');
+    } catch (e) { toast.error(e.message || '처리에 실패했습니다.'); }
+  };
+
+  const handlePurge = async () => {
+    const ok = await confirm({
+      title: '영구 삭제',
+      description: `"${member.name}" 회원과 사진·시리즈·포트폴리오·예약·문의·댓글·프로필 콘텐츠를 영구 삭제합니다. 되돌릴 수 없습니다.`,
+      variant: 'danger',
+    });
+    if (!ok) return;
+    try {
+      await deleteApi(`/admin/members/${id}`);
+      toast.success('영구 삭제되었습니다.');
+      navigate('/members');
+    } catch (e) { toast.error(e.message || '삭제에 실패했습니다.'); }
+  };
+
   useEffect(() => {
     if (!member) return;
     if (activeTab === 'photos') {
@@ -186,8 +278,14 @@ const MemberDetailPage = () => {
       getApi(`/admin/portfolios?memberId=${id}&size=6`).then(r => setTabPortfolios(r.content || [])).catch(() => {});
     } else if (activeTab === 'inquiries') {
       getApi(`/admin/inquiries?senderId=${id}&size=10`).then(r => setTabInquiries(r.content || [])).catch(() => {});
+    } else if (activeTab === 'comments') {
+      getApi(`/admin/comments?memberId=${id}&size=20`).then(r => setTabComments(r.content || [])).catch(() => {});
+    } else if (activeTab === 'security') {
+      getApi(`/admin/security-audit?memberId=${id}&days=30&size=30`).then(r => setTabSecurity(r.content || [])).catch(() => {});
+    } else if (activeTab === 'manage') {
+      loadManage();
     }
-  }, [activeTab, member, id]);
+  }, [activeTab, member, id, loadManage]);
 
   useEffect(() => {
     if (!member || member.isVerified) return;
@@ -241,15 +339,18 @@ const MemberDetailPage = () => {
     if (!ok) return;
     try {
       await patchApi(`/admin/members/${id}/role`, { authority: newAuthority });
-      toast.success('역할이 변경되었습니다.');
-      fetchMember();
-    } catch { toast.error('역할 변경에 실패했습니다.'); }
+      afterAction('역할이 변경되었습니다.');
+    } catch (e) { toast.error(e.message || '역할 변경에 실패했습니다.'); }
   };
 
   useEffect(() => {
-    if (!tabBarRef.current) return;
-    const el = tabBarRef.current.querySelector('.mdp-tab.active');
-    if (el) setIndicator({ left: el.offsetLeft, width: el.offsetWidth });
+    const place = () => {
+      const el = tabBarRef.current?.querySelector('.mdp-tab.active');
+      if (el) setIndicator({ left: el.offsetLeft, width: el.offsetWidth });
+    };
+    place();
+    window.addEventListener('resize', place);
+    return () => window.removeEventListener('resize', place);
   }, [activeTab, member]);
 
   const handleActivate = async () => {
@@ -257,18 +358,16 @@ const MemberDetailPage = () => {
     if (!ok) return;
     try {
       await patchApi(`/admin/members/${id}/status`, { status: 'ACTIVE' });
-      toast.success('정지가 해제되었습니다.');
-      fetchMember();
-    } catch { toast.error('처리에 실패했습니다.'); }
+      afterAction('정지가 해제되었습니다.');
+    } catch (e) { toast.error(e.message || '처리에 실패했습니다.'); }
   };
 
   const handleSuspendConfirm = async (reason, suspendDays) => {
     setShowSuspend(false);
     try {
       await patchApi(`/admin/members/${id}/status`, { status: 'SUSPENDED', reason, suspendDays: suspendDays || null });
-      toast.success('정지 처리되었습니다.');
-      fetchMember();
-    } catch { toast.error('처리에 실패했습니다.'); }
+      afterAction('정지 처리되었습니다.');
+    } catch (e) { toast.error(e.message || '처리에 실패했습니다.'); }
   };
 
   if (!member) {
@@ -282,6 +381,9 @@ const MemberDetailPage = () => {
   }
 
   const statusInfo = STATUS_MAP[member.status] || STATUS_MAP.INACTIVE;
+  const isSelf = user?.memberId === member.id || user?.email === member.email;
+  const isWm = user?.authority === 'WM';
+  const canRestrict = !isSelf && (!(member.authority === 'WM' || member.authority === 'SA') || isWm);
   const color = avatarColor(member.name);
 
   return (
@@ -326,18 +428,27 @@ const MemberDetailPage = () => {
               <span className="mdp-suspend-label">정지 사유</span>
               <span className="mdp-suspend-text">{member.suspendReason}</span>
               {member.suspendUntil
-                ? <span className="mdp-suspend-until">~ {member.suspendUntil.slice(0, 10)}</span>
+                ? <span className="mdp-suspend-until">~ {member.suspendUntil.slice(0, 10)} · {daysLeft(member.suspendUntil)}일 후 자동 해제</span>
                 : <span className="mdp-suspend-until">영구</span>}
             </div>
           )}
         </div>
 
         <div className="mdp-hero-actions">
-          {member.status === 'SUSPENDED'
-            ? <button className="btn btn-warning btn-md" onClick={handleActivate}>정지 해제</button>
-            : member.status === 'ACTIVE'
-              ? <button className="btn btn-outline btn-md" onClick={() => setShowSuspend(true)}>정지</button>
-              : null}
+          {isSelf ? <span className="mdp-self-note">본인 계정은 여기서 조치할 수 없습니다</span>
+            : member.status === 'DELETED' ? (
+              <>
+                <button className="btn btn-outline btn-md" onClick={handleRestore}>복구</button>
+                {isWm && <button className="btn btn-danger-outline btn-md" onClick={handlePurge}>영구 삭제</button>}
+              </>
+            ) : (
+              <>
+                {member.status === 'SUSPENDED' && <button className="btn btn-warning btn-md" onClick={handleActivate}>정지 해제</button>}
+                {member.status === 'ACTIVE' && canRestrict && <button className="btn btn-outline btn-md" onClick={() => setShowSuspend(true)}>정지</button>}
+                {canRestrict && <button className="btn btn-danger-outline btn-md" onClick={handleWithdraw}>탈퇴 처리</button>}
+              </>
+            )}
+          <Link to={`/profile-content?memberId=${id}`} className="mdp-side-link"><IdCard size={13} /> 프로필 콘텐츠</Link>
         </div>
       </div>
 
@@ -459,6 +570,87 @@ const MemberDetailPage = () => {
                 </div>
               ))
             }
+          </div>
+        )}
+        {activeTab === 'comments' && (
+          <div className="mdp-list-stack">
+            {tabComments.length === 0
+              ? <div className="mdp-empty"><MessageSquare size={32} /><span>작성한 댓글이 없습니다.</span></div>
+              : tabComments.map(c => (
+                <div key={c.id} className="mdp-list-item">
+                  <MessageSquare size={16} className="mdp-list-icon" />
+                  <span className="mdp-list-title mdp-comment-text">{c.parentId ? '↳ ' : ''}{c.content}</span>
+                  <span className="mdp-list-meta">{c.photoTitle || `사진 #${c.photoId}`} · {fmt(c.createdAt)}</span>
+                </div>
+              ))}
+            {tabComments.length > 0 && <Link to="/comments" className="mdp-side-link mdp-more-link">댓글 관리에서 보기 →</Link>}
+          </div>
+        )}
+
+        {activeTab === 'security' && (
+          <div className="mdp-list-stack">
+            {tabSecurity.length === 0
+              ? <div className="mdp-empty"><ShieldAlert size={32} /><span>최근 30일 보안 기록이 없습니다.</span></div>
+              : tabSecurity.map(l => (
+                <div key={l.id} className="mdp-list-item">
+                  <span className={`badge ${l.success ? 'badge-green' : 'badge-red'}`}>{AUDIT_LABELS[l.actionType] || l.actionType}</span>
+                  <span className="mdp-list-title">{l.actionDetail || '-'}{l.errorMessage && <span className="mdp-audit-error"> · {l.errorMessage}</span>}</span>
+                  <span className="mdp-list-meta">{l.ipAddress || '-'} · {fmt(l.createdAt)}</span>
+                </div>
+              ))}
+          </div>
+        )}
+
+        {activeTab === 'manage' && (
+          <div className="mdp-manage">
+            <section className="mdp-card">
+              <div className="mdp-card-title"><StickyNote size={14} /> 내부 메모 <span className="mdp-card-hint">회원에게 보이지 않습니다</span></div>
+              <div className="mdp-note-form">
+                <textarea
+                  className="modal-textarea"
+                  rows={3}
+                  maxLength={2000}
+                  placeholder="상담 내용, 조치 근거, 다음 담당자에게 남길 말"
+                  value={newNote}
+                  onChange={e => setNewNote(e.target.value)}
+                />
+                <button type="button" className="btn btn-primary btn-sm" onClick={handleAddNote} disabled={savingNote || !newNote.trim()}>
+                  {savingNote ? '저장 중...' : '메모 남기기'}
+                </button>
+              </div>
+              {notes.length === 0 ? <div className="mdp-note-empty">아직 메모가 없습니다.</div> : (
+                <ul className="mdp-notes">
+                  {notes.map(n => (
+                    <li key={n.id} className="mdp-note">
+                      <div className="mdp-note-head">
+                        <strong>{n.adminName || '관리자'}</strong>
+                        <span>{fmt(n.createdAt)}</span>
+                        {(n.adminId === user?.memberId || isWm) && (
+                          <button type="button" className="mdp-note-del" aria-label="메모 삭제" onClick={() => handleDeleteNote(n)}><Trash2 size={13} /></button>
+                        )}
+                      </div>
+                      <p>{n.content}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+            <section className="mdp-card">
+              <div className="mdp-card-title"><History size={14} /> 조치 이력</div>
+              {history.length === 0 ? <div className="mdp-note-empty">기록된 조치가 없습니다.</div> : (
+                <ol className="mdp-timeline">
+                  {history.map(h => (
+                    <li key={h.id}>
+                      <span className={`mdp-tl-dot mdp-tl-${h.action}`} />
+                      <div className="mdp-tl-body">
+                        <div className="mdp-tl-head"><strong>{HISTORY_LABELS[h.action] || h.action}</strong><span>{h.adminName || '-'} · {fmt(h.createdAt)}</span></div>
+                        <div className="mdp-tl-detail">{h.details}</div>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </section>
           </div>
         )}
       </div>

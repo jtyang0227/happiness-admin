@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -13,4 +14,8 @@ public interface PricingPackageRepository extends JpaRepository<PricingPackage, 
 
     @Query("SELECT x FROM PricingPackage x WHERE (:memberId IS NULL OR x.memberId = :memberId)")
     Page<PricingPackage> findByMember(@Param("memberId") Long memberId, Pageable pageable);
+
+    @Modifying
+    @Query("DELETE FROM PricingPackage x WHERE x.memberId = :memberId")
+    int deleteByMemberId(@Param("memberId") Long memberId);
 }

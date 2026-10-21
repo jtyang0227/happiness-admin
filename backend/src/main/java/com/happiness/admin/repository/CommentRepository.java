@@ -16,9 +16,11 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query("SELECT c FROM Comment c WHERE " +
            "(:photoId IS NULL OR c.photoId = :photoId) AND " +
+           "(:memberId IS NULL OR c.memberId = :memberId) AND " +
            "(:search IS NULL OR LOWER(c.content) LIKE LOWER(CONCAT('%', :search, '%')) " +
            "OR LOWER(c.memberName) LIKE LOWER(CONCAT('%', :search, '%')))")
-    Page<Comment> search(@Param("photoId") Long photoId, @Param("search") String search, Pageable pageable);
+    Page<Comment> search(@Param("photoId") Long photoId, @Param("memberId") Long memberId,
+                         @Param("search") String search, Pageable pageable);
 
     @Query("SELECT c.parentId, COUNT(c) FROM Comment c WHERE c.parentId IN :parentIds GROUP BY c.parentId")
     List<Object[]> countRepliesByParentIdIn(@Param("parentIds") List<Long> parentIds);
@@ -26,4 +28,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByParentId(Long parentId);
 
     long countByCreatedAtGreaterThanEqual(LocalDateTime since);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("DELETE FROM Comment c WHERE c.memberId = :memberId OR c.photoId IN :photoIds")
+    int deleteByMemberOrPhotos(@Param("memberId") Long memberId, @Param("photoIds") List<Long> photoIds);
 }

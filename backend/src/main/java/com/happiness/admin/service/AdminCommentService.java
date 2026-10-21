@@ -28,10 +28,10 @@ public class AdminCommentService {
     private final PhotoRepository photoRepository;
     private final AdminActivityRecorder activityRecorder;
 
-    public PageResponse<AdminCommentDto> getComments(Long photoId, String search, int page, int size) {
+    public PageResponse<AdminCommentDto> getComments(Long photoId, Long memberId, String search, int page, int size) {
         String searchTerm = (search != null && !search.isBlank()) ? search.trim() : null;
         var pageable = PageRequest.of(page, size, Sort.by("createdAt").descending().and(Sort.by("id").descending()));
-        var comments = commentRepository.search(photoId, searchTerm, pageable);
+        var comments = commentRepository.search(photoId, memberId, searchTerm, pageable);
 
         List<Long> photoIds = comments.getContent().stream().map(Comment::getPhotoId).distinct().toList();
         Map<Long, Photo> photos = photoIds.isEmpty() ? Map.of()

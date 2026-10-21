@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -34,4 +35,10 @@ public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
 
     @Query("SELECT p.member.id, COUNT(p) FROM Portfolio p WHERE p.member.id IN :memberIds GROUP BY p.member.id")
     List<Object[]> countByMemberIdIn(@Param("memberIds") List<Long> memberIds);
+
+    List<com.happiness.admin.entity.Portfolio> findByMemberId(Long memberId);
+
+    @Modifying
+    @Query("UPDATE Portfolio p SET p.reviewedBy = null WHERE p.reviewedBy.id = :memberId")
+    int clearReviewer(@Param("memberId") Long memberId);
 }

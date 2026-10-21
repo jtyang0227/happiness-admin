@@ -25,4 +25,8 @@ public interface AdminActivityLogRepository extends JpaRepository<AdminActivityL
     @Query("SELECT cast(l.createdAt as LocalDate) as day, COUNT(l) as cnt FROM AdminActivityLog l " +
            "WHERE l.createdAt >= :since GROUP BY cast(l.createdAt as LocalDate) ORDER BY day")
     List<Object[]> dailyActivity(@Param("since") LocalDateTime since);
+
+    @Query("SELECT l FROM AdminActivityLog l WHERE l.targetType = :targetType AND l.targetId = :targetId " +
+           "ORDER BY l.createdAt DESC, l.id DESC")
+    List<AdminActivityLog> findByTarget(@Param("targetType") String targetType, @Param("targetId") Long targetId);
 }

@@ -17,10 +17,11 @@ public class AdminCommentController {
     @GetMapping
     public ResponseEntity<?> list(
             @RequestParam(required = false) Long photoId,
+            @RequestParam(required = false) Long memberId,
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(commentService.getComments(photoId, search, page, size));
+        return ResponseEntity.ok(commentService.getComments(photoId, memberId, search, page, size));
     }
 
     @GetMapping("/counts")

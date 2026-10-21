@@ -48,6 +48,7 @@ public class DataInitializer implements ApplicationRunner {
     private final NewsletterSubscriberRepository newsletterSubscriberRepository;
     private final MeetRepository meetRepository;
     private final DeliverySetRepository deliverySetRepository;
+    private final AdminMemberNoteRepository adminMemberNoteRepository;
     private final GatheringRepository gatheringRepository;
     private final GatheringParticipantRepository gatheringParticipantRepository;
     private final GatheringPostRepository gatheringPostRepository;
@@ -339,6 +340,38 @@ public class DataInitializer implements ApplicationRunner {
         seedProfileContent(users, wm);
         seedNewsletter(users);
         seedTransactions(users, wm);
+        seedMemberModeration(users, wm, sa);
+    }
+
+    private void seedMemberModeration(List<Member> users, Member wm, Member sa) {
+        Member expired = users.get(5);
+        expired.setStatus(MemberStatus.SUSPENDED);
+        expired.setSuspendReason("스팸 댓글 반복");
+        expired.setSuspendedAt(LocalDateTime.now().minusDays(7));
+        expired.setSuspendUntil(LocalDateTime.now().minusMinutes(5));
+        expired.setSuspendedById(wm.getId());
+        memberRepository.save(expired);
+
+        Member ending = users.get(6);
+        ending.setStatus(MemberStatus.SUSPENDED);
+        ending.setSuspendReason("허위 후기 작성");
+        ending.setSuspendedAt(LocalDateTime.now().minusDays(1));
+        ending.setSuspendUntil(LocalDateTime.now().plusDays(2));
+        ending.setSuspendedById(sa.getId());
+        memberRepository.save(ending);
+
+        Member withdrawn = users.get(8);
+        withdrawn.setStatus(MemberStatus.DELETED);
+        memberRepository.save(withdrawn);
+
+        adminMemberNoteRepository.save(AdminMemberNote.builder().memberId(ending.getId())
+                .adminId(sa.getId()).adminName(sa.getName())
+                .content("후기 3건 중 2건이 같은 IP에서 작성됨. 해제 후 재발 시 영구 정지 검토.")
+                .createdAt(LocalDateTime.now().minusDays(1)).build());
+        activityLogRepository.save(AdminActivityLog.builder().adminId(sa.getId()).adminName(sa.getName())
+                .action("MEMBER_SUSPEND").targetType("MEMBER").targetId(ending.getId())
+                .details(ending.getName() + ": ACTIVE → SUSPENDED · 3일 · 사유: 허위 후기 작성")
+                .createdAt(LocalDateTime.now().minusDays(1)).build());
     }
 
     private void seedTransactions(List<Member> users, Member wm) {

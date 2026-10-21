@@ -53,7 +53,7 @@ Standard layered Spring Boot architecture:
 
 - **`controller/`** — REST endpoints. Auth: `AuthController`/`AdminAuthController` (`/api/auth/login` → JWT 발급). Admin (모두 `/api/admin/**`, `ROLE_WM`/`ROLE_SA` 필요):
   - `AdminStatsController` — 대시보드 통계
-  - `AdminMemberController` — 회원 목록/상세/역할 변경/상태 변경(정지·해제)/삭제
+  - `AdminMemberController` — 회원 목록/상세/역할 변경/상태 변경(정지·해제·탈퇴 처리·복구), `/summary`, `POST /export`, `/{id}/history`, `/{id}/notes`. 영구 삭제(`DELETE`)는 **WM 전용 + 이미 `DELETED`인 회원만**, 연관 데이터(예약·포트폴리오·인증·피처드·댓글·프로필 콘텐츠 등)를 FK 순서대로 정리. 본인 계정 조치 금지, 관리자 계정 정지·탈퇴는 WM만
   - `AdminPhotoController` — 사진 목록/삭제/카테고리코드 수정
   - `AdminInquiryController` — 문의 목록(receiverId·senderId 필터)/읽음 처리/삭제
   - `AdminSeriesController` — 시리즈 목록/삭제, 작업 큐레이션(`GET /series/curation`, `PUT /series/{id}/featured` — App 탐색 "에디터 추천")
@@ -76,12 +76,12 @@ Standard layered Spring Boot architecture:
   - `AdminNewsletterController` — 뉴스레터 구독자 목록·집계, `POST /export`(활성 구독자, 활동 로그 기록)
   - `AdminTransactionController` — 미팅·납품 메타데이터 집계/정체 건/목록, 읽기 전용
   - `AdminHelloController` — 헬스체크용 샘플 엔드포인트
-- **`service/`** — `AuthService`, `MemberService`, `AdminStatsService`, `AdminMemberService`, `AdminPhotoService`, `AdminInquiryService`, `AdminSeriesService`, `AdminPortfolioService`, `AdminCategoryService`, `AdminSortService`, `AdminReportService`, `AdminReportAiTriageService`+`ReportAiTriageWriter`(§AI 연동), `AdminNoticeService`, `AdminBannerService`, `AdminPopupService`, `AdminFeaturedService`, `AdminVerificationService`, `AdminBookingService`, `AdminContentPolicyService`, `AdminCommentService`, `AdminGatheringService`, `AdminSecurityAuditService`, `AdminProfileContentService`, `AdminNewsletterService`, `AdminTransactionService`, `AdminActivityRecorder`(현재 관리자로 `admin_activity_logs` 기록 — 큐레이션·댓글/게시글 삭제가 사용), `GeminiClientService`(§AI 연동).
-- **`repository/`** — Spring Data JPA: `MemberRepository`, `PhotoRepository`, `InquiryRepository`, `SeriesRepository`, `SeriesPhotoRepository`, `PortfolioRepository`, `PortfolioItemRepository`, `PhotoCategoryRepository`, `ReportRepository`, `NoticeRepository`, `BannerRepository`, `PopupRepository`, `FeaturedItemRepository`, `VerificationRequestRepository`, `BookingRepository`, `SystemConfigRepository`, `AdminActivityLogRepository`, `CommentRepository`, `Gathering*Repository`(모임·참여자·게시글·사진·좋아요·댓글), `SecurityAuditLogRepository`, `TestimonialRepository`·`PricingPackageRepository`·`PressFeatureRepository`·`AchievementRepository`·`ClientBrandRepository`, `NewsletterSubscriberRepository`, `MeetRepository`, `DeliverySetRepository`.
+- **`service/`** — `AuthService`, `MemberService`, `AdminStatsService`, `AdminMemberService`, `AdminPhotoService`, `AdminInquiryService`, `AdminSeriesService`, `AdminPortfolioService`, `AdminCategoryService`, `AdminSortService`, `AdminReportService`, `AdminReportAiTriageService`+`ReportAiTriageWriter`(§AI 연동), `AdminNoticeService`, `AdminBannerService`, `AdminPopupService`, `AdminFeaturedService`, `AdminVerificationService`, `AdminBookingService`, `AdminContentPolicyService`, `AdminCommentService`, `AdminGatheringService`, `AdminSecurityAuditService`, `AdminProfileContentService`, `AdminNewsletterService`, `AdminTransactionService`, `AdminActivityRecorder`(현재 관리자로 `admin_activity_logs` 기록, 스케줄러용 `recordSystem` — 회원 조치·큐레이션·댓글/게시글 삭제·내보내기가 사용), `MemberSuspensionScheduler`(10분마다 기간 만료 정지 자동 해제 — App은 `SUSPENDED`면 로그인을 막으므로 해제하지 않으면 영구 정지가 됨, `admin.member.suspension-check-ms`로 주기 조정), `GeminiClientService`(§AI 연동).
+- **`repository/`** — Spring Data JPA: `MemberRepository`, `PhotoRepository`, `InquiryRepository`, `SeriesRepository`, `SeriesPhotoRepository`, `PortfolioRepository`, `PortfolioItemRepository`, `PhotoCategoryRepository`, `ReportRepository`, `NoticeRepository`, `BannerRepository`, `PopupRepository`, `FeaturedItemRepository`, `VerificationRequestRepository`, `BookingRepository`, `SystemConfigRepository`, `AdminActivityLogRepository`, `CommentRepository`, `Gathering*Repository`(모임·참여자·게시글·사진·좋아요·댓글), `SecurityAuditLogRepository`, `TestimonialRepository`·`PricingPackageRepository`·`PressFeatureRepository`·`AchievementRepository`·`ClientBrandRepository`, `NewsletterSubscriberRepository`, `MeetRepository`, `DeliverySetRepository`, `AdminMemberNoteRepository`.
   **주의**: `BoardRepository`/`ContentRepository`(및 `Board`/`Content` 엔티티)는 어떤 컨트롤러·서비스에서도 참조되지 않는 죽은 코드다 — 실제 게시판 기능은 없다(확인 필요 시 grep으로 재검증할 것, 새 기능을 여기 얹지 말 것).
-- **`entity/`** — `Member` (suspendReason·suspendUntil·isVerified 포함), `Photo` (displayOrder), `Inquiry`(+`InquiryProcessStatus`), `Series` (displayOrder), `SeriesPhoto` (displayOrder), `Portfolio`, `PortfolioItem` (displayOrder), `PhotoCategory`, `Report`(aiSummary·aiSeverity·aiSuggestedAction·aiAnalyzedAt 포함, §AI 연동), `Notice`, `Banner`, `Popup`, `FeaturedItem`, `VerificationRequest`, `Booking`(+`BookingStatus`), `SystemConfig`, `AdminActivityLog`, `Authority` (WM/SA/US), `MemberStatus`, `PortfolioStatus`, `PortfolioVisibility`, `Comment`, `Gathering`/`GatheringParticipant`/`GatheringPost`/`GatheringPhoto`/`GatheringPostLike`/`GatheringPostComment`, `SecurityAuditLog`, `Testimonial`/`PricingPackage`/`PressFeature`/`Achievement`/`ClientBrand`, `NewsletterSubscriber`(token은 응답 제외), `Meet`/`DeliverySet`(메타데이터만 — 메시지·주소·토큰·비밀번호·피드백은 의도적으로 미매핑).
+- **`entity/`** — `Member` (suspendReason·suspendUntil·isVerified 포함), `Photo` (displayOrder), `Inquiry`(+`InquiryProcessStatus`), `Series` (displayOrder), `SeriesPhoto` (displayOrder), `Portfolio`, `PortfolioItem` (displayOrder), `PhotoCategory`, `Report`(aiSummary·aiSeverity·aiSuggestedAction·aiAnalyzedAt 포함, §AI 연동), `Notice`, `Banner`, `Popup`, `FeaturedItem`, `VerificationRequest`, `Booking`(+`BookingStatus`), `SystemConfig`, `AdminActivityLog`, `Authority` (WM/SA/US), `MemberStatus`, `PortfolioStatus`, `PortfolioVisibility`, `Comment`, `Gathering`/`GatheringParticipant`/`GatheringPost`/`GatheringPhoto`/`GatheringPostLike`/`GatheringPostComment`, `SecurityAuditLog`, `Testimonial`/`PricingPackage`/`PressFeature`/`Achievement`/`ClientBrand`, `NewsletterSubscriber`(token은 응답 제외), `Meet`/`DeliverySet`(메타데이터만 — 메시지·주소·토큰·비밀번호·피드백은 의도적으로 미매핑), `AdminMemberNote`(Admin 전용 신규 테이블 `admin_member_notes` — 운영자 내부 메모).
   **App 테이블 미러링 규칙**: prod에서 Admin은 App과 같은 Postgres(`ddl-auto=update`)를 쓴다 — `Comment`·`Gathering*`·`SecurityAuditLog`·프로필 콘텐츠 5종·`NewsletterSubscriber`·`Meet`·`DeliverySet`·`Series.draft/featuredAt/shootType`은 App 엔티티의 테이블·컬럼명을 그대로 부분 매핑한 것이다. 새로 매핑하는 컬럼은 App과 이름을 맞추고, App에 없는 NOT NULL 컬럼을 추가하지 말 것(배경: `docs/planning/APP_FEATURE_SYNC_PLAN.md` §6).
-- **`security/`** — `JwtTokenProvider`, `JwtAuthenticationFilter` (Bearer 토큰 검증). 모든 `/api/admin/**`는 `ROLE_WM` 또는 `ROLE_SA` 필요.
+- **`security/`** — `JwtTokenProvider`, `JwtAuthenticationFilter` (Bearer 토큰 검증, principal = 이메일), `CurrentAdminProvider`(요청 중인 관리자 `Member` 조회 — 권한 가드·이력 기록용). `@PreAuthorize` 거부는 `GlobalExceptionHandler`에서 403으로 변환. 모든 `/api/admin/**`는 `ROLE_WM` 또는 `ROLE_SA` 필요.
 - **`dto/`** — `LoginResponse`, `PageResponse<T>`, `AdminMemberDto` (portfolioCount 포함), `AdminPhotoDto`, `AdminInquiryDto`, `AdminSeriesDto`, `AdminPortfolioDto`, `StatsSummaryDto`, `DailyStatDto`, `TopPhotoDto`, `DistItemDto`, `SystemStatusDto`, `RoleUpdateRequest`, `StatusUpdateRequest`, `CategoryDto`, `ReorderItem`, `SortPhotoDto`, `SortSeriesDto`, `SortSeriesPhotoDto`, `SortPortfolioItemDto`.
 - **`DataInitializer`** — `@Profile("!prod")`: 서버 기동 시 H2에 테스트 데이터 자동 삽입 (관리자 2명, 회원 10명, 사진 30장·displayOrder 1–30, 문의 15건, 시리즈 8개·displayOrder 1–8, 포트폴리오 6개). **개발 계정: `admin@happiness.dev` / `Admin123!`**
 
@@ -98,10 +98,10 @@ React SPA using React Router v6 + Recharts:
 - **`context/AuthContext.jsx`** — JWT 저장/조회/삭제, `useAuth()` 훅 제공
 - **`context/ConfirmContext.jsx`** — 전역 확인 다이얼로그, `useConfirm()` 훅 제공
 - **`pages/`** —
-  - `LoginPage` — JWT 로그인 (앱 전체 다크모드와 무관하게 항상 라이트 고정)
+  - `LoginPage` — JWT 로그인 (앱 전체 다크모드와 무관하게 항상 라이트 고정). `admin_user`에 `memberId`도 저장(본인 판별용)
   - `DashboardPage` — "처리 대기" 그라디언트 히어로(심사·신고·인증·미읽음 문의 합계) + 처리 큐 카드 3종(최다 건 오렌지 보더) + KPI 스트립(lucide 아이콘) + 심사 대기 포트폴리오 + 활동 피드 + 예약 캘린더
-  - `MemberListPage` — 회원 목록/검색/상태 필터/역할 변경/정지/삭제
-  - `MemberDetailPage` — 회원 상세·KPI·탭(사진·시리즈·문의)·정지 모달
+  - `MemberListPage` — 현황 카드(클릭=상태 필터, 3일 내 자동 해제 수), 상태 `SegmentedControl`, 검색·역할 필터, CSV 내보내기, 행 조치(정지·해제·탈퇴·복구·WM 영구 삭제, 본인 행은 "나" 표시·조치 없음)
+  - `MemberDetailPage` — 회원 상세·KPI·탭 8개(요약·사진·시리즈·포트폴리오·문의·댓글·보안 기록·관리 이력·메모), 정지 모달·탈퇴/복구/영구 삭제, 자동 해제 D-day 표시
   - `PhotoListPage` — 사진 목록/필터/삭제
   - `InquiryListPage` — 문의 목록/읽음 처리/처리상태 관리
   - `SeriesListPage` — 시리즈 목록/삭제/사진 정렬 링크
@@ -241,6 +241,7 @@ AKIRA의 각진 프레임·하드 오프셋 섀도우·네온 포인트·CRT 텍
 - `docs/planning/V14_MINIMAL_DESIGN_PLAN.md` — **현재(7차) V14 디자인 기획·토큰·구조**
 - `docs/design/TOSS_DESIGN_SPEC.md` — 디자인 세대 계보 + 6차 Toss 구현 기록(레거시 참고용)
 - `docs/planning/APP_TO_ADMIN_SPEC.md` — happiness-app에서 admin으로 이식할 기능 명세. **주의: 이 문서(2026-06-23자)는 이미 낡았다** — "신고/제재 미구현(P2)"라고 적혀 있지만 실제로는 `AdminReportController`/`ReportListPage`가 완전히 구현돼 있고 AI 트리아지까지 붙어 있다(§AI 연동). 이 문서의 구현 여부 표시를 그대로 믿지 말고 코드로 재확인할 것.
+- `docs/planning/MEMBER_MGMT_V2_PLAN.md` — 회원 관리 2차(운영 결함 D1~D6: 삭제 500·정지 미해제·본인 조치·이력 부재 등) 기획·구현 기록. 1차 `MEMBER_MGMT_SPEC.md`는 구현 현황 표가 낡음
 - `docs/planning/APP_FEATURE_SYNC_PLAN.md` — App(2026-10-20) 기능 분석 → Admin 반영 2차 기획(큐레이션·댓글·모임 구현, 태그·미팅·납품은 보류 사유 포함)
 - `docs/planning/AX_REPORT_TRIAGE_PLAN.md` — 신고 트리아지 AI 어시스트 기획(위 AI 연동 섹션의 설계 근거)
 - 그 외 `docs/planning/*.md` — 기능별 기획서 다수(배치 로직, 대시보드/통계 역할 재정의 등). 새 기획 작업 전에 관련 파일이 이미 있는지 먼저 확인할 것.

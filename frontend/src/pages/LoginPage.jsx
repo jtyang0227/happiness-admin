@@ -21,7 +21,7 @@ const LoginPage = () => {
     setLoading(true);
     try {
       const res = await postApi('/auth/login', { email, password });
-      login({ name: res.name, email: res.email, authority: res.authority }, res.token);
+      login({ memberId: res.memberId, name: res.name, email: res.email, authority: res.authority }, res.token);
       navigate('/');
     } catch (err) {
       setError(err.message || '로그인에 실패했습니다.');

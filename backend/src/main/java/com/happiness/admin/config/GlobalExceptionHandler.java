@@ -18,6 +18,12 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", e.getMessage()));
     }
 
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<Map<String, String>> handleAccessDenied(Exception e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("error", "이 작업을 할 권한이 없습니다."));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneral(Exception e) {
         log.error("Unhandled exception", e);

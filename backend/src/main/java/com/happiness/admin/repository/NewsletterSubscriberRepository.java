@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -28,4 +29,8 @@ public interface NewsletterSubscriberRepository extends JpaRepository<Newsletter
     long countByUnsubscribedAtGreaterThanEqual(LocalDateTime since);
 
     List<NewsletterSubscriber> findByUnsubscribedAtIsNullOrderBySubscribedAtAsc();
+
+    @Modifying
+    @Query("DELETE FROM NewsletterSubscriber x WHERE x.memberId = :memberId")
+    int deleteByMemberId(@Param("memberId") Long memberId);
 }

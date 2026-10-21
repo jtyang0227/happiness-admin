@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -20,4 +21,8 @@ public interface VerificationRequestRepository extends JpaRepository<Verificatio
             Pageable pageable);
 
     long countByStatus(String status);
+
+    @Modifying
+    @Query("DELETE FROM VerificationRequest v WHERE v.member.id = :memberId")
+    int deleteByMember(@Param("memberId") Long memberId);
 }

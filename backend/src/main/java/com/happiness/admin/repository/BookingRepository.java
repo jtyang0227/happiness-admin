@@ -5,6 +5,7 @@ import com.happiness.admin.entity.BookingStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -58,4 +59,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
         @Param("status") BookingStatus status,
         Pageable pageable
     );
+
+    @Modifying
+    @Query("DELETE FROM Booking b WHERE b.photographer.id = :memberId OR b.client.id = :memberId")
+    int deleteByMember(@Param("memberId") Long memberId);
 }
