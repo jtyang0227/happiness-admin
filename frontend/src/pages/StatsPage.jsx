@@ -5,6 +5,7 @@ import {
 } from 'recharts';
 import { getApi } from '../utils/api';
 import ImgWithFallback from '../components/common/ImgWithFallback';
+import SegmentedControl from '../components/common/SegmentedControl';
 import './StatsPage.css';
 
 const CHART_COLORS = ['#EC572D', '#3F8A57', '#B8791E', '#A82530', '#2F7A8C', '#6A5B8C', '#7BA23F', '#9C6B4E'];
@@ -70,13 +71,12 @@ const StatsPage = () => {
       <div className="stats-card">
         <div className="card-header">
           <h2 className="card-title">기간별 추이</h2>
-          <div className="period-tabs">
-            {[7, 30, 90].map(d => (
-              <button key={d} className={`period-tab ${days === d ? 'active' : ''}`} onClick={() => setDays(d)}>
-                {d}일
-              </button>
-            ))}
-          </div>
+          <SegmentedControl
+            ariaLabel="기간"
+            value={days}
+            onChange={setDays}
+            options={[7, 30, 90].map(d => ({ value: d, label: `${d}일` }))}
+          />
         </div>
         {dailyLoading ? (
           <div className="page-loading" style={{ height: 260 }}>로딩 중...</div>

@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getApi, postApi } from '../utils/api';
 import Pagination from '../components/common/Pagination';
+import SegmentedControl from '../components/common/SegmentedControl';
 import './VerificationListPage.css';
 
 const STATUS_LABELS = { PENDING: '신청 대기', APPROVED: '승인됨', REJECTED: '반려됨' };
@@ -78,19 +79,16 @@ const VerificationListPage = () => {
       )}
 
       <div className="verification-tabs">
-        {[
-          { key: 'PENDING', label: `신청 대기 (${counts.PENDING || 0})` },
-          { key: 'APPROVED', label: `승인됨 (${counts.APPROVED || 0})` },
-          { key: 'REJECTED', label: `반려됨 (${counts.REJECTED || 0})` },
-        ].map(t => (
-          <button
-            key={t.key}
-            className={`verification-tab${status === t.key ? ' active' : ''}`}
-            onClick={() => { setStatus(t.key); setPage(0); }}
-          >
-            {t.label}
-          </button>
-        ))}
+        <SegmentedControl
+          ariaLabel="신청 상태"
+          value={status}
+          onChange={(v) => { setStatus(v); setPage(0); }}
+          options={[
+            { value: 'PENDING', label: '신청 대기', count: counts.PENDING || 0 },
+            { value: 'APPROVED', label: '승인됨', count: counts.APPROVED || 0 },
+            { value: 'REJECTED', label: '반려됨', count: counts.REJECTED || 0 },
+          ]}
+        />
       </div>
 
       <div className="table-card">

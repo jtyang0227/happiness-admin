@@ -71,12 +71,16 @@ Standard layered Spring Boot architecture:
   - `AdminVerificationController` — 작가 인증 신청 검토
   - `AdminBookingController` — 촬영 예약 관리
   - `AdminContentPolicyController` — 정렬 가중치·유지보수 모드 설정
+  - `AdminSecurityAuditController` — App 보안 감사 로그 조회(`/security-audit`, `/summary` — 24h 로그인 실패·실패 상위 IP), 읽기 전용
+  - `AdminProfileContentController` — 작가 프로필 콘텐츠 5종(`type=testimonials|pricing|press|achievements|brands`) 목록/삭제
+  - `AdminNewsletterController` — 뉴스레터 구독자 목록·집계, `POST /export`(활성 구독자, 활동 로그 기록)
+  - `AdminTransactionController` — 미팅·납품 메타데이터 집계/정체 건/목록, 읽기 전용
   - `AdminHelloController` — 헬스체크용 샘플 엔드포인트
-- **`service/`** — `AuthService`, `MemberService`, `AdminStatsService`, `AdminMemberService`, `AdminPhotoService`, `AdminInquiryService`, `AdminSeriesService`, `AdminPortfolioService`, `AdminCategoryService`, `AdminSortService`, `AdminReportService`, `AdminReportAiTriageService`+`ReportAiTriageWriter`(§AI 연동), `AdminNoticeService`, `AdminBannerService`, `AdminPopupService`, `AdminFeaturedService`, `AdminVerificationService`, `AdminBookingService`, `AdminContentPolicyService`, `AdminCommentService`, `AdminGatheringService`, `AdminActivityRecorder`(현재 관리자로 `admin_activity_logs` 기록 — 큐레이션·댓글/게시글 삭제가 사용), `GeminiClientService`(§AI 연동).
-- **`repository/`** — Spring Data JPA: `MemberRepository`, `PhotoRepository`, `InquiryRepository`, `SeriesRepository`, `SeriesPhotoRepository`, `PortfolioRepository`, `PortfolioItemRepository`, `PhotoCategoryRepository`, `ReportRepository`, `NoticeRepository`, `BannerRepository`, `PopupRepository`, `FeaturedItemRepository`, `VerificationRequestRepository`, `BookingRepository`, `SystemConfigRepository`, `AdminActivityLogRepository`, `CommentRepository`, `Gathering*Repository`(모임·참여자·게시글·사진·좋아요·댓글).
+- **`service/`** — `AuthService`, `MemberService`, `AdminStatsService`, `AdminMemberService`, `AdminPhotoService`, `AdminInquiryService`, `AdminSeriesService`, `AdminPortfolioService`, `AdminCategoryService`, `AdminSortService`, `AdminReportService`, `AdminReportAiTriageService`+`ReportAiTriageWriter`(§AI 연동), `AdminNoticeService`, `AdminBannerService`, `AdminPopupService`, `AdminFeaturedService`, `AdminVerificationService`, `AdminBookingService`, `AdminContentPolicyService`, `AdminCommentService`, `AdminGatheringService`, `AdminSecurityAuditService`, `AdminProfileContentService`, `AdminNewsletterService`, `AdminTransactionService`, `AdminActivityRecorder`(현재 관리자로 `admin_activity_logs` 기록 — 큐레이션·댓글/게시글 삭제가 사용), `GeminiClientService`(§AI 연동).
+- **`repository/`** — Spring Data JPA: `MemberRepository`, `PhotoRepository`, `InquiryRepository`, `SeriesRepository`, `SeriesPhotoRepository`, `PortfolioRepository`, `PortfolioItemRepository`, `PhotoCategoryRepository`, `ReportRepository`, `NoticeRepository`, `BannerRepository`, `PopupRepository`, `FeaturedItemRepository`, `VerificationRequestRepository`, `BookingRepository`, `SystemConfigRepository`, `AdminActivityLogRepository`, `CommentRepository`, `Gathering*Repository`(모임·참여자·게시글·사진·좋아요·댓글), `SecurityAuditLogRepository`, `TestimonialRepository`·`PricingPackageRepository`·`PressFeatureRepository`·`AchievementRepository`·`ClientBrandRepository`, `NewsletterSubscriberRepository`, `MeetRepository`, `DeliverySetRepository`.
   **주의**: `BoardRepository`/`ContentRepository`(및 `Board`/`Content` 엔티티)는 어떤 컨트롤러·서비스에서도 참조되지 않는 죽은 코드다 — 실제 게시판 기능은 없다(확인 필요 시 grep으로 재검증할 것, 새 기능을 여기 얹지 말 것).
-- **`entity/`** — `Member` (suspendReason·suspendUntil·isVerified 포함), `Photo` (displayOrder), `Inquiry`(+`InquiryProcessStatus`), `Series` (displayOrder), `SeriesPhoto` (displayOrder), `Portfolio`, `PortfolioItem` (displayOrder), `PhotoCategory`, `Report`(aiSummary·aiSeverity·aiSuggestedAction·aiAnalyzedAt 포함, §AI 연동), `Notice`, `Banner`, `Popup`, `FeaturedItem`, `VerificationRequest`, `Booking`(+`BookingStatus`), `SystemConfig`, `AdminActivityLog`, `Authority` (WM/SA/US), `MemberStatus`, `PortfolioStatus`, `PortfolioVisibility`, `Comment`, `Gathering`/`GatheringParticipant`/`GatheringPost`/`GatheringPhoto`/`GatheringPostLike`/`GatheringPostComment`.
-  **App 테이블 미러링 규칙**: prod에서 Admin은 App과 같은 Postgres(`ddl-auto=update`)를 쓴다 — `Comment`·`Gathering*`·`Series.draft/featuredAt/shootType`은 App 엔티티의 테이블·컬럼명을 그대로 부분 매핑한 것이다. 새로 매핑하는 컬럼은 App과 이름을 맞추고, App에 없는 NOT NULL 컬럼을 추가하지 말 것(배경: `docs/planning/APP_FEATURE_SYNC_PLAN.md` §6).
+- **`entity/`** — `Member` (suspendReason·suspendUntil·isVerified 포함), `Photo` (displayOrder), `Inquiry`(+`InquiryProcessStatus`), `Series` (displayOrder), `SeriesPhoto` (displayOrder), `Portfolio`, `PortfolioItem` (displayOrder), `PhotoCategory`, `Report`(aiSummary·aiSeverity·aiSuggestedAction·aiAnalyzedAt 포함, §AI 연동), `Notice`, `Banner`, `Popup`, `FeaturedItem`, `VerificationRequest`, `Booking`(+`BookingStatus`), `SystemConfig`, `AdminActivityLog`, `Authority` (WM/SA/US), `MemberStatus`, `PortfolioStatus`, `PortfolioVisibility`, `Comment`, `Gathering`/`GatheringParticipant`/`GatheringPost`/`GatheringPhoto`/`GatheringPostLike`/`GatheringPostComment`, `SecurityAuditLog`, `Testimonial`/`PricingPackage`/`PressFeature`/`Achievement`/`ClientBrand`, `NewsletterSubscriber`(token은 응답 제외), `Meet`/`DeliverySet`(메타데이터만 — 메시지·주소·토큰·비밀번호·피드백은 의도적으로 미매핑).
+  **App 테이블 미러링 규칙**: prod에서 Admin은 App과 같은 Postgres(`ddl-auto=update`)를 쓴다 — `Comment`·`Gathering*`·`SecurityAuditLog`·프로필 콘텐츠 5종·`NewsletterSubscriber`·`Meet`·`DeliverySet`·`Series.draft/featuredAt/shootType`은 App 엔티티의 테이블·컬럼명을 그대로 부분 매핑한 것이다. 새로 매핑하는 컬럼은 App과 이름을 맞추고, App에 없는 NOT NULL 컬럼을 추가하지 말 것(배경: `docs/planning/APP_FEATURE_SYNC_PLAN.md` §6).
 - **`security/`** — `JwtTokenProvider`, `JwtAuthenticationFilter` (Bearer 토큰 검증). 모든 `/api/admin/**`는 `ROLE_WM` 또는 `ROLE_SA` 필요.
 - **`dto/`** — `LoginResponse`, `PageResponse<T>`, `AdminMemberDto` (portfolioCount 포함), `AdminPhotoDto`, `AdminInquiryDto`, `AdminSeriesDto`, `AdminPortfolioDto`, `StatsSummaryDto`, `DailyStatDto`, `TopPhotoDto`, `DistItemDto`, `SystemStatusDto`, `RoleUpdateRequest`, `StatusUpdateRequest`, `CategoryDto`, `ReorderItem`, `SortPhotoDto`, `SortSeriesDto`, `SortSeriesPhotoDto`, `SortPortfolioItemDto`.
 - **`DataInitializer`** — `@Profile("!prod")`: 서버 기동 시 H2에 테스트 데이터 자동 삽입 (관리자 2명, 회원 10명, 사진 30장·displayOrder 1–30, 문의 15건, 시리즈 8개·displayOrder 1–8, 포트폴리오 6개). **개발 계정: `admin@happiness.dev` / `Admin123!`**
@@ -95,7 +99,7 @@ React SPA using React Router v6 + Recharts:
 - **`context/ConfirmContext.jsx`** — 전역 확인 다이얼로그, `useConfirm()` 훅 제공
 - **`pages/`** —
   - `LoginPage` — JWT 로그인 (앱 전체 다크모드와 무관하게 항상 라이트 고정)
-  - `DashboardPage` — KPI 카드(brand/accent/info/warning/danger 토큰) + 심사 대기 포트폴리오 + 활동 피드 + 예약 캘린더
+  - `DashboardPage` — "처리 대기" 그라디언트 히어로(심사·신고·인증·미읽음 문의 합계) + 처리 큐 카드 3종(최다 건 오렌지 보더) + KPI 스트립(lucide 아이콘) + 심사 대기 포트폴리오 + 활동 피드 + 예약 캘린더
   - `MemberListPage` — 회원 목록/검색/상태 필터/역할 변경/정지/삭제
   - `MemberDetailPage` — 회원 상세·KPI·탭(사진·시리즈·문의)·정지 모달
   - `PhotoListPage` — 사진 목록/필터/삭제
@@ -119,6 +123,10 @@ React SPA using React Router v6 + Recharts:
   - `CurationPage` (`/curation`) — 작업 "에디터 추천" 올리기/내리기(추천 중·후보 세그먼트)
   - `CommentListPage` (`/comments`) — App 사진 댓글 검색·삭제
   - `GatheringListPage` (`/gatherings`) — App 모임 목록·상태 필터, SlideOver에서 모임 피드 게시글 삭제
+  - `SecurityAuditPage` (`/security-audit`, 설정) — 보안 감사 로그 유형·기간·IP 필터, 실패 상위 IP 드릴다운
+  - `ProfileContentPage` (`/profile-content`, 회원) — 작가 후기·가격·언론·수상·브랜드 점검/삭제(`?memberId=` 필터)
+  - `NewsletterPage` (`/newsletter`, 운영·마케팅) — 구독자 목록·KPI·CSV 내보내기(클라이언트에서 BOM 포함 CSV 생성)
+  - `TransactionsPage` (`/transactions`, 운영·마케팅) — 미팅·납품 상태 집계와 정체/만료 알림, 읽기 전용
 - **`components/layout/`** — `navConfig.js`(그룹↔라우트 단일 소스, `findActiveGroup`), `AdminTopbar`(상단 pill 탭 5그룹·검색·상태·다크모드 토글·프로필), `IconRail`(활성 그룹 페이지용 플로팅 아이콘 레일, 모바일 ≤767px에서는 하단 바, 정렬 관리는 팝오버), `AdminLayout`. `Sidebar`는 V14에서 삭제됨
 - **`components/common/`** — `Pagination`, `ConfirmDialog`, `SlideOver`, `ImgWithFallback`, `SegmentedControl`(pill 세그먼트 필터, 카운트 배지)
 - **`hooks/useDragSort.js`** — HTML5 DnD 기반 정렬 훅. `toReorderPayload()` 로 `[{id, displayOrder}]` 생성
@@ -174,38 +182,44 @@ AKIRA의 각진 프레임·하드 오프셋 섀도우·네온 포인트·CRT 텍
 ```css
 /* frontend/src/styles/tokens.css 실제 정의 (발췌) */
 :root {
-  --color-bg:             #F2F4F6;  /* 밝은 회색 캔버스 (라이트) */
+  --color-bg:             #F5F3F6;  /* 옅은 라벤더 그레이 캔버스 (라이트) */
   --color-surface:        #FFFFFF;
-  --color-border:         #E5E8EB;  /* 옅은 회색 라인 — 라이트/다크 모두 반전 없음 */
-  --color-text-primary:   #191F28;
+  --color-surface-2:      #F8F6F9;
+  --color-border:         #ECE9EE;  /* 카드는 기본적으로 보더 없이 섀도우만 — 보더는 테이블 행·입력창용 */
+  --color-text-primary:   #151316;
   --color-text-secondary: #4E5968;
   --color-text-tertiary:  #8B95A1;
-  --color-brand:          #3182F6;  /* Toss Blue */
+  --color-brand:          #EC572D;  /* V14 오렌지 — 강조·선택·진행 상태 전용 */
+  --color-brand-light:    #FEF2F0;
+  --color-ink:            #151316;  /* 블랙 pill CTA(.btn-primary)·활성 탭/레일 */
+  --color-ink-text:       #FFFFFF;
+  --gradient-hero:        linear-gradient(135deg, #F37851 0%, #DB481F 100%);
   --color-accent:         #0EA5E9;  /* sky, 보조 액센트 */
   --color-success/-warning/-danger/-info: ... /* 각각 -bg 페어 존재 */
-  --font-pixel:  var(--font-sans);  /* 하위 호환용 별칭 — 전용 디스플레이 서체 없음 */
-  --font-serif:  var(--font-sans);  /* 동일 */
-  --shadow-ring: 0 1px 2px rgba(25,31,40,.04), 0 8px 20px rgba(25,31,40,.06); /* 소프트 엘리베이션 */
-  --shadow-glow-red/-cyan: ...; /* 토큰명 유지, 값은 소프트 컬러 글로우로 교체 */
+  --shadow-ring: 0 1px 2px rgba(21,19,22,.03), 0 6px 18px rgba(21,19,22,.04); /* 약한 소프트 엘리베이션 */
+  --topbar-height: 64px;  --rail-width: 56px;
+  /* --color-sidebar-*, --sidebar-width-* 는 V14에서 삭제됨 */
 }
 
-/* 다크모드: 반전하지 않는다 — 어둡게 톤만 낮추고 파랑 밝기만 올린다 */
+/* 다크모드: 같은 구조를 어둡게 파생 — 잉크는 밝은 pill로 반전, 오렌지만 한 단계 밝게 */
 [data-theme="dark"], @media (prefers-color-scheme: dark) {
-  --color-bg:     #14181D;
-  --color-border: #2C333D;  /* 다크에서도 여전히 "옅은" 회색 라인, 화이트 반전 없음 */
-  --color-text-primary: #F2F4F6;
-  --color-brand:  #4C8FFF;  /* 다크 배경에서 시인성 위해 살짝 밝게 */
-  --color-accent: #38BDF8;
+  --color-bg:      #121113;
+  --color-surface: #1C1A1E;
+  --color-border:  #2E2B31;
+  --color-text-primary: #F5F3F6;
+  --color-ink:     #F5F3F6;  --color-ink-text: #151316;
+  --color-brand:   #FF7347;
 }
 ```
 
-색상 이름·전체 팔레트는 `docs/design/TOSS_DESIGN_SPEC.md` 참고.
+전체 설계 근거·토큰 표는 `docs/planning/V14_MINIMAL_DESIGN_PLAN.md`, 세대 계보는 `docs/design/TOSS_DESIGN_SPEC.md` 참고.
 
 ### Key Component Patterns
 
 | Component | Pattern | Notes |
 |---|---|---|
-| **카드/테이블/모달** | `border: 1px solid var(--color-border)` + `box-shadow: var(--shadow-ring)` | 소프트 엘리베이션, 이중 프레임 아님 |
+| **카드/테이블/모달** | 보더 없이 `box-shadow: var(--shadow-ring)` + `--radius-xl`(20px) | 강조 카드만 `2px solid var(--color-brand)` 보더(예: 대시보드 최다 큐, 추천 중 작업) |
+| **SegmentedControl** | 흰 pill 트랙 + 활성 항목 `--color-ink` 채움, 카운트 배지(활성 시 오렌지) | 상태·기간 필터는 이 컴포넌트로 통일(탭 밑줄·사각 버튼 그룹 새로 만들지 말 것) |
 | **StatusDot** | `border-radius: var(--radius-full)` 원형 | 다이아몬드/사각 아님 |
 | **TopNav/IconRail active** | `--color-ink` 블랙 pill 배경 + `--color-ink-text` | 대시보드는 레일 없음, 아이콘에 `aria-label`+툴팁 |
 | **버튼 클릭 피드백** | `transform: scale(0.97)` 스퀴시 | 하드 오프셋(`translate(2px,2px)`) 아님 |
@@ -224,7 +238,8 @@ AKIRA의 각진 프레임·하드 오프셋 섀도우·네온 포인트·CRT 텍
 
 ### Design Files
 
-- `docs/design/TOSS_DESIGN_SPEC.md` — **현재(6차) 디자인 구현 기록** (팔레트·컴포넌트·적용 범위)
+- `docs/planning/V14_MINIMAL_DESIGN_PLAN.md` — **현재(7차) V14 디자인 기획·토큰·구조**
+- `docs/design/TOSS_DESIGN_SPEC.md` — 디자인 세대 계보 + 6차 Toss 구현 기록(레거시 참고용)
 - `docs/planning/APP_TO_ADMIN_SPEC.md` — happiness-app에서 admin으로 이식할 기능 명세. **주의: 이 문서(2026-06-23자)는 이미 낡았다** — "신고/제재 미구현(P2)"라고 적혀 있지만 실제로는 `AdminReportController`/`ReportListPage`가 완전히 구현돼 있고 AI 트리아지까지 붙어 있다(§AI 연동). 이 문서의 구현 여부 표시를 그대로 믿지 말고 코드로 재확인할 것.
 - `docs/planning/APP_FEATURE_SYNC_PLAN.md` — App(2026-10-20) 기능 분석 → Admin 반영 2차 기획(큐레이션·댓글·모임 구현, 태그·미팅·납품은 보류 사유 포함)
 - `docs/planning/AX_REPORT_TRIAGE_PLAN.md` — 신고 트리아지 AI 어시스트 기획(위 AI 연동 섹션의 설계 근거)
@@ -235,8 +250,8 @@ AKIRA의 각진 프레임·하드 오프셋 섀도우·네온 포인트·CRT 텍
 1. **CSS 변수만 사용**: 하드코딩된 색상값 금지. 반드시 실제 존재하는 `var(--color-*)` 사용 —
    작업 전 `frontend/src/styles/tokens.css`에서 토큰명을 확인할 것(이 문서의 표기만 믿지 말 것).
 2. **다크모드 기본 지원**: 새 컴포넌트는 CSS 변수 시스템에 따라 자동으로 양쪽 테마를 지원해야 한다.
-   Toss는 라이트/다크 모두 "옅은 회색 보더" 원칙을 유지한다(반전 없음) — 하드코딩된 보더/배경
-   조합을 피할 것.
+   다크는 라이트와 같은 구조를 어둡게 파생한다(잉크 pill만 밝게 반전, 오렌지는 한 단계 밝게) —
+   하드코딩된 보더/배경 조합을 피하고 `--color-ink`/`--color-ink-text` 쌍으로 대비를 맞출 것.
 3. **둥근 모서리 사용**: `border-radius`는 항상 `var(--radius-*)` 사용 — `0`으로 하드코딩하지 말 것.
 4. **이미지 blur reveal**: 모든 이미지는 `onLoad`에서 blur → clear 전환 적용.
 5. **IntersectionObserver 입장 애니메이션**: 카드 리스트 페이지에서 스크롤 진입 시 fade+slide up 적용.

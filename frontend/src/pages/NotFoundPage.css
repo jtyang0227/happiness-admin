@@ -39,17 +39,17 @@
 
 .home-link {
   display: inline-block;
-  background-color: var(--color-brand);
-  color: #fff;
+  background-color: var(--color-ink);
+  color: var(--color-ink-text);
   border: none;
   padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full);
   text-decoration: none;
   font-weight: 600;
-  transition: transform var(--dur-fast) var(--ease-out), background-color 0.2s;
+  transition: transform var(--dur-fast) var(--ease-out), filter var(--dur-fast);
 
   &:hover {
-    background-color: var(--color-brand-hover);
+    filter: brightness(1.25);
     text-decoration: none;
   }
 
