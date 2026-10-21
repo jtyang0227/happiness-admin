@@ -24,6 +24,7 @@ import CommentListPage from './pages/CommentListPage';
 import GatheringListPage from './pages/GatheringListPage';
 import SecurityAuditPage from './pages/SecurityAuditPage';
 import ProfileContentPage from './pages/ProfileContentPage';
+import NewsletterPage from './pages/NewsletterPage';
 import NotFoundPage from './pages/NotFoundPage';
 import NoticePage from './pages/NoticePage';
 import BannerPage from './pages/BannerPage';
@@ -69,6 +70,7 @@ const AppRoutes = () => {
       <Route path="/gatherings" element={<ProtectedRoute><GatheringListPage /></ProtectedRoute>} />
       <Route path="/security-audit" element={<ProtectedRoute><SecurityAuditPage /></ProtectedRoute>} />
       <Route path="/profile-content" element={<ProtectedRoute><ProfileContentPage /></ProtectedRoute>} />
+      <Route path="/newsletter" element={<ProtectedRoute><NewsletterPage /></ProtectedRoute>} />
       <Route path="/popups" element={<ProtectedRoute><PopupPage /></ProtectedRoute>} />
       <Route path="*" element={<ProtectedRoute><NotFoundPage /></ProtectedRoute>} />
     </Routes>

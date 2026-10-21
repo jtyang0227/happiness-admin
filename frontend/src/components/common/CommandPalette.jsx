@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, Image, MessageSquare, BookOpen,
   BarChart2, Settings, FolderOpen, Bell, Flag, ShieldCheck,
   LayoutPanelTop, AppWindow, Star, SlidersHorizontal, CalendarDays,
-  ArrowUpDown, Search, X, User, Sparkles, MessagesSquare, Tent, ShieldAlert, IdCard,
+  ArrowUpDown, Search, X, User, Sparkles, MessagesSquare, Tent, ShieldAlert, IdCard, Mail,
 } from 'lucide-react';
 import { getApi } from '../../utils/api';
 import './CommandPalette.css';
@@ -25,6 +25,7 @@ const COMMANDS = [
   { path: '/notices',        label: '공지사항',    Icon: Bell,              group: '페이지' },
   { path: '/banners',        label: '배너 관리',   Icon: LayoutPanelTop,    group: '페이지' },
   { path: '/popups',         label: '팝업 관리',   Icon: AppWindow,         group: '페이지' },
+  { path: '/newsletter',     label: '뉴스레터 구독자', Icon: Mail,          group: '페이지' },
   { path: '/verifications',  label: '작가 인증',   Icon: ShieldCheck,       group: '페이지' },
   { path: '/profile-content', label: '프로필 콘텐츠 점검', Icon: IdCard,     group: '페이지' },
   { path: '/featured',       label: '피처드',      Icon: Star,              group: '페이지' },

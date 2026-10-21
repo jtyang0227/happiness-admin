@@ -45,6 +45,7 @@ public class DataInitializer implements ApplicationRunner {
     private final PressFeatureRepository pressFeatureRepository;
     private final AchievementRepository achievementRepository;
     private final ClientBrandRepository clientBrandRepository;
+    private final NewsletterSubscriberRepository newsletterSubscriberRepository;
     private final GatheringRepository gatheringRepository;
     private final GatheringParticipantRepository gatheringParticipantRepository;
     private final GatheringPostRepository gatheringPostRepository;
@@ -334,6 +335,20 @@ public class DataInitializer implements ApplicationRunner {
         seedGatherings(users, wm);
         seedSecurityAudit(users, wm);
         seedProfileContent(users, wm);
+        seedNewsletter(users);
+    }
+
+    private void seedNewsletter(List<Member> users) {
+        for (int i = 0; i < users.size(); i++) {
+            Member m = users.get(i);
+            LocalDateTime subscribed = LocalDateTime.now().minusDays(i * 6L + 1);
+            newsletterSubscriberRepository.save(NewsletterSubscriber.builder()
+                    .memberId(m.getId()).email(m.getEmail())
+                    .token(java.util.UUID.randomUUID().toString().replace("-", ""))
+                    .subscribedAt(subscribed)
+                    .unsubscribedAt(i % 4 == 3 ? subscribed.plusDays(2) : null)
+                    .build());
+        }
     }
 
     private void seedProfileContent(List<Member> users, Member wm) {

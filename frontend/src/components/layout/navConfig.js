@@ -3,7 +3,7 @@ import {
   BookOpen, BarChart2, Settings,
   FolderOpen, Bell, Flag, ShieldCheck, LayoutPanelTop,
   Star, SlidersHorizontal, ArrowUpDown, AppWindow,
-  CalendarDays, Sparkles, MessagesSquare, Tent, ShieldAlert, IdCard,
+  CalendarDays, Sparkles, MessagesSquare, Tent, ShieldAlert, IdCard, Mail,
 } from 'lucide-react';
 
 export const SORT_ITEMS = [
@@ -48,6 +48,7 @@ export const NAV_GROUPS = [
       { path: '/notices',   label: '공지사항',  Icon: Bell },
       { path: '/banners',   label: '배너 관리', Icon: LayoutPanelTop },
       { path: '/popups',    label: '팝업 관리', Icon: AppWindow },
+      { path: '/newsletter', label: '뉴스레터 구독자', Icon: Mail },
     ],
   },
   {
