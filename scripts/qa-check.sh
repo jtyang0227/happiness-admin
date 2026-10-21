@@ -32,7 +32,7 @@ ROUTES=(
   "/" "/bookings" "/members" "/members/1" "/photos" "/inquiries"
   "/portfolios" "/series" "/sort/photos" "/sort/series" "/stats" "/system"
   "/notices" "/banners" "/reports" "/verifications" "/featured"
-  "/content-policy" "/popups" "/curation" "/comments" "/gatherings"
+  "/content-policy" "/popups" "/curation" "/comments" "/gatherings" "/security-audit"
 )
 
 mkdir -p "$OUT_DIR"

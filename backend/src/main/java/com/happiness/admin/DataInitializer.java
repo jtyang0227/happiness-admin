@@ -39,6 +39,7 @@ public class DataInitializer implements ApplicationRunner {
     private final PopupRepository popupRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final SecurityAuditLogRepository securityAuditLogRepository;
     private final GatheringRepository gatheringRepository;
     private final GatheringParticipantRepository gatheringParticipantRepository;
     private final GatheringPostRepository gatheringPostRepository;
@@ -326,6 +327,31 @@ public class DataInitializer implements ApplicationRunner {
 
         seedComments(photos, users);
         seedGatherings(users, wm);
+        seedSecurityAudit(users, wm);
+    }
+
+    private void seedSecurityAudit(List<Member> users, Member wm) {
+        String[] uris = {"GET /api/admin/reports", "PUT /api/admin/series/3/featured", "GET /api/admin/members", "DELETE /api/admin/photos/12"};
+        for (int i = 0; i < 36; i++) {
+            LocalDateTime at = LocalDateTime.now().minusMinutes(i * 47L);
+            SecurityAuditLog.SecurityAuditLogBuilder b = SecurityAuditLog.builder().createdAt(at);
+            switch (i % 6) {
+                case 0, 3 -> b.actionType("LOGIN_FAILURE").success(false)
+                        .actionDetail("email=" + (i % 4 == 0 ? "ad***@happiness.dev" : "us***@test.com"))
+                        .ipAddress(i % 4 == 0 ? "203.0.113.45" : "198.51.100." + (i % 3 + 7));
+                case 1, 4 -> {
+                    Member m = users.get(i % users.size());
+                    b.actionType("LOGIN_SUCCESS").success(true).memberId(m.getId())
+                            .ipAddress("10.0.0." + (i % 20 + 2)).actionDetail("ip=10.0.0." + (i % 20 + 2));
+                }
+                case 2 -> b.actionType("ADMIN_API").success(true).memberId(wm.getId()).role("WM")
+                        .ipAddress("10.0.0.2").actionDetail(uris[i % uris.length]);
+                default -> b.actionType("SERVICE").memberId(users.get(i % users.size()).getId())
+                        .success(i % 5 != 0).actionDetail("deleteAccount")
+                        .errorMessage(i % 5 != 0 ? null : "비밀번호가 일치하지 않습니다.");
+            }
+            securityAuditLogRepository.save(b.build());
+        }
     }
 
     private void seedComments(List<Photo> photos, List<Member> users) {

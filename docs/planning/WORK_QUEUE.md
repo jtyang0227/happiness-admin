@@ -11,7 +11,7 @@
 
 ## 큐
 
-- [ ] **Q1 보안 감사 로그** `/security-audit` (설정 그룹) — App `security_audit_log` 읽기 전용 뷰어: 유형·성공여부·기간 필터, 최근 24시간 로그인 실패 집계
+- [x] **Q1 보안 감사 로그** `/security-audit` (설정 그룹) — App `security_audit_log` 읽기 전용 뷰어: 유형·성공여부·기간 필터, 최근 24시간 로그인 실패 집계
 - [ ] **Q2 작가 프로필 콘텐츠 점검** `/profile-content` (회원 그룹) — `testimonials`·`pricing_packages`·`press_features`·`achievements`·`client_brands` 탭별 목록 + 삭제(허위 후기·부적절 콘텐츠 대응)
 - [ ] **Q3 뉴스레터 구독자** `/newsletter` (운영·마케팅) — `newsletter_subscribers` 목록·구독/해지 집계·CSV 내보내기(token 제외)
 - [ ] **Q4 미팅·납품 운영 현황** `/transactions` (운영·마케팅) — `meets`·`delivery_sets` 상태 집계와 장기 정체 건(미팅 PENDING 7일+, 납품 만료 임박/만료) 목록, 메타데이터만
