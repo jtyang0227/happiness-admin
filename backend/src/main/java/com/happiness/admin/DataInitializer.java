@@ -46,6 +46,8 @@ public class DataInitializer implements ApplicationRunner {
     private final AchievementRepository achievementRepository;
     private final ClientBrandRepository clientBrandRepository;
     private final NewsletterSubscriberRepository newsletterSubscriberRepository;
+    private final MeetRepository meetRepository;
+    private final DeliverySetRepository deliverySetRepository;
     private final GatheringRepository gatheringRepository;
     private final GatheringParticipantRepository gatheringParticipantRepository;
     private final GatheringPostRepository gatheringPostRepository;
@@ -336,6 +338,37 @@ public class DataInitializer implements ApplicationRunner {
         seedSecurityAudit(users, wm);
         seedProfileContent(users, wm);
         seedNewsletter(users);
+        seedTransactions(users, wm);
+    }
+
+    private void seedTransactions(List<Member> users, Member wm) {
+        String[] meetStatuses = {"PENDING", "NEGOTIATING", "CONFIRMED", "COMPLETED", "CANCELLED", "PENDING", "NEGOTIATING", "CONFIRMED"};
+        int[] idleDays = {12, 9, 1, 3, 5, 2, 15, 0};
+        for (int i = 0; i < meetStatuses.length; i++) {
+            LocalDateTime updated = LocalDateTime.now().minusDays(idleDays[i]);
+            meetRepository.save(Meet.builder()
+                    .requesterId(users.get(i % users.size()).getId())
+                    .receiverId(i % 2 == 0 ? wm.getId() : users.get((i + 1) % users.size()).getId())
+                    .status(meetStatuses[i])
+                    .confirmedDate("CONFIRMED".equals(meetStatuses[i]) ? LocalDate.now().plusDays(i + 2) : null)
+                    .createdAt(updated.minusDays(3)).updatedAt(updated).build());
+        }
+        Object[][] deliveries = {
+            {"웨딩 본식 원본", "김지현", "PENDING", 2}, {"프로필 보정본", "박도윤", "APPROVED", 20},
+            {"가족 야외 셀렉", "이수아", "PENDING", -1}, {"브랜드 룩북", "브랜드 스튜디오 N", "REJECTED", 10},
+            {"돌잔치 스냅", "최민지", "PENDING", 12},
+        };
+        for (int i = 0; i < deliveries.length; i++) {
+            LocalDateTime created = LocalDateTime.now().minusDays(7 + i);
+            deliverySetRepository.save(DeliverySet.builder()
+                    .memberId(i % 2 == 0 ? wm.getId() : users.get(i).getId())
+                    .title((String) deliveries[i][0]).clientName((String) deliveries[i][1])
+                    .status((String) deliveries[i][2])
+                    .expiresAt(LocalDateTime.now().plusDays((Integer) deliveries[i][3]))
+                    .viewedAt(i % 2 == 0 ? created.plusDays(1) : null)
+                    .approvedAt("APPROVED".equals(deliveries[i][2]) ? created.plusDays(2) : null)
+                    .createdAt(created).build());
+        }
     }
 
     private void seedNewsletter(List<Member> users) {
