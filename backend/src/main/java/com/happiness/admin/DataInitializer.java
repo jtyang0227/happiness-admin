@@ -40,6 +40,11 @@ public class DataInitializer implements ApplicationRunner {
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
     private final SecurityAuditLogRepository securityAuditLogRepository;
+    private final TestimonialRepository testimonialRepository;
+    private final PricingPackageRepository pricingPackageRepository;
+    private final PressFeatureRepository pressFeatureRepository;
+    private final AchievementRepository achievementRepository;
+    private final ClientBrandRepository clientBrandRepository;
     private final GatheringRepository gatheringRepository;
     private final GatheringParticipantRepository gatheringParticipantRepository;
     private final GatheringPostRepository gatheringPostRepository;
@@ -328,6 +333,50 @@ public class DataInitializer implements ApplicationRunner {
         seedComments(photos, users);
         seedGatherings(users, wm);
         seedSecurityAudit(users, wm);
+        seedProfileContent(users, wm);
+    }
+
+    private void seedProfileContent(List<Member> users, Member wm) {
+        Member[] authors = {wm, users.get(0), users.get(1), users.get(2)};
+        String[][] reviews = {
+            {"김지현", "신부", "2026.09", "결혼식 스냅 너무 만족스러워요. 자연스러운 표정을 잘 잡아주셨어요."},
+            {"박도윤", "스타트업 대표", "2026.08", "프로필 촬영 친절하게 디렉팅해주셔서 편했습니다."},
+            {"익명", "고객", "2026.10", "최고!!! 무조건 여기서 찍으세요 ★★★★★ 할인코드 HAPPY50 (외부 링크 bit.ly/xx)"},
+            {"이수아", "가족", "2026.07", "아이들 사진이 정말 따뜻하게 나왔어요."},
+        };
+        for (int i = 0; i < reviews.length; i++) {
+            testimonialRepository.save(Testimonial.builder().memberId(authors[i].getId())
+                    .clientName(reviews[i][0]).clientRole(reviews[i][1]).shootDate(reviews[i][2]).content(reviews[i][3])
+                    .featured(i == 0).seriesId(i == 1 ? 2L : null)
+                    .createdAt(LocalDateTime.now().minusDays(i * 3L)).build());
+        }
+        Object[][] packages = {{"베이직 프로필", 150000, null}, {"웨딩 본식 스냅", null, "문의 필요"}, {"가족 야외 촬영", 300000, null}};
+        for (int i = 0; i < packages.length; i++) {
+            pricingPackageRepository.save(PricingPackage.builder().memberId(authors[i].getId())
+                    .name((String) packages[i][0]).price((Integer) packages[i][1]).priceLabel((String) packages[i][2])
+                    .description("보정본 20장 · 원본 전체 제공").features("[\"보정 20장\",\"원본 제공\"]")
+                    .featured(i == 0).active(i != 2)
+                    .createdAt(LocalDateTime.now().minusDays(i * 5L)).build());
+        }
+        pressFeatureRepository.save(PressFeature.builder().memberId(wm.getId()).publication("월간 사진")
+                .title("빛을 기록하는 사람들").publishedDate("2026.05").url("https://example.com/press/1")
+                .createdAt(LocalDateTime.now().minusDays(20)).build());
+        pressFeatureRepository.save(PressFeature.builder().memberId(users.get(1).getId()).publication("디자인 매거진")
+                .title("신진 작가 인터뷰").publishedDate("2026.08").createdAt(LocalDateTime.now().minusDays(4)).build());
+        String[][] achievements = {{"AWARD", "서울 사진 공모전 금상", "서울시", "서울", "2025.11"},
+                {"EXHIBITION", "개인전 「여름의 끝」", "갤러리 담", "종로", "2026.08"}};
+        for (int i = 0; i < achievements.length; i++) {
+            achievementRepository.save(Achievement.builder().memberId(authors[i].getId())
+                    .type(achievements[i][0]).title(achievements[i][1]).organizer(achievements[i][2])
+                    .location(achievements[i][3]).yearMonth(achievements[i][4])
+                    .createdAt(LocalDateTime.now().minusDays(i * 7L + 2)).build());
+        }
+        String[] brands = {"카페 오후", "브랜드 스튜디오 N", "한빛 웨딩홀"};
+        for (int i = 0; i < brands.length; i++) {
+            clientBrandRepository.save(ClientBrand.builder().memberId(authors[i].getId()).name(brands[i])
+                    .logoUrl("https://picsum.photos/seed/brand" + i + "/120/120").displayOrder(i)
+                    .createdAt(LocalDateTime.now().minusDays(i)).build());
+        }
     }
 
     private void seedSecurityAudit(List<Member> users, Member wm) {

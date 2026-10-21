@@ -3,7 +3,7 @@ import {
   BookOpen, BarChart2, Settings,
   FolderOpen, Bell, Flag, ShieldCheck, LayoutPanelTop,
   Star, SlidersHorizontal, ArrowUpDown, AppWindow,
-  CalendarDays, Sparkles, MessagesSquare, Tent, ShieldAlert,
+  CalendarDays, Sparkles, MessagesSquare, Tent, ShieldAlert, IdCard,
 } from 'lucide-react';
 
 export const SORT_ITEMS = [
@@ -35,6 +35,7 @@ export const NAV_GROUPS = [
     items: [
       { path: '/members',       label: '회원 관리', Icon: Users },
       { path: '/verifications', label: '작가 인증', Icon: ShieldCheck },
+      { path: '/profile-content', label: '프로필 콘텐츠 점검', Icon: IdCard },
     ],
   },
   {
