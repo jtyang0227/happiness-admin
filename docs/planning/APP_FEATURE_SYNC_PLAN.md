@@ -26,10 +26,11 @@ App은 6월 이후 커뮤니티(댓글·팔로우·모임)와 작가 업무(작�
 | booking | 높음 | 구현됨 | 유지 |
 | analytics | 중간 | 통계 페이지로 대체 | 유지 |
 | tags | 낮음 | 없음 | **보류** — App 사진에 키워드 태그 컬럼이 없고, App의 태그 관리 화면도 목업(TODO). `photo_tags`는 인물 태그(위치 좌표)라 성격이 다름 |
-| meet / delivery | 낮음 — 작가↔고객 간 사적 거래 데이터 | 없음 | **보류(P2)** — 열람 권한·개인정보 기준 합의가 먼저 |
+| meet / delivery | 낮음 — 작가↔고객 간 사적 거래 데이터 | `/transactions` | **구현(Q4)** — 메타데이터만(상태·일자·정체/만료), 메시지·주소·토큰·피드백 미매핑, 읽기 전용 |
 | moodboard / follow | 없음 — 개인 비공개 데이터 | 없음 | 대상 아님 |
-| newsletter / testimonial / press / pricing / brand | 낮음 | 없음 | **P2 후보** — 구독자 목록·내보내기 정도 |
-| audit(SecurityAuditLog) | 중간 | Admin 자체 활동 로그만 있음 | **P2 후보** |
+| newsletter | 낮음 | `/newsletter` | **구현(Q3)** — 목록·집계·CSV 내보내기(활동 로그) |
+| testimonial / press / achievement / pricing / brand | 중간 — 허위 후기·부적절 콘텐츠 | `/profile-content` | **구현(Q2)** — 종류별 점검·삭제 |
+| audit(SecurityAuditLog) | 중간 | `/security-audit` | **구현(Q1)** — 읽기 전용 뷰어·로그인 실패 집계 |
 
 ## 3. P0-A 작업 큐레이션 (에디터 추천)
 
@@ -87,3 +88,5 @@ App은 6월 이후 커뮤니티(댓글·팔로우·모임)와 작가 업무(작�
 - [x] 다크모드·모바일(390px) 레이아웃 확인
 
 검증(2026-10-20): curl로 API 동작·에러 케이스 확인, `qa-check.sh` 22개 라우트 통과, agent-browser로 세 화면 조작·다크모드·390px 확인.
+
+3차(2026-10-21, `WORK_QUEUE.md` Q1–Q6): 보안 감사 로그·프로필 콘텐츠·뉴스레터·미팅/납품 현황 추가 구현, 전 라우트 26개 QA 통과. 남은 보류: 태그 관리(데이터 모델 없음).

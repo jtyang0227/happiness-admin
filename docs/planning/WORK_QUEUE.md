@@ -16,7 +16,7 @@
 - [x] **Q3 뉴스레터 구독자** `/newsletter` (운영·마케팅) — `newsletter_subscribers` 목록·구독/해지 집계·CSV 내보내기(token 제외)
 - [x] **Q4 미팅·납품 운영 현황** `/transactions` (운영·마케팅) — `meets`·`delivery_sets` 상태 집계와 장기 정체 건(미팅 PENDING 7일+, 납품 만료 임박/만료) 목록, 메타데이터만
 - [x] **Q5 V14 잔여** — 신고·작가인증·통계 필터를 `SegmentedControl`로 교체, 404 버튼 블랙 pill, CLAUDE.md의 낡은 Toss 표기(CSS 변수 예시·Design Files·DashboardPage 설명·Design Rule 2) 정리
-- [ ] **Q6 마무리** — `qa-check.sh` ROUTES·CommandPalette·CLAUDE.md 갱신, 전 라우트 QA, `APP_FEATURE_SYNC_PLAN.md` 매트릭스 상태 갱신
+- [x] **Q6 마무리** — `qa-check.sh` ROUTES·CommandPalette·CLAUDE.md 갱신, 전 라우트 QA, `APP_FEATURE_SYNC_PLAN.md` 매트릭스 상태 갱신
 
 ## 보류(구현하지 않음)
 - 태그 관리 — App 사진에 키워드 태그 데이터가 없음(App 태그 관리 화면도 목업). 데이터 모델이 생기면 재검토.
