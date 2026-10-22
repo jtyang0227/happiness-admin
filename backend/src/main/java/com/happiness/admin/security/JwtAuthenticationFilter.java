@@ -1,6 +1,8 @@
 package com.happiness.admin.security;
 
 import com.happiness.admin.entity.Authority;
+import com.happiness.admin.entity.MemberStatus;
+import com.happiness.admin.repository.MemberRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +21,7 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final MemberRepository memberRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -26,14 +29,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = resolveToken(request);
         if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
-            String email = jwtTokenProvider.getEmail(token);
-            Authority authority = jwtTokenProvider.getAuthority(token);
-            var auth = new UsernamePasswordAuthenticationToken(
-                    email,
-                    null,
-                    List.of(new SimpleGrantedAuthority("ROLE_" + authority.name()))
-            );
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            // 토큰의 권한을 그대로 믿지 않고 매 요청마다 DB의 현재 상태·권한으로 판정한다 —
+            // 강등·정지·탈퇴된 관리자가 남은 토큰 유효시간 동안 계속 접근하는 것을 막는다.
+            memberRepository.findByEmail(jwtTokenProvider.getEmail(token))
+                    .filter(m -> m.getStatus() == MemberStatus.ACTIVE)
+                    .filter(m -> m.getAuthority() == Authority.WM || m.getAuthority() == Authority.SA)
+                    .ifPresent(m -> SecurityContextHolder.getContext().setAuthentication(
+                            new UsernamePasswordAuthenticationToken(m.getEmail(), null,
+                                    List.of(new SimpleGrantedAuthority("ROLE_" + m.getAuthority().name())))));
         }
         filterChain.doFilter(request, response);
     }

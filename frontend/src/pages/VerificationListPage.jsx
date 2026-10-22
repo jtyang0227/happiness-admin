@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { getApi, postApi } from '../utils/api';
 import Pagination from '../components/common/Pagination';
 import SegmentedControl from '../components/common/SegmentedControl';
+import { safeHref } from '../utils/safeUrl';
 import './VerificationListPage.css';
 
 const STATUS_LABELS = { PENDING: '신청 대기', APPROVED: '승인됨', REJECTED: '반려됨' };
@@ -111,8 +112,8 @@ const VerificationListPage = () => {
                 <td>{v.memberEmail}</td>
                 <td>{v.memberProfileName || '-'}</td>
                 <td>
-                  {v.portfolioUrl
-                    ? <a href={v.portfolioUrl} target="_blank" rel="noopener noreferrer" className="portfolio-link">링크 ↗</a>
+                  {safeHref(v.portfolioUrl)
+                    ? <a href={safeHref(v.portfolioUrl)} target="_blank" rel="noopener noreferrer" className="portfolio-link">링크 ↗</a>
                     : '-'
                   }
                 </td>

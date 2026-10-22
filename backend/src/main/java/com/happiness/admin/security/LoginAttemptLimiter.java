@@ -18,6 +18,8 @@ public class LoginAttemptLimiter {
 
     static final int MAX_FAILURES = 5;
     static final Duration LOCK_DURATION = Duration.ofMinutes(15);
+    /** 임의 이메일로 실패를 쏟아 메모리를 고갈시키는 것을 막는 상한 */
+    static final int MAX_TRACKED = 10_000;
 
     private record Attempt(int failures, Instant lockedUntil) {}
 
@@ -45,6 +47,7 @@ public class LoginAttemptLimiter {
     }
 
     public void recordFailure(String email) {
+        if (attempts.size() >= MAX_TRACKED) prune();
         attempts.compute(key(email), (k, a) -> {
             int failures = (a == null ? 0 : a.failures()) + 1;
             return failures >= MAX_FAILURES
@@ -55,6 +58,16 @@ public class LoginAttemptLimiter {
 
     public void recordSuccess(String email) {
         attempts.remove(key(email));
+    }
+
+    /** 잠금이 끝났거나 잠기지 않은 항목을 비운다 — 잠금 중인 계정은 유지해 무차별 대입 방어를 깨지 않는다. */
+    private void prune() {
+        Instant now = clock.instant();
+        attempts.entrySet().removeIf(e -> e.getValue().lockedUntil() == null || e.getValue().lockedUntil().isBefore(now));
+    }
+
+    int trackedCount() {
+        return attempts.size();
     }
 
     private static String key(String email) {

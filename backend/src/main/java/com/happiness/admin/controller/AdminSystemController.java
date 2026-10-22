@@ -4,7 +4,6 @@ import com.happiness.admin.dto.ActivityHeatmapDayDto;
 import com.happiness.admin.dto.AdminActivityLogDto;
 import com.happiness.admin.dto.PageResponse;
 import com.happiness.admin.dto.SystemStatusDto;
-import com.happiness.admin.entity.AdminActivityLog;
 import com.happiness.admin.repository.AdminActivityLogRepository;
 import com.happiness.admin.service.GeminiClientService;
 import lombok.RequiredArgsConstructor;
@@ -78,11 +77,6 @@ public class AdminSystemController {
         var logs = activityLogRepository.searchLogs(adminId, action, pageable)
                 .map(AdminActivityLogDto::from);
         return ResponseEntity.ok(PageResponse.of(logs));
-    }
-
-    @PostMapping("/activity-logs")
-    public ResponseEntity<?> logActivity(@RequestBody AdminActivityLog log) {
-        return ResponseEntity.ok(activityLogRepository.save(log));
     }
 
     @GetMapping("/activity-heatmap")

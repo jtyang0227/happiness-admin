@@ -84,7 +84,7 @@ Standard layered Spring Boot architecture:
 - **`entity/`** — `Member` (suspendReason·suspendUntil·isVerified 포함), `Photo` (displayOrder), `Inquiry`(+`InquiryProcessStatus`), `Series` (displayOrder), `SeriesPhoto` (displayOrder), `Portfolio`, `PortfolioItem` (displayOrder), `PhotoCategory`, `Report`(aiSummary·aiSeverity·aiSuggestedAction·aiAnalyzedAt 포함, §AI 연동), `Notice`, `Banner`, `Popup`, `FeaturedItem`, `VerificationRequest`, `Booking`(+`BookingStatus`), `SystemConfig`, `AdminActivityLog`, `Authority` (WM/SA/US), `MemberStatus`, `PortfolioStatus`, `PortfolioVisibility`, `Comment`, `Gathering`/`GatheringParticipant`/`GatheringPost`/`GatheringPhoto`/`GatheringPostLike`/`GatheringPostComment`, `SecurityAuditLog`, `Testimonial`/`PricingPackage`/`PressFeature`/`Achievement`/`ClientBrand`, `NewsletterSubscriber`(token은 응답 제외), `Meet`/`DeliverySet`(메타데이터만 — 메시지·주소·토큰·비밀번호·피드백은 의도적으로 미매핑), `AdminMemberNote`(Admin 전용 신규 테이블 `admin_member_notes` — 운영자 내부 메모, 내용 암호화 저장), `PrivacyAccessLog`(Admin 전용 `admin_privacy_access_logs` — 개인정보 접속기록, 해시 체인).
   **개인정보 규칙**: 회원 이메일·전화를 응답에 원문으로 넣지 말 것(항상 `PrivacyMasker`). 원문이 꼭 필요하면 사유를 받고 `PrivacyAccessRecorder.record("REVEAL"…)`. 새 CSV/다운로드는 사유 필수 + `EXPORT` 기록. 주민번호·카드·계좌 등 고시 제7조 암호화 대상을 저장하게 되면 반드시 `EncryptedStringConverter`. App 공유 컬럼(email/tel/name)은 App이 평문으로 읽으므로 Admin 단독으로 암호화하지 말 것.
   **App 테이블 미러링 규칙**: prod에서 Admin은 App과 같은 Postgres(`ddl-auto=update`)를 쓴다 — `Comment`·`Gathering*`·`SecurityAuditLog`·프로필 콘텐츠 5종·`NewsletterSubscriber`·`Meet`·`DeliverySet`·`Series.draft/featuredAt/shootType`은 App 엔티티의 테이블·컬럼명을 그대로 부분 매핑한 것이다. 새로 매핑하는 컬럼은 App과 이름을 맞추고, App에 없는 NOT NULL 컬럼을 추가하지 말 것(배경: `docs/planning/APP_FEATURE_SYNC_PLAN.md` §6).
-- **`security/`** — `JwtTokenProvider`, `JwtAuthenticationFilter` (Bearer 토큰 검증, principal = 이메일), `CurrentAdminProvider`(요청 중인 관리자 `Member` 조회 — 권한 가드·이력 기록용), `LoginAttemptLimiter`(인메모리 로그인 잠금 — 다중 인스턴스 시 공유 저장소 필요). 공개 경로는 `POST /api/auth/login`, `GET /api/popups/active`, `GET /actuator/health`뿐(H2 콘솔은 `spring.h2.console.enabled`일 때만). JWT 기본 만료 8시간. `@PreAuthorize` 거부는 `GlobalExceptionHandler`에서 403으로 변환. 모든 `/api/admin/**`는 `ROLE_WM` 또는 `ROLE_SA` 필요.
+- **`security/`** — `JwtTokenProvider`, `JwtAuthenticationFilter` (Bearer 토큰 검증, principal = 이메일 — **매 요청 DB에서 회원을 다시 읽어 `ACTIVE`+WM/SA일 때만 인증하고 권한도 DB 값 사용**: 강등·정지 즉시 차단, 토큰 클레임으로 권한 상승 불가), `CurrentAdminProvider`(요청 중인 관리자 `Member` 조회 — 권한 가드·이력 기록용), `LoginAttemptLimiter`(인메모리 로그인 잠금 — 다중 인스턴스 시 공유 저장소 필요). 공개 경로는 `POST /api/auth/login`, `GET /api/popups/active`, `GET /actuator/health`뿐(H2 콘솔은 `spring.h2.console.enabled`일 때만). JWT 기본 만료 8시간. CORS는 `cors.allowed-origins`(운영 `CORS_ALLOWED_ORIGINS`) 목록만, 자격증명(쿠키) 비허용. 엔티티를 `@RequestBody`로 직접 받지 말 것(과거 활동 로그 덮어쓰기 취약점 — 요청 DTO 사용). 관리자가 입력해 App에 노출되는 URL은 `util/UrlSafety`로 검증. 점검 기록: `docs/security/SECURITY_AUDIT_2026-10.md`. `@PreAuthorize` 거부는 `GlobalExceptionHandler`에서 403으로 변환. 모든 `/api/admin/**`는 `ROLE_WM` 또는 `ROLE_SA` 필요.
 - **`dto/`** — `LoginResponse`, `PageResponse<T>`, `AdminMemberDto` (portfolioCount 포함), `AdminPhotoDto`, `AdminInquiryDto`, `AdminSeriesDto`, `AdminPortfolioDto`, `StatsSummaryDto`, `DailyStatDto`, `TopPhotoDto`, `DistItemDto`, `SystemStatusDto`, `RoleUpdateRequest`, `StatusUpdateRequest`, `CategoryDto`, `ReorderItem`, `SortPhotoDto`, `SortSeriesDto`, `SortSeriesPhotoDto`, `SortPortfolioItemDto`.
 - **`DataInitializer`** — `@Profile("!prod")`: 서버 기동 시 H2에 테스트 데이터 자동 삽입 (관리자 2명, 회원 10명, 사진 30장·displayOrder 1–30, 문의 15건, 시리즈 8개·displayOrder 1–8, 포트폴리오 6개). **개발 계정: `admin@happiness.dev` / `Admin123!`**
 
@@ -96,7 +96,7 @@ Key settings (`application.properties`):
 
 ### Frontend (`frontend/src/`)
 
-React SPA using React Router v6 + Recharts:
+React SPA using React Router v7 (라이브러리 모드, v6와 같은 `BrowserRouter`/`Routes` API) + Recharts. 운영 빌드는 `.env.production`(`INLINE_RUNTIME_CHUNK=false` — `vercel.json` CSP `script-src 'self'` 유지용, 소스맵 비공개), 보안 헤더는 `vercel.json`:
 
 - **`context/AuthContext.jsx`** — JWT 저장/조회/삭제, `useAuth()` 훅 제공. **30분 무조작 시 자동 로그아웃**(`/login?reason=idle`, 탭 간 공유되는 `admin_last_activity` 기준 — 고시 제6조 자동 접속차단)
 - **`context/ConfirmContext.jsx`** — 전역 확인 다이얼로그, `useConfirm()` 훅 제공
@@ -134,6 +134,7 @@ React SPA using React Router v6 + Recharts:
 - **`components/layout/`** — `navConfig.js`(그룹↔라우트 단일 소스, `findActiveGroup`), `AdminTopbar`(상단 pill 탭 5그룹·검색·상태·다크모드 토글·프로필), `IconRail`(활성 그룹 페이지용 플로팅 아이콘 레일, 모바일 ≤767px에서는 하단 바, 정렬 관리는 팝오버), `AdminLayout`. `Sidebar`는 V14에서 삭제됨
 - **`components/common/`** — `Pagination`, `ConfirmDialog`, `SlideOver`, `ImgWithFallback`, `SegmentedControl`(pill 세그먼트 필터, 카운트 배지), `ReasonDialog`(개인정보 열람·다운로드 사유 입력 — 회원 상세 "개인정보 보기", 회원·뉴스레터 CSV)
 - **`hooks/useDragSort.js`** — HTML5 DnD 기반 정렬 훅. `toReorderPayload()` 로 `[{id, displayOrder}]` 생성
+- **`utils/safeUrl.js`** — `safeHref()`: 사용자 입력 URL을 링크로 쓸 때 반드시 통과(http(s)만, `javascript:` 차단). **`utils/csv.js`** — `csvCell()`: CSV 이스케이프 + 수식 주입 방지(모든 내보내기에 사용)
 - **`utils/api.js`** — `getApi`, `postApi`, `patchApi`, `putApi`, `deleteApi`. **토큰이 실려 있던 요청**의 401만 세션 만료로 간주해 `/login` 강제 리다이렉트한다 — 토큰 없이 보낸 요청(로그인 자체 등)의 401은 그 자체가 인증 실패 응답이라 일반 에러로 넘긴다. 이전에는 이 구분이 없어서 로그인 실패 메시지가 아예 안 뜨는 버그가 있었다(수정됨).
 - **`App.jsx`** — `ProtectedRoute` 래퍼: 미인증 시 `/login`으로 리다이렉트
 
@@ -304,6 +305,7 @@ AKIRA의 각진 프레임·하드 오프셋 섀도우·네온 포인트·CRT 텍
 |---|---|---|
 | `JWT_SECRET` | `ci-test-secret-key-at-least-256-bits-long-for-hs256-algorithm` | 백엔드 테스트용 JWT 시크릿 |
 | `CI` | `false` | CRA ESLint 경고를 에러로 처리하지 않도록 설정 |
+| `CORS_ALLOWED_ORIGINS` | 콤마 구분 프론트 도메인 (예: `https://admin.example.com`) | 운영 권장 — 미설정 시 `*`(자격증명 없음) + 경고 로그 |
 | `PRIVACY_ENCRYPTION_KEY` | Base64 32바이트 (`openssl rand -base64 32`) | **운영(Railway) 필수** — 없으면 prod 프로필 기동 실패. 개인정보 필드 암호화 키, 분실 시 암호화된 메모·정지 사유 복호화 불가 |
 
 **주의사항**
@@ -323,13 +325,13 @@ AKIRA의 각진 프레임·하드 오프셋 섀도우·네온 포인트·CRT 텍
 
 | Layer | Technology |
 |---|---|
-| Backend runtime | Java 25, Spring Boot 3.5 |
+| Backend runtime | Java 25, Spring Boot 3.5.16 |
 | Build tool | Gradle 8.14.4 |
 | ORM | Spring Data JPA + Hibernate |
 | Database (dev) | H2 in-memory |
 | Security | Spring Security 6 |
 | Testing | JUnit 5, MockMvc, Spring Security Test |
 | Code gen | Lombok |
-| Frontend | React 18, React Router DOM 6, Recharts 3 |
+| Frontend | React 18, React Router DOM 7, Recharts 3 |
 | Frontend tooling | Create React App (react-scripts 5) |
 | Linting | ESLint 8 (`react-app` config) |

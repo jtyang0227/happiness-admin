@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Search, ShieldCheck, Users, Download } from 'lucide-react';
 import { getApi, patchApi, deleteApi, postApi } from '../utils/api';
+import { csvCell } from '../utils/csv';
 import { useConfirm } from '../context/ConfirmContext';
 import { useAuth } from '../context/AuthContext';
 import Pagination from '../components/common/Pagination';
@@ -16,7 +17,6 @@ const STATUS_COLORS = { ACTIVE: 'badge-green', INACTIVE: 'badge-yellow', SUSPEND
 const STATUS_LABELS = { ACTIVE: '활성', INACTIVE: '비활성', SUSPENDED: '정지', DELETED: '탈퇴' };
 
 const daysLeft = (iso) => Math.max(0, Math.ceil((new Date(iso).getTime() - Date.now()) / 86400000));
-const csvCell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
 
 const AVATAR_COLORS = [
   '#EC572D', '#2F7A8C', '#6A5B8C', '#3F8A57', '#B8791E', '#2C4E6E', '#A82530',

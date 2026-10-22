@@ -7,6 +7,7 @@ import { useConfirm } from '../context/ConfirmContext';
 import Pagination from '../components/common/Pagination';
 import ImgWithFallback from '../components/common/ImgWithFallback';
 import SegmentedControl from '../components/common/SegmentedControl';
+import { safeHref } from '../utils/safeUrl';
 import './ProfileContentPage.css';
 
 const TYPES = [
@@ -99,8 +100,8 @@ const ProfileContentPage = () => {
                 <div className="pc-meta">
                   <Link to={`/members/${item.memberId}`} className="pc-author">{item.memberName || `작가 #${item.memberId}`}</Link>
                   <span>· {item.createdAt?.slice(0, 10)}</span>
-                  {item.linkUrl && (
-                    <a href={item.linkUrl} target="_blank" rel="noopener noreferrer" className="pc-link">
+                  {safeHref(item.linkUrl) && (
+                    <a href={safeHref(item.linkUrl)} target="_blank" rel="noopener noreferrer" className="pc-link">
                       링크 <ExternalLink size={11} />
                     </a>
                   )}

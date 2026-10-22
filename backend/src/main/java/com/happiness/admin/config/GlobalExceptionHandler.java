@@ -18,6 +18,22 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", e.getMessage()));
     }
 
+    /** 잘못된 파라미터·본문은 서버 오류(500)가 아니라 클라이언트 오류(400)로 — 내부 정보 없이 짧게 */
+    @ExceptionHandler({
+            org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class,
+            org.springframework.web.bind.MissingServletRequestParameterException.class,
+            org.springframework.http.converter.HttpMessageNotReadableException.class,
+            org.springframework.web.HttpRequestMethodNotSupportedException.class
+    })
+    public ResponseEntity<Map<String, String>> handleBadRequest(Exception e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "잘못된 요청입니다."));
+    }
+
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<Map<String, String>> handleNotFound(Exception e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "요청한 경로가 없습니다."));
+    }
+
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ResponseEntity<Map<String, String>> handleAccessDenied(Exception e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)

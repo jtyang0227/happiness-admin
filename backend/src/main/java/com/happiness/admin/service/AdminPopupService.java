@@ -35,8 +35,8 @@ public class AdminPopupService {
         Popup popup = Popup.builder()
                 .title(req.getTitle())
                 .content(req.getContent())
-                .imageUrl(req.getImageUrl())
-                .linkUrl(req.getLinkUrl())
+                .imageUrl(com.happiness.admin.util.UrlSafety.requireSafeImage(req.getImageUrl(), "이미지"))
+                .linkUrl(com.happiness.admin.util.UrlSafety.requireSafeLink(req.getLinkUrl(), "링크"))
                 .targetScreen(req.getTargetScreen() != null ? req.getTargetScreen() : "ALL")
                 .isActive(req.isActive())
                 .showOnce(req.isShowOnce())
@@ -53,8 +53,8 @@ public class AdminPopupService {
                 .orElseThrow(() -> new IllegalArgumentException("팝업을 찾을 수 없습니다."));
         popup.setTitle(req.getTitle());
         popup.setContent(req.getContent());
-        popup.setImageUrl(req.getImageUrl());
-        popup.setLinkUrl(req.getLinkUrl());
+        popup.setImageUrl(com.happiness.admin.util.UrlSafety.requireSafeImage(req.getImageUrl(), "이미지"));
+        popup.setLinkUrl(com.happiness.admin.util.UrlSafety.requireSafeLink(req.getLinkUrl(), "링크"));
         popup.setTargetScreen(req.getTargetScreen() != null ? req.getTargetScreen() : "ALL");
         popup.setActive(req.isActive());
         popup.setShowOnce(req.isShowOnce());

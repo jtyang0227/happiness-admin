@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Download } from 'lucide-react';
 import { getApi, postApi } from '../utils/api';
+import { csvCell } from '../utils/csv';
 import Pagination from '../components/common/Pagination';
 import SegmentedControl from '../components/common/SegmentedControl';
 import ReasonDialog from '../components/common/ReasonDialog';
 import './NewsletterPage.css';
 
 const formatDate = (v) => (v ? v.slice(0, 10) : '-');
-const csvCell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
 
 const NewsletterPage = () => {
   const [status, setStatus] = useState('active');

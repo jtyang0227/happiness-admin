@@ -95,10 +95,10 @@ public class PrivacyAccessRecorder {
 
     private static String clientIp() {
         if (!(RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes attrs)) return null;
+        // X-Forwarded-For를 직접 읽으면 클라이언트가 임의 IP를 위조할 수 있다 — 운영은
+        // server.forward-headers-strategy=framework로 신뢰 프록시 헤더를 remoteAddr에 반영한다.
         HttpServletRequest req = attrs.getRequest();
-        String forwarded = req.getHeader("X-Forwarded-For");
-        String ip = (forwarded != null && !forwarded.isBlank()) ? forwarded.split(",")[0].trim() : req.getRemoteAddr();
-        return truncate(ip, 45);
+        return truncate(req.getRemoteAddr(), 45);
     }
 
     private static String truncate(String s, int max) {

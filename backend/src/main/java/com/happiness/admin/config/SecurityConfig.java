@@ -28,6 +28,11 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final com.happiness.admin.repository.MemberRepository memberRepository;
+
+    /** 콤마 구분 허용 Origin. 인증은 Authorization 헤더(Bearer)라 쿠키 자격증명은 허용하지 않는다. */
+    @org.springframework.beans.factory.annotation.Value("${cors.allowed-origins:http://localhost:3000}")
+    private String allowedOrigins;
 
     @org.springframework.beans.factory.annotation.Value("${spring.h2.console.enabled:false}")
     private boolean h2ConsoleEnabled;
@@ -47,7 +52,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .headers(h -> h.frameOptions(f -> f.sameOrigin()))
-            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, memberRepository),
                     UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
@@ -60,10 +65,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("*"));
+        List<String> origins = java.util.Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim).filter(o -> !o.isEmpty()).toList();
+        if (origins.contains("*")) {
+            org.slf4j.LoggerFactory.getLogger(SecurityConfig.class)
+                    .warn("[SECURITY] cors.allowed-origins='*' — 운영에서는 CORS_ALLOWED_ORIGINS에 프론트 도메인만 지정하세요.");
+        }
+        config.setAllowedOriginPatterns(origins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        config.setAllowCredentials(false);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;

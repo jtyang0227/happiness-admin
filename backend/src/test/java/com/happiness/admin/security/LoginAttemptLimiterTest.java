@@ -40,4 +40,14 @@ class LoginAttemptLimiterTest {
         limiter.recordFailure("a@b.c");
         assertThat(limiter.remainingLock("a@b.c")).isEqualTo(Duration.ZERO);
     }
+
+    @Test
+    void trackedEntriesAreBounded_butActiveLocksSurvivePruning() {
+        MutableClock clock = new MutableClock();
+        LoginAttemptLimiter limiter = new LoginAttemptLimiter(clock);
+        for (int i = 0; i < LoginAttemptLimiter.MAX_FAILURES; i++) limiter.recordFailure("victim@x.com");
+        for (int i = 0; i < LoginAttemptLimiter.MAX_TRACKED + 50; i++) limiter.recordFailure("spray" + i + "@x.com");
+        assertThat(limiter.trackedCount()).isLessThanOrEqualTo(LoginAttemptLimiter.MAX_TRACKED + 1);
+        assertThat(limiter.remainingLock("victim@x.com")).isPositive();
+    }
 }
