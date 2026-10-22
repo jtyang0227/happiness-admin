@@ -154,7 +154,7 @@ const ContentPolicyPage = () => {
       {/* 복합 정렬 가중치 */}
       <div className="policy-card">
         <h2 className="policy-card-title">복합 정렬 가중치</h2>
-        <p className="policy-desc">세 값의 합계는 1.0이어야 합니다. (현재: <strong style={{ color: Math.abs(totalWeight - 1) > 0.01 ? '#ef4444' : '#22c55e' }}>{totalWeight.toFixed(2)}</strong>)</p>
+        <p className="policy-desc">세 값의 합계는 1.0이어야 합니다. (현재: <strong style={{ color: Math.abs(totalWeight - 1) > 0.01 ? 'var(--color-danger)' : 'var(--color-success)' }}>{totalWeight.toFixed(2)}</strong>)</p>
         {[
           { key: 'sort.composite_likes_weight', label: '좋아요 가중치' },
           { key: 'sort.composite_inquiries_weight', label: '문의 가중치' },

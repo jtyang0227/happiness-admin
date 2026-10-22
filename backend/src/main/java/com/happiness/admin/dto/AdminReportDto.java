@@ -19,13 +19,17 @@ public class AdminReportDto {
     private String processMemo;
     private LocalDateTime processedAt;
     private LocalDateTime createdAt;
+    private String aiSummary;
+    private String aiSeverity;
+    private String aiSuggestedAction;
+    private LocalDateTime aiAnalyzedAt;
 
     public static AdminReportDto from(Report r) {
         return AdminReportDto.builder()
                 .id(r.getId())
                 .reporterId(r.getReporter() != null ? r.getReporter().getId() : null)
                 .reporterName(r.getReporter() != null ? r.getReporter().getName() : null)
-                .reporterEmail(r.getReporter() != null ? r.getReporter().getEmail() : null)
+                .reporterEmail(r.getReporter() != null ? com.happiness.admin.privacy.PrivacyMasker.email(r.getReporter().getEmail()) : null)
                 .targetType(r.getTargetType())
                 .targetId(r.getTargetId())
                 .reason(r.getReason())
@@ -34,6 +38,10 @@ public class AdminReportDto {
                 .processMemo(r.getProcessMemo())
                 .processedAt(r.getProcessedAt())
                 .createdAt(r.getCreatedAt())
+                .aiSummary(r.getAiSummary())
+                .aiSeverity(r.getAiSeverity())
+                .aiSuggestedAction(r.getAiSuggestedAction())
+                .aiAnalyzedAt(r.getAiAnalyzedAt())
                 .build();
     }
 }

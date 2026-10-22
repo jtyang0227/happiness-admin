@@ -28,6 +28,22 @@ public class Series {
     @Builder.Default
     private int displayOrder = 0;
 
+    @Column(name = "likes_count", nullable = false)
+    @Builder.Default
+    private int likesCount = 0;
+
+    @Column(name = "view_count", nullable = false)
+    @Builder.Default
+    private int viewCount = 0;
+
+    @Column(name = "shoot_type", length = 30)
+    private String shootType;
+
+    private Boolean draft;
+
+    @Column(name = "featured_at")
+    private LocalDateTime featuredAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;

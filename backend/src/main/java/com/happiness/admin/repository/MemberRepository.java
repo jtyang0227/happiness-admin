@@ -41,4 +41,14 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
            "GROUP BY m.id, m.name, m.profileName " +
            "ORDER BY COUNT(p) DESC")
     List<Object[]> photographerStats(Pageable pageable);
+
+    long countByStatus(com.happiness.admin.entity.MemberStatus status);
+
+    @Query("SELECT m FROM Member m WHERE m.status = com.happiness.admin.entity.MemberStatus.SUSPENDED " +
+           "AND m.suspendUntil IS NOT NULL AND m.suspendUntil < :now")
+    List<Member> findExpiredSuspensions(@Param("now") LocalDateTime now);
+
+    @Query("SELECT COUNT(m) FROM Member m WHERE m.status = com.happiness.admin.entity.MemberStatus.SUSPENDED " +
+           "AND m.suspendUntil IS NOT NULL AND m.suspendUntil < :before")
+    long countSuspensionsEndingBefore(@Param("before") LocalDateTime before);
 }

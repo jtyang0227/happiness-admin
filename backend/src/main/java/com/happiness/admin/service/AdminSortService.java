@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -22,14 +23,17 @@ public class AdminSortService {
     private final SeriesPhotoRepository seriesPhotoRepository;
     private final PortfolioItemRepository portfolioItemRepository;
 
-    public List<SortPhotoDto> getPhotosForSort() {
-        return photoRepository.findAllOrderedForSort()
-                .stream().map(SortPhotoDto::from).collect(Collectors.toList());
+    public List<SortPhotoDto> getPhotosForSort(Long memberId) {
+        List<Photo> photos = (memberId != null)
+                ? photoRepository.findAllOrderedForSort(memberId)
+                : photoRepository.findAllOrderedForSort();
+        return photos.stream().map(SortPhotoDto::from).collect(Collectors.toList());
     }
 
     @Transactional
     public void reorderPhotos(List<ReorderItem> items) {
-        Map<Long, Photo> map = photoRepository.findAll()
+        List<Long> ids = items.stream().map(ReorderItem::getId).toList();
+        Map<Long, Photo> map = photoRepository.findAllById(ids)
                 .stream().collect(Collectors.toMap(Photo::getId, Function.identity()));
         for (ReorderItem item : items) {
             Photo p = map.get(item.getId());
@@ -41,13 +45,27 @@ public class AdminSortService {
     }
 
     public List<SortSeriesDto> getSeriesForSort() {
-        return seriesRepository.findAllOrderedForSort()
-                .stream().map(SortSeriesDto::from).collect(Collectors.toList());
+        List<Series> seriesList = seriesRepository.findAllOrderedForSort();
+        List<Long> seriesIds = seriesList.stream().map(Series::getId).toList();
+        Map<Long, Long> photoCounts = seriesIds.isEmpty()
+                ? Map.of() : toCountMap(seriesPhotoRepository.countBySeriesIdIn(seriesIds));
+        return seriesList.stream()
+                .map(s -> SortSeriesDto.from(s, photoCounts.getOrDefault(s.getId(), 0L)))
+                .collect(Collectors.toList());
+    }
+
+    private static Map<Long, Long> toCountMap(List<Object[]> rows) {
+        Map<Long, Long> map = new HashMap<>();
+        for (Object[] row : rows) {
+            map.put((Long) row[0], (Long) row[1]);
+        }
+        return map;
     }
 
     @Transactional
     public void reorderSeries(List<ReorderItem> items) {
-        Map<Long, Series> map = seriesRepository.findAll()
+        List<Long> ids = items.stream().map(ReorderItem::getId).toList();
+        Map<Long, Series> map = seriesRepository.findAllById(ids)
                 .stream().collect(Collectors.toMap(Series::getId, Function.identity()));
         for (ReorderItem item : items) {
             Series s = map.get(item.getId());

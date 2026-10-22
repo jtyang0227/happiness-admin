@@ -1,30 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import AdminTopbar from './AdminTopbar';
-import Sidebar from './Sidebar';
+import IconRail from './IconRail';
+import { findActiveGroup } from './navConfig';
 import CommandPalette from '../common/CommandPalette';
 import './AdminLayout.css';
 
 const AdminLayout = ({ children }) => {
-  const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const { pathname } = useLocation();
   const [cmdOpen, setCmdOpen] = useState(false);
-  const isMobile = () => window.innerWidth <= 767;
-
-  const handleMenuClick = () => {
-    if (isMobile()) {
-      setMobileOpen(v => !v);
-    } else {
-      setCollapsed(v => !v);
-    }
-  };
+  const group = findActiveGroup(pathname);
+  const hasRail = !!group && group.items.length > 0;
 
   const openCmd = useCallback(() => setCmdOpen(true), []);
   const closeCmd = useCallback(() => setCmdOpen(false), []);
-
-  useEffect(() => {
-    document.body.style.overflow = mobileOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [mobileOpen]);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -39,25 +28,10 @@ const AdminLayout = ({ children }) => {
 
   return (
     <div className="admin-layout">
-      <AdminTopbar
-        onMenuClick={handleMenuClick}
-        sidebarCollapsed={collapsed}
-        onSearchClick={openCmd}
-      />
+      <AdminTopbar onSearchClick={openCmd} />
+      <IconRail />
 
-      <Sidebar
-        collapsed={collapsed}
-        className={mobileOpen ? 'sidebar--mobile-open' : ''}
-      />
-
-      {mobileOpen && (
-        <div className="sidebar-overlay" onClick={() => setMobileOpen(false)} />
-      )}
-
-      <main
-        className="admin-main"
-        style={{ marginLeft: collapsed ? 'var(--sidebar-width-collapsed)' : 'var(--sidebar-width-expanded)' }}
-      >
+      <main className={`admin-main${hasRail ? ' admin-main--rail' : ''}`}>
         {children}
       </main>
 

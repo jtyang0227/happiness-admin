@@ -14,6 +14,8 @@ const STATUS_BADGE = { DRAFT: 'badge-draft', PENDING: 'badge-pending', APPROVED:
 const VISIBILITY_BADGE = { PUBLIC: 'badge-public', PRIVATE: 'badge-private', UNLISTED: 'badge-unlisted' };
 const VISIBILITY_LABELS = { PUBLIC: '공개', PRIVATE: '비공개', UNLISTED: '일부공개' };
 
+const pendingDays = (createdAt) => Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000);
+
 const StatCard = ({ label, value, active, onClick }) => (
   <button className={`pf-stat-card ${active ? 'active' : ''}`} onClick={onClick}>
     <span className="pf-stat-value">{value ?? '-'}</span>
@@ -62,10 +64,11 @@ const PortfolioListPage = () => {
     if (status)     params.set('status', status);
     if (visibility) params.set('visibility', visibility);
     if (search)     params.set('search', search);
+    if (sortBy && sortBy !== 'latest') params.set('sortBy', sortBy);
     getApi(`/admin/portfolios?${params}`)
       .then(setData)
       .finally(() => setLoading(false));
-  }, [page, status, visibility, search]);
+  }, [page, status, visibility, search, sortBy]);
 
   useEffect(() => { fetchStats(); }, [fetchStats]);
   useEffect(() => { fetchData(); }, [fetchData]);
@@ -170,6 +173,7 @@ const PortfolioListPage = () => {
           <option value="latest">최신순</option>
           <option value="likes">좋아요순</option>
           <option value="views">조회순</option>
+          {status === 'PENDING' && <option value="oldest">대기 오래된 순</option>}
         </select>
         {isFiltered && (
           <button className="btn btn-ghost btn-sm" onClick={() => { setInputValue(''); setSearchParams({}); }}>초기화</button>
@@ -194,6 +198,11 @@ const PortfolioListPage = () => {
                   {STATUS_LABELS[p.status] || p.status}
                 </span>
                 {p.pinned && <span className="pf-pin-badge">📌</span>}
+                {p.status === 'PENDING' && (
+                  <span className={`pf-pending-age ${pendingDays(p.createdAt) > 7 ? 'pf-pending-age--overdue' : ''}`}>
+                    ⏱ {pendingDays(p.createdAt)}일 경과
+                  </span>
+                )}
               </div>
               <div className="pf-body">
                 <div className="pf-title">{p.title}</div>

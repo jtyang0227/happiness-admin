@@ -23,6 +23,7 @@ public class AdminInquiryDto {
     private String budget;
     private String message;
     private boolean isRead;
+    private String processStatus;
     private LocalDateTime createdAt;
 
     public static AdminInquiryDto from(Inquiry i) {
@@ -31,7 +32,7 @@ public class AdminInquiryDto {
                 .senderId(i.getSender() != null ? i.getSender().getId() : null)
                 .receiverId(i.getReceiver() != null ? i.getReceiver().getId() : null)
                 .senderName(i.getSenderName())
-                .senderEmail(i.getSenderEmail())
+                .senderEmail(com.happiness.admin.privacy.PrivacyMasker.email(i.getSenderEmail()))
                 .receiverName(i.getReceiver() != null ? i.getReceiver().getName() : null)
                 .receiverProfileName(i.getReceiver() != null ? i.getReceiver().getProfileName() : null)
                 .shootType(i.getShootType())
@@ -39,6 +40,7 @@ public class AdminInquiryDto {
                 .budget(i.getBudget())
                 .message(i.getMessage())
                 .isRead(i.isRead())
+                .processStatus(i.getProcessStatus().name())
                 .createdAt(i.getCreatedAt())
                 .build();
     }

@@ -254,14 +254,14 @@ useEffect 의존성 배열과 실제 데이터 흐름을 추적해서."
 
 ```
 1. [시작 전] Plan 에이전트로 구현 범위 확인
-   → "Plan: DESIGN_ROADMAP.md의 Phase N 구현 범위와
+   → "Plan: docs/planning/UI_IMPROVEMENT_PLAN.md의 항목 N 구현 범위와
       수정이 필요한 파일 목록을 정리해줘."
 
 2. [탐색] Explore 에이전트로 연관 파일 확인
-   → "Explore: Phase N과 관련된 컴포넌트/서비스 파일 찾아줘. medium"
+   → "Explore: 항목 N과 관련된 컴포넌트/서비스 파일 찾아줘. medium"
 
 3. [구현] Claude Code에 구현 요청
-   → DESIGN_ROADMAP.md의 해당 Phase 프롬프트 그대로 사용
+   → docs/planning/UI_IMPROVEMENT_DESIGN.md의 해당 항목 설계 그대로 사용
 
 4. [검증] 빌드 확인 (CLAUDE.md 규칙)
    → 프론트: npm run build

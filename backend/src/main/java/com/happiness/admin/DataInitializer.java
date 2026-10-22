@@ -38,6 +38,23 @@ public class DataInitializer implements ApplicationRunner {
     private final AdminActivityLogRepository activityLogRepository;
     private final PopupRepository popupRepository;
     private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
+    private final SecurityAuditLogRepository securityAuditLogRepository;
+    private final TestimonialRepository testimonialRepository;
+    private final PricingPackageRepository pricingPackageRepository;
+    private final PressFeatureRepository pressFeatureRepository;
+    private final AchievementRepository achievementRepository;
+    private final ClientBrandRepository clientBrandRepository;
+    private final NewsletterSubscriberRepository newsletterSubscriberRepository;
+    private final MeetRepository meetRepository;
+    private final DeliverySetRepository deliverySetRepository;
+    private final AdminMemberNoteRepository adminMemberNoteRepository;
+    private final GatheringRepository gatheringRepository;
+    private final GatheringParticipantRepository gatheringParticipantRepository;
+    private final GatheringPostRepository gatheringPostRepository;
+    private final GatheringPhotoRepository gatheringPhotoRepository;
+    private final GatheringPostLikeRepository gatheringPostLikeRepository;
+    private final GatheringPostCommentRepository gatheringPostCommentRepository;
 
     private static final String[] MOODS = {"WARM", "COOL", "NEUTRAL", "VIVID", "DARK", "SOFT"};
     private static final String[] SHOOT_TYPES = {"웨딩", "가족", "프로필", "스냅", "바디프로필", "커플"};
@@ -98,7 +115,9 @@ public class DataInitializer implements ApplicationRunner {
                     .shootDate(LocalDate.now().plusDays(i * 5L + 10))
                     .budget((i * 10 + 30) + "만원")
                     .message("안녕하세요, " + SHOOT_TYPES[i % SHOOT_TYPES.length] + " 촬영을 문의드립니다. 잘 부탁드립니다.")
-                    .isRead(i % 3 == 0).createdAt(inqTime)
+                    .isRead(i % 3 == 0)
+                    .processStatus(InquiryProcessStatus.values()[i % InquiryProcessStatus.values().length])
+                    .createdAt(inqTime)
                     .build());
         }
 
@@ -109,6 +128,10 @@ public class DataInitializer implements ApplicationRunner {
                     .title(seriesTitles[i]).description(seriesTitles[i] + " 시리즈입니다.")
                     .coverImageUrl("https://picsum.photos/seed/series" + i + "/600/400")
                     .displayOrder(i + 1)
+                    .likesCount(i * 11 + 15).viewCount(i * 23 + 40)
+                    .shootType(SHOOT_TYPES[i % SHOOT_TYPES.length])
+                    .draft(i == 7)
+                    .featuredAt(i == 1 || i == 4 ? LocalDateTime.now().minusDays(i) : null)
                     .member(author).build();
             series.getSeriesPhotos().add(SeriesPhoto.builder()
                     .series(series).photo(photos.get(i * 3 % photos.size())).displayOrder(0).build());
@@ -309,6 +332,232 @@ public class DataInitializer implements ApplicationRunner {
                     .targetId((long) (i + 1))
                     .details(logData[i][2])
                     .build());
+        }
+
+        seedComments(photos, users);
+        seedGatherings(users, wm);
+        seedSecurityAudit(users, wm);
+        seedProfileContent(users, wm);
+        seedNewsletter(users);
+        seedTransactions(users, wm);
+        seedMemberModeration(users, wm, sa);
+    }
+
+    private void seedMemberModeration(List<Member> users, Member wm, Member sa) {
+        Member expired = users.get(5);
+        expired.setStatus(MemberStatus.SUSPENDED);
+        expired.setSuspendReason("스팸 댓글 반복");
+        expired.setSuspendedAt(LocalDateTime.now().minusDays(7));
+        expired.setSuspendUntil(LocalDateTime.now().minusMinutes(5));
+        expired.setSuspendedById(wm.getId());
+        memberRepository.save(expired);
+
+        Member ending = users.get(6);
+        ending.setStatus(MemberStatus.SUSPENDED);
+        ending.setSuspendReason("허위 후기 작성");
+        ending.setSuspendedAt(LocalDateTime.now().minusDays(1));
+        ending.setSuspendUntil(LocalDateTime.now().plusDays(2));
+        ending.setSuspendedById(sa.getId());
+        memberRepository.save(ending);
+
+        Member withdrawn = users.get(8);
+        withdrawn.setStatus(MemberStatus.DELETED);
+        memberRepository.save(withdrawn);
+
+        adminMemberNoteRepository.save(AdminMemberNote.builder().memberId(ending.getId())
+                .adminId(sa.getId()).adminName(sa.getName())
+                .content("후기 3건 중 2건이 같은 IP에서 작성됨. 해제 후 재발 시 영구 정지 검토.")
+                .createdAt(LocalDateTime.now().minusDays(1)).build());
+        activityLogRepository.save(AdminActivityLog.builder().adminId(sa.getId()).adminName(sa.getName())
+                .action("MEMBER_SUSPEND").targetType("MEMBER").targetId(ending.getId())
+                .details(ending.getName() + ": ACTIVE → SUSPENDED · 3일 · 사유: 허위 후기 작성")
+                .createdAt(LocalDateTime.now().minusDays(1)).build());
+    }
+
+    private void seedTransactions(List<Member> users, Member wm) {
+        String[] meetStatuses = {"PENDING", "NEGOTIATING", "CONFIRMED", "COMPLETED", "CANCELLED", "PENDING", "NEGOTIATING", "CONFIRMED"};
+        int[] idleDays = {12, 9, 1, 3, 5, 2, 15, 0};
+        for (int i = 0; i < meetStatuses.length; i++) {
+            LocalDateTime updated = LocalDateTime.now().minusDays(idleDays[i]);
+            meetRepository.save(Meet.builder()
+                    .requesterId(users.get(i % users.size()).getId())
+                    .receiverId(i % 2 == 0 ? wm.getId() : users.get((i + 1) % users.size()).getId())
+                    .status(meetStatuses[i])
+                    .confirmedDate("CONFIRMED".equals(meetStatuses[i]) ? LocalDate.now().plusDays(i + 2) : null)
+                    .createdAt(updated.minusDays(3)).updatedAt(updated).build());
+        }
+        Object[][] deliveries = {
+            {"웨딩 본식 원본", "김지현", "PENDING", 2}, {"프로필 보정본", "박도윤", "APPROVED", 20},
+            {"가족 야외 셀렉", "이수아", "PENDING", -1}, {"브랜드 룩북", "브랜드 스튜디오 N", "REJECTED", 10},
+            {"돌잔치 스냅", "최민지", "PENDING", 12},
+        };
+        for (int i = 0; i < deliveries.length; i++) {
+            LocalDateTime created = LocalDateTime.now().minusDays(7 + i);
+            deliverySetRepository.save(DeliverySet.builder()
+                    .memberId(i % 2 == 0 ? wm.getId() : users.get(i).getId())
+                    .title((String) deliveries[i][0]).clientName((String) deliveries[i][1])
+                    .status((String) deliveries[i][2])
+                    .expiresAt(LocalDateTime.now().plusDays((Integer) deliveries[i][3]))
+                    .viewedAt(i % 2 == 0 ? created.plusDays(1) : null)
+                    .approvedAt("APPROVED".equals(deliveries[i][2]) ? created.plusDays(2) : null)
+                    .createdAt(created).build());
+        }
+    }
+
+    private void seedNewsletter(List<Member> users) {
+        for (int i = 0; i < users.size(); i++) {
+            Member m = users.get(i);
+            LocalDateTime subscribed = LocalDateTime.now().minusDays(i * 6L + 1);
+            newsletterSubscriberRepository.save(NewsletterSubscriber.builder()
+                    .memberId(m.getId()).email(m.getEmail())
+                    .token(java.util.UUID.randomUUID().toString().replace("-", ""))
+                    .subscribedAt(subscribed)
+                    .unsubscribedAt(i % 4 == 3 ? subscribed.plusDays(2) : null)
+                    .build());
+        }
+    }
+
+    private void seedProfileContent(List<Member> users, Member wm) {
+        Member[] authors = {wm, users.get(0), users.get(1), users.get(2)};
+        String[][] reviews = {
+            {"김지현", "신부", "2026.09", "결혼식 스냅 너무 만족스러워요. 자연스러운 표정을 잘 잡아주셨어요."},
+            {"박도윤", "스타트업 대표", "2026.08", "프로필 촬영 친절하게 디렉팅해주셔서 편했습니다."},
+            {"익명", "고객", "2026.10", "최고!!! 무조건 여기서 찍으세요 ★★★★★ 할인코드 HAPPY50 (외부 링크 bit.ly/xx)"},
+            {"이수아", "가족", "2026.07", "아이들 사진이 정말 따뜻하게 나왔어요."},
+        };
+        for (int i = 0; i < reviews.length; i++) {
+            testimonialRepository.save(Testimonial.builder().memberId(authors[i].getId())
+                    .clientName(reviews[i][0]).clientRole(reviews[i][1]).shootDate(reviews[i][2]).content(reviews[i][3])
+                    .featured(i == 0).seriesId(i == 1 ? 2L : null)
+                    .createdAt(LocalDateTime.now().minusDays(i * 3L)).build());
+        }
+        Object[][] packages = {{"베이직 프로필", 150000, null}, {"웨딩 본식 스냅", null, "문의 필요"}, {"가족 야외 촬영", 300000, null}};
+        for (int i = 0; i < packages.length; i++) {
+            pricingPackageRepository.save(PricingPackage.builder().memberId(authors[i].getId())
+                    .name((String) packages[i][0]).price((Integer) packages[i][1]).priceLabel((String) packages[i][2])
+                    .description("보정본 20장 · 원본 전체 제공").features("[\"보정 20장\",\"원본 제공\"]")
+                    .featured(i == 0).active(i != 2)
+                    .createdAt(LocalDateTime.now().minusDays(i * 5L)).build());
+        }
+        pressFeatureRepository.save(PressFeature.builder().memberId(wm.getId()).publication("월간 사진")
+                .title("빛을 기록하는 사람들").publishedDate("2026.05").url("https://example.com/press/1")
+                .createdAt(LocalDateTime.now().minusDays(20)).build());
+        pressFeatureRepository.save(PressFeature.builder().memberId(users.get(1).getId()).publication("디자인 매거진")
+                .title("신진 작가 인터뷰").publishedDate("2026.08").createdAt(LocalDateTime.now().minusDays(4)).build());
+        String[][] achievements = {{"AWARD", "서울 사진 공모전 금상", "서울시", "서울", "2025.11"},
+                {"EXHIBITION", "개인전 「여름의 끝」", "갤러리 담", "종로", "2026.08"}};
+        for (int i = 0; i < achievements.length; i++) {
+            achievementRepository.save(Achievement.builder().memberId(authors[i].getId())
+                    .type(achievements[i][0]).title(achievements[i][1]).organizer(achievements[i][2])
+                    .location(achievements[i][3]).yearMonth(achievements[i][4])
+                    .createdAt(LocalDateTime.now().minusDays(i * 7L + 2)).build());
+        }
+        String[] brands = {"카페 오후", "브랜드 스튜디오 N", "한빛 웨딩홀"};
+        for (int i = 0; i < brands.length; i++) {
+            clientBrandRepository.save(ClientBrand.builder().memberId(authors[i].getId()).name(brands[i])
+                    .logoUrl("https://picsum.photos/seed/brand" + i + "/120/120").displayOrder(i)
+                    .createdAt(LocalDateTime.now().minusDays(i)).build());
+        }
+    }
+
+    private void seedSecurityAudit(List<Member> users, Member wm) {
+        String[] uris = {"GET /api/admin/reports", "PUT /api/admin/series/3/featured", "GET /api/admin/members", "DELETE /api/admin/photos/12"};
+        for (int i = 0; i < 36; i++) {
+            LocalDateTime at = LocalDateTime.now().minusMinutes(i * 47L);
+            SecurityAuditLog.SecurityAuditLogBuilder b = SecurityAuditLog.builder().createdAt(at);
+            switch (i % 6) {
+                case 0, 3 -> b.actionType("LOGIN_FAILURE").success(false)
+                        .actionDetail("email=" + (i % 4 == 0 ? "ad***@happiness.dev" : "us***@test.com"))
+                        .ipAddress(i % 4 == 0 ? "203.0.113.45" : "198.51.100." + (i % 3 + 7));
+                case 1, 4 -> {
+                    Member m = users.get(i % users.size());
+                    b.actionType("LOGIN_SUCCESS").success(true).memberId(m.getId())
+                            .ipAddress("10.0.0." + (i % 20 + 2)).actionDetail("ip=10.0.0." + (i % 20 + 2));
+                }
+                case 2 -> b.actionType("ADMIN_API").success(true).memberId(wm.getId()).role("WM")
+                        .ipAddress("10.0.0.2").actionDetail(uris[i % uris.length]);
+                default -> b.actionType("SERVICE").memberId(users.get(i % users.size()).getId())
+                        .success(i % 5 != 0).actionDetail("deleteAccount")
+                        .errorMessage(i % 5 != 0 ? null : "비밀번호가 일치하지 않습니다.");
+            }
+            securityAuditLogRepository.save(b.build());
+        }
+    }
+
+    private void seedComments(List<Photo> photos, List<Member> users) {
+        String[] bodies = {"색감이 정말 따뜻하네요!", "구도가 인상적이에요.", "어떤 렌즈로 찍으셨나요?", "이런 분위기 너무 좋아요",
+                "빛 표현이 예술입니다", "광고 문의는 DM 주세요 www.spam-example.com", "다음 작업도 기대할게요", "보정 팁 공유해주실 수 있나요?"};
+        for (int i = 0; i < 16; i++) {
+            Member writer = users.get(i % users.size());
+            Comment parent = commentRepository.save(Comment.builder()
+                    .photoId(photos.get(i % 8).getId()).memberId(writer.getId()).memberName(writer.getName())
+                    .content(bodies[i % bodies.length])
+                    .createdAt(LocalDateTime.now().minusHours(i * 5L))
+                    .build());
+            if (i % 3 == 0) {
+                Member replier = users.get((i + 3) % users.size());
+                commentRepository.save(Comment.builder()
+                        .photoId(parent.getPhotoId()).memberId(replier.getId()).memberName(replier.getName())
+                        .content("저도 같은 생각이에요 :)").parentId(parent.getId())
+                        .createdAt(parent.getCreatedAt().plusMinutes(30))
+                        .build());
+            }
+        }
+    }
+
+    private void seedGatherings(List<Member> users, Member wm) {
+        Object[][] data = {
+            {"한강 노을 출사", "여의도 한강공원", "골든아워 실루엣", "RECRUITING", 10},
+            {"성수동 스트리트 스냅", "성수역 3번 출구", "스트리트 · 흑백", "RECRUITMENT_CLOSED", 8},
+            {"북촌 한옥 인물 촬영", "북촌한옥마을", "자연광 인물", "SCHEDULED", 6},
+            {"서울숲 가을 출사", "서울숲 정문", "단풍 · 역광", "ONGOING", 12},
+            {"을지로 야경 출사", "을지로3가역", "네온 · 장노출", "ENDED", 8},
+            {"제주 오름 일출 출사", "용눈이오름", "일출 · 풍경", "ENDED", 15},
+        };
+        int[] dayOffsets = {10, 5, 3, 0, -7, -20};
+        String[] postBodies = {"오늘 모임 덕분에 좋은 사진 많이 건졌어요!", "다음에도 꼭 참여할게요 📸",
+                "보정 전후 비교 올려봅니다", "단톡방 링크 여기 있어요 bit.ly/xxxx (홍보 아님)"};
+        for (int i = 0; i < data.length; i++) {
+            LocalDateTime start = LocalDateTime.now().plusDays(dayOffsets[i]).withHour(17).withMinute(0).withSecond(0).withNano(0);
+            Member host = i == 0 ? wm : users.get(i);
+            Gathering g = gatheringRepository.save(Gathering.builder()
+                    .title((String) data[i][0]).location((String) data[i][1]).shootTheme((String) data[i][2])
+                    .status((String) data[i][3]).maxParticipants((Integer) data[i][4])
+                    .description(data[i][0] + " — 함께 찍고 서로 피드백해요.")
+                    .thumbnailUrl("https://picsum.photos/seed/gathering" + i + "/600/400")
+                    .startDateTime(start).endDateTime(start.plusHours(3))
+                    .recruitmentEndDateTime(start.minusDays(2))
+                    .createdBy(host.getId())
+                    .createdAt(start.minusDays(14))
+                    .build());
+            int joined = Math.min((Integer) data[i][4], 3 + i);
+            for (int j = 0; j < joined; j++) {
+                gatheringParticipantRepository.save(GatheringParticipant.builder()
+                        .gatheringId(g.getId()).memberId(users.get((i + j) % users.size()).getId())
+                        .status(j == joined - 1 && i % 2 == 0 ? "WAITING" : "PARTICIPATING").build());
+            }
+            if (!"ENDED".equals(data[i][3]) && !"ONGOING".equals(data[i][3])) continue;
+            for (int k = 0; k < postBodies.length; k++) {
+                Member writer = users.get((i + k) % users.size());
+                GatheringPost post = gatheringPostRepository.save(GatheringPost.builder()
+                        .gatheringId(g.getId()).memberId(writer.getId()).memberName(writer.getName())
+                        .content(postBodies[k]).hashtags(k == 0 ? "#출사 #모임" : null)
+                        .createdAt(start.plusHours(4 + k))
+                        .build());
+                for (int n = 0; n < (k % 3); n++) {
+                    gatheringPhotoRepository.save(GatheringPhoto.builder()
+                            .gatheringPostId(post.getId()).sortOrder(n)
+                            .imageUrl("https://picsum.photos/seed/gpost" + post.getId() + "_" + n + "/400/400").build());
+                }
+                for (int n = 0; n < k + 1; n++) {
+                    gatheringPostLikeRepository.save(GatheringPostLike.builder()
+                            .gatheringPostId(post.getId()).memberId(users.get(n).getId()).build());
+                }
+                if (k % 2 == 0) {
+                    gatheringPostCommentRepository.save(GatheringPostComment.builder()
+                            .gatheringPostId(post.getId()).memberId(users.get(k).getId()).build());
+                }
+            }
         }
     }
 

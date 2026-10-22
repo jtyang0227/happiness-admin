@@ -1,0 +1,56 @@
+.pl-inspect { margin-left: auto; }
+
+.pl-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 1.6fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+.pl-kpi, .pl-integrity {
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-ring);
+  padding: var(--space-4) var(--space-5);
+  border: 2px solid transparent;
+}
+.pl-kpi--alert { border-color: var(--color-warning); }
+.pl-kpi-value { font-size: var(--text-2xl); font-weight: var(--fw-bold); color: var(--color-text-primary); }
+.pl-kpi-small { font-size: var(--text-lg); line-height: 1.6; }
+.pl-kpi-label { font-size: var(--text-xs); color: var(--color-text-tertiary); margin-top: 2px; }
+
+.pl-integrity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-secondary);
+}
+.pl-integrity svg { flex-shrink: 0; vertical-align: -3px; margin-right: 4px; }
+.pl-integrity.ok { border-color: var(--color-success); color: var(--color-success); }
+.pl-integrity.broken { border-color: var(--color-danger); color: var(--color-danger); }
+
+.pl-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+}
+
+.pl-mono { font-family: var(--font-mono); font-size: var(--text-xs); }
+.pl-row-export td { background: var(--color-warning-bg); }
+.pl-subject { color: var(--color-text-secondary); font-weight: var(--fw-semibold); text-decoration: none; }
+.pl-subject:hover { color: var(--color-brand); }
+.pl-detail { max-width: 360px; white-space: normal; }
+.pl-reason { color: var(--color-text-primary); font-weight: var(--fw-medium); }
+.pl-detail-text { font-size: var(--text-xs); color: var(--color-text-tertiary); }
+
+@media (max-width: 1100px) {
+  .pl-summary { grid-template-columns: repeat(2, 1fr); }
+  .pl-integrity { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+  .pl-inspect { margin-left: 0; }
+}

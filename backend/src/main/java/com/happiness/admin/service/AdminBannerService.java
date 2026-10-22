@@ -29,8 +29,8 @@ public class AdminBannerService {
                 .mapToInt(Banner::getDisplayOrder).max().orElse(0);
         Banner banner = Banner.builder()
                 .title(req.getTitle())
-                .imageUrl(req.getImageUrl())
-                .linkUrl(req.getLinkUrl())
+                .imageUrl(com.happiness.admin.util.UrlSafety.requireSafeImage(req.getImageUrl(), "이미지"))
+                .linkUrl(com.happiness.admin.util.UrlSafety.requireSafeLink(req.getLinkUrl(), "링크"))
                 .isActive(req.isActive())
                 .displayOrder(maxOrder + 1)
                 .startsAt(req.getStartsAt())
@@ -44,8 +44,8 @@ public class AdminBannerService {
         Banner banner = bannerRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("배너를 찾을 수 없습니다."));
         banner.setTitle(req.getTitle());
-        banner.setImageUrl(req.getImageUrl());
-        banner.setLinkUrl(req.getLinkUrl());
+        banner.setImageUrl(com.happiness.admin.util.UrlSafety.requireSafeImage(req.getImageUrl(), "이미지"));
+        banner.setLinkUrl(com.happiness.admin.util.UrlSafety.requireSafeLink(req.getLinkUrl(), "링크"));
         banner.setActive(req.isActive());
         banner.setStartsAt(req.getStartsAt());
         banner.setEndsAt(req.getEndsAt());
