@@ -155,6 +155,7 @@ React SPA using React Router v7 (라이브러리 모드, v6와 같은 `BrowserRo
 
 ## 자동화 · MCP · 스킬
 
+- **`.mcp.json`**(project scope, 팀 공유) — 외부 MCP 서버 3개: `github`(공식 원격 HTTP, PAT 헤더), `jenkins`(`uvx --with "mcp<2" jenkins-mcp@0.1.1` — 0.1.1이 의존성을 고정하지 않아 `mcp` 2.x에서 기동 실패하므로 `mcp<2` 고정 필수), `playwright`(`npx @playwright/mcp@latest`). 비밀값은 `${VAR}`로만 참조, 목록은 `.env.example`(`.env`는 gitignore). Claude Code는 `.env`를 자동으로 읽지 않으므로 `set -a; source .env; set +a` 후 `claude` 실행. Jenkins `trigger_build`는 `.claude/settings.json`의 `ask`로 항상 확인을 거친다(조회 도구 2개만 `allow`).
 - **`happiness-admin-mcp-server/`** — Node/TypeScript MCP 서버(stdio). 읽기 전용 도구(`happiness_admin_get_dashboard_summary`, `_list_reports`, `_list_members`) + AI 트리아지 트리거(`_run_report_ai_triage`)만 제공한다 — 회원 정지·삭제 같은 조치성 API는 의도적으로 노출하지 않음(실제 조치는 항상 Admin UI에서 사람이). `HAPPINESS_ADMIN_EMAIL`/`_PASSWORD`로 백엔드에 로그인해 JWT를 내부적으로 관리한다. 상세: `happiness-admin-mcp-server/README.md`.
 - **`.claude/hooks/notify-page-change.sh`** (Stop 훅) — `frontend/src/pages/**/*.jsx|css`가 바뀐 채로 턴이 끝나면 멈추지 않고 "agent-browser로 스크린샷 찍고 Gmail로 알려라"는 지시를 다시 넣는다. 같은 미완료 변경은 diff 해시 마커(`.claude/.page-change-notify-marker`, gitignore 처리)로 중복 알림 방지.
 - **`scripts/qa-check.sh`** — agent-browser로 로그인 후 전체 라우트를 순회하며 콘솔 에러·5xx·스크린샷을 점검. 새 라우트를 추가하면 이 스크립트의 `ROUTES` 배열도 수동으로 같이 갱신해야 한다(자동 동기화 안 됨).

@@ -18,7 +18,12 @@
       "Bash(cat backend/build.gradle)",
       "Bash(PATH=*/.nvm/versions/node/*/bin:$PATH npm run build)",
       "Bash(PATH=*/.nvm/versions/node/*/bin:$PATH npm run test -- --watchAll=false*)",
-      "Bash(PATH=*/.nvm/versions/node/*/bin:$PATH npx eslint frontend/src*)"
+      "Bash(PATH=*/.nvm/versions/node/*/bin:$PATH npx eslint frontend/src*)",
+      "mcp__jenkins__list_jobs",
+      "mcp__jenkins__get_build_status"
+    ],
+    "ask": [
+      "mcp__jenkins__trigger_build"
     ]
   },
   "hooks": {

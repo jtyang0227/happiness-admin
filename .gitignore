@@ -18,6 +18,11 @@ build/
 # application-prod.properties 는 env var 참조만 포함하므로 커밋 허용
 # 실제 시크릿은 Railway/GitHub Secrets 에서 주입
 
+# Local secrets (MCP 서버 토큰 등 — 템플릿은 .env.example)
+.env
+.env.local
+.env.*.local
+
 # Node
 node_modules/
 dist/
