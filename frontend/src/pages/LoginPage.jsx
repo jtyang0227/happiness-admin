@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Sparkles } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { postApi } from '../utils/api';
+import logo from '../assets/logo.png';
 import './LoginPage.css';
 
 const LoginPage = () => {
@@ -10,6 +11,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [idleNotice] = useState(() => new URLSearchParams(window.location.search).get('reason') === 'idle');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -20,7 +22,7 @@ const LoginPage = () => {
     setLoading(true);
     try {
       const res = await postApi('/auth/login', { email, password });
-      login({ name: res.name, email: res.email, authority: res.authority }, res.token);
+      login({ memberId: res.memberId, name: res.name, email: res.email, authority: res.authority }, res.token);
       navigate('/');
     } catch (err) {
       setError(err.message || '로그인에 실패했습니다.');
@@ -32,8 +34,8 @@ const LoginPage = () => {
   return (
     <div className="login-page">
       <div className="login-card">
-        <div className="login-logo"><Sparkles size={28} /></div>
-        <h1 className="login-title">Happiness Admin</h1>
+        <div className="login-logo"><img src={logo} alt="hapis" className="login-logo-img" /></div>
+        <h1 className="sr-only">hapis Admin</h1>
         <p className="login-subtitle">관리자 계정으로 로그인하세요</p>
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
@@ -61,6 +63,7 @@ const LoginPage = () => {
               </button>
             </div>
           </div>
+          {idleNotice && !error && <div className="login-notice" role="status">30분 동안 사용하지 않아 안전을 위해 로그아웃되었습니다.</div>}
           {error && <div className="login-error" role="alert" aria-live="polite">{error}</div>}
           <button type="submit" className="login-btn" disabled={loading}>
             {loading ? '로그인 중...' : '로그인'}

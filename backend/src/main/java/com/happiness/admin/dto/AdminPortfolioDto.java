@@ -32,9 +32,13 @@ public class AdminPortfolioDto {
     private LocalDateTime createdAt;
 
     public static AdminPortfolioDto from(Portfolio p) {
+        int photos = (int) p.getItems().stream().filter(i -> "PHOTO".equals(i.getItemType())).count();
+        int series = (int) p.getItems().stream().filter(i -> "SERIES".equals(i.getItemType())).count();
+        return from(p, photos, series);
+    }
+
+    public static AdminPortfolioDto from(Portfolio p, int photoCount, int seriesCount) {
         String[] codes = CategoryCode.parse(p.getCategoryCode());
-        int photos  = (int) p.getItems().stream().filter(i -> "PHOTO".equals(i.getItemType())).count();
-        int series  = (int) p.getItems().stream().filter(i -> "SERIES".equals(i.getItemType())).count();
         return AdminPortfolioDto.builder()
                 .id(p.getId())
                 .title(p.getTitle())
@@ -52,8 +56,8 @@ public class AdminPortfolioDto {
                 .likesCount(p.getLikesCount())
                 .pinned(p.isPinned())
                 .adminNote(p.getAdminNote())
-                .photoCount(photos)
-                .seriesCount(series)
+                .photoCount(photoCount)
+                .seriesCount(seriesCount)
                 .reviewedAt(p.getReviewedAt())
                 .createdAt(p.getCreatedAt())
                 .build();

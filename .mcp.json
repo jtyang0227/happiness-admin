@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer ${GITHUB_PAT}"
+      }
+    },
+    "jenkins": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["--with", "mcp<2", "jenkins-mcp@0.1.1"],
+      "env": {
+        "JENKINS_URL": "${JENKINS_URL}",
+        "JENKINS_USERNAME": "${JENKINS_USERNAME}",
+        "JENKINS_PASSWORD": "${JENKINS_PASSWORD}",
+        "JENKINS_USE_API_TOKEN": "${JENKINS_USE_API_TOKEN:-true}"
+      }
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    }
+  }
+}

@@ -1,5 +1,6 @@
 package com.happiness.admin.entity;
 
+import com.happiness.admin.privacy.EncryptedStringConverter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -48,7 +49,9 @@ public class Member {
     @Column(nullable = true)
     private String providerId;
 
+    /** Admin 전용 컬럼(App 엔티티에 없음) — AES-GCM 암호화 저장. 평문 100자 상한이면 암호문이 500자 안에 들어간다. */
     @Column(nullable = true, length = 500)
+    @Convert(converter = EncryptedStringConverter.class)
     private String suspendReason;
 
     @Column(nullable = true)

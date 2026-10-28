@@ -5,6 +5,7 @@ import com.happiness.admin.entity.BookingStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -30,11 +31,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("""
         SELECT b.shootDate, COUNT(b)
         FROM Booking b
-        WHERE YEAR(b.shootDate) = :year AND MONTH(b.shootDate) = :month
+        WHERE b.shootDate BETWEEN :from AND :to
         GROUP BY b.shootDate
         ORDER BY b.shootDate ASC
         """)
-    List<Object[]> countByDay(@Param("year") int year, @Param("month") int month);
+    List<Object[]> countByDayBetween(@Param("from") LocalDate from, @Param("to") LocalDate to);
 
     @Query("""
         SELECT b FROM Booking b
@@ -58,4 +59,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
         @Param("status") BookingStatus status,
         Pageable pageable
     );
+
+    @Modifying
+    @Query("DELETE FROM Booking b WHERE b.photographer.id = :memberId OR b.client.id = :memberId")
+    int deleteByMember(@Param("memberId") Long memberId);
 }

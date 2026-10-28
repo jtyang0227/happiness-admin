@@ -7,12 +7,15 @@ import Pagination from '../components/common/Pagination';
 import './InquiryListPage.css';
 
 const SHOOT_TYPES = ['웨딩', '가족', '프로필', '스냅', '바디프로필', '커플'];
+const PROCESS_STATUS_LABELS = { NEW: '신규', IN_PROGRESS: '처리중', RESOLVED: '완료', ON_HOLD: '보류' };
+const PROCESS_STATUS_BADGES = { NEW: 'badge-red', IN_PROGRESS: 'badge-yellow', RESOLVED: 'badge-green', ON_HOLD: 'badge-draft' };
 
 const InquiryListPage = () => {
   const { confirm } = useConfirm();
   const [data, setData] = useState({ content: [], totalPages: 0, totalElements: 0 });
   const [isRead, setIsRead] = useState('');
   const [shootType, setShootType] = useState('');
+  const [processStatus, setProcessStatus] = useState('');
   const [page, setPage] = useState(0);
   const [expanded, setExpanded] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -22,10 +25,11 @@ const InquiryListPage = () => {
     const params = new URLSearchParams({ page, size: 20 });
     if (isRead !== '') params.set('isRead', isRead);
     if (shootType) params.set('shootType', shootType);
+    if (processStatus) params.set('processStatus', processStatus);
     getApi(`/admin/inquiries?${params}`)
       .then(setData)
       .finally(() => setLoading(false));
-  }, [page, isRead, shootType]);
+  }, [page, isRead, shootType, processStatus]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -33,6 +37,16 @@ const InquiryListPage = () => {
     try {
       await patchApi(`/admin/inquiries/${id}/read`, {});
       toast.success('읽음 처리되었습니다.');
+      fetchData();
+    } catch {
+      toast.error('처리에 실패했습니다.');
+    }
+  };
+
+  const handleProcessStatusChange = async (id, status) => {
+    try {
+      await patchApi(`/admin/inquiries/${id}/process-status`, { processStatus: status });
+      toast.success('처리 상태가 변경되었습니다.');
       fetchData();
     } catch {
       toast.error('처리에 실패했습니다.');
@@ -95,6 +109,10 @@ const InquiryListPage = () => {
           <option value="">전체 촬영 종류</option>
           {SHOOT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
         </select>
+        <select className="filter-select" value={processStatus} onChange={e => { setProcessStatus(e.target.value); setPage(0); }}>
+          <option value="">전체 처리 상태</option>
+          {Object.entries(PROCESS_STATUS_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+        </select>
       </div>
 
       <div className="table-card">
@@ -132,6 +150,9 @@ const InquiryListPage = () => {
                     <td>
                       <span className={`badge ${readStatus ? 'badge-green' : 'badge-red'}`}>
                         {readStatus ? '읽음' : '미읽음'}
+                      </span>{' '}
+                      <span className={`badge ${PROCESS_STATUS_BADGES[i.processStatus] || 'badge-draft'}`}>
+                        {PROCESS_STATUS_LABELS[i.processStatus] || i.processStatus}
                       </span>
                     </td>
                     <td onClick={e => e.stopPropagation()} className="action-cell">
@@ -145,6 +166,16 @@ const InquiryListPage = () => {
                     <tr>
                       <td colSpan="9" className="inquiry-detail">
                         <div className="inquiry-message">{i.message}</div>
+                        <div className="inquiry-process-row" onClick={e => e.stopPropagation()}>
+                          <span className="inquiry-process-label">처리 상태</span>
+                          <select
+                            className={`role-select badge ${PROCESS_STATUS_BADGES[i.processStatus] || 'badge-draft'}`}
+                            value={i.processStatus}
+                            onChange={e => handleProcessStatusChange(i.id, e.target.value)}
+                          >
+                            {Object.entries(PROCESS_STATUS_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                          </select>
+                        </div>
                       </td>
                     </tr>
                   )}

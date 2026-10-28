@@ -15,4 +15,6 @@ public class SystemStatusDto {
     private String rateLimitRefillSeconds;
     private String dbType;
     private String activeProfile;
+    private boolean geminiConfigured;
+    private String geminiModel;
 }

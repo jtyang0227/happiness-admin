@@ -8,7 +8,8 @@
 .slideover {
   position: fixed; top: 0; right: 0; bottom: 0;
   background: var(--color-surface);
-  box-shadow: var(--shadow-modal);
+  border-left: none;
+  box-shadow: var(--shadow-xl);
   z-index: var(--z-modal);
   display: flex; flex-direction: column;
   animation: soSlideIn var(--dur-slow) var(--ease-spring);
@@ -40,18 +41,34 @@
   background: var(--color-surface);
 }
 
+.slideover-backdrop.closing {
+  animation: soFadeOut var(--dur-normal) var(--ease-out);
+}
+
+.slideover.closing {
+  animation: soSlideOut var(--dur-normal) var(--ease-out);
+}
+
 @keyframes soFadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
+}
+@keyframes soFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }
 @keyframes soSlideIn {
   from { transform: translateX(100%); }
   to   { transform: translateX(0); }
 }
+@keyframes soSlideOut {
+  from { transform: translateX(0); }
+  to   { transform: translateX(100%); }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .slideover { animation: none; }
-  .slideover-backdrop { animation: none; }
+  .slideover, .slideover.closing { animation-duration: 1ms; }
+  .slideover-backdrop, .slideover-backdrop.closing { animation-duration: 1ms; }
 }
 
 /* Slideover internal layout helpers */

@@ -1,6 +1,7 @@
 # Happiness Admin — 회원 관리 기능 기획서
 
 > 버전: 1.0  
+> ⚠️ 구현 현황 표는 2026-06 기준으로 낡았다 — 최신 상태와 2차 개선은 `MEMBER_MGMT_V2_PLAN.md` 참고.  
 > 작성일: 2026-06-26  
 > 담당 페이지: `/members`, `/members/:id`  
 > 연관 문서: `APP_ADMIN_SPEC.md` (P0 회원상태관리 / P0 회원상세), `COSMOS_DESIGN_SPEC.md`

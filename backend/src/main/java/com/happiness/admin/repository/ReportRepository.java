@@ -6,12 +6,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
-    @Query("SELECT r FROM Report r WHERE " +
+    @Query("SELECT r FROM Report r LEFT JOIN FETCH r.reporter WHERE " +
            "(:status IS NULL OR r.status = :status) AND " +
            "(:targetType IS NULL OR r.targetType = :targetType)")
     Page<Report> searchReports(@Param("status") String status,
@@ -19,4 +22,12 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
                                Pageable pageable);
 
     long countByStatus(String status);
+
+    @Query("SELECT r FROM Report r WHERE r.status IN ('PENDING', 'IN_REVIEW') " +
+           "AND r.aiAnalyzedAt IS NULL ORDER BY r.createdAt ASC")
+    List<Report> findPendingWithoutAiTriage(Pageable pageable);
+
+    @Modifying
+    @Query("UPDATE Report r SET r.reporter = null WHERE r.reporter.id = :memberId")
+    int clearReporter(@Param("memberId") Long memberId);
 }

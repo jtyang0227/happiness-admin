@@ -27,6 +27,43 @@ public class AdminMemberController {
         return ResponseEntity.ok(memberService.getMembers(search, authority, status, page, size));
     }
 
+    @GetMapping("/summary")
+    public ResponseEntity<?> summary() {
+        return ResponseEntity.ok(memberService.getSummary());
+    }
+
+    @PostMapping("/export")
+    public ResponseEntity<?> export(@RequestBody(required = false) Map<String, String> filter) {
+        Map<String, String> f = filter != null ? filter : Map.of();
+        return ResponseEntity.ok(memberService.exportMembers(f.get("search"), f.get("authority"), f.get("status"), f.get("reason")));
+    }
+
+    @PostMapping("/{id}/reveal")
+    public ResponseEntity<?> reveal(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        return ResponseEntity.ok(memberService.revealContact(id, body.get("reason")));
+    }
+
+    @GetMapping("/{id}/history")
+    public ResponseEntity<?> history(@PathVariable Long id) {
+        return ResponseEntity.ok(memberService.getHistory(id));
+    }
+
+    @GetMapping("/{id}/notes")
+    public ResponseEntity<?> notes(@PathVariable Long id) {
+        return ResponseEntity.ok(memberService.getNotes(id));
+    }
+
+    @PostMapping("/{id}/notes")
+    public ResponseEntity<?> addNote(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        return ResponseEntity.ok(memberService.addNote(id, body.get("content")));
+    }
+
+    @DeleteMapping("/{id}/notes/{noteId}")
+    public ResponseEntity<?> deleteNote(@PathVariable Long id, @PathVariable Long noteId) {
+        memberService.deleteNote(id, noteId);
+        return ResponseEntity.ok(Map.of("message", "메모가 삭제되었습니다."));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> detail(@PathVariable Long id) {
         return ResponseEntity.ok(memberService.getMember(id));
@@ -49,6 +86,6 @@ public class AdminMemberController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         memberService.deleteMember(id);
-        return ResponseEntity.ok(Map.of("message", "회원이 삭제되었습니다."));
+        return ResponseEntity.ok(Map.of("message", "회원이 영구 삭제되었습니다."));
     }
 }

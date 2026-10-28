@@ -18,7 +18,12 @@
       "Bash(cat backend/build.gradle)",
       "Bash(PATH=*/.nvm/versions/node/*/bin:$PATH npm run build)",
       "Bash(PATH=*/.nvm/versions/node/*/bin:$PATH npm run test -- --watchAll=false*)",
-      "Bash(PATH=*/.nvm/versions/node/*/bin:$PATH npx eslint frontend/src*)"
+      "Bash(PATH=*/.nvm/versions/node/*/bin:$PATH npx eslint frontend/src*)",
+      "mcp__jenkins__list_jobs",
+      "mcp__jenkins__get_build_status"
+    ],
+    "ask": [
+      "mcp__jenkins__trigger_build"
     ]
   },
   "hooks": {
@@ -39,6 +44,17 @@
           {
             "type": "command",
             "command": "file=\"$CLAUDE_TOOL_RESULT_FILE_PATH\"; if echo \"$file\" | grep -q 'frontend/src'; then echo \"[hook] 프론트엔드 파일 변경 감지: $file\"; fi"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/notify-page-change.sh",
+            "timeout": 15
           }
         ]
       }
